@@ -111,6 +111,7 @@
         "typescript.updateImportsOnFileMove.enabled" = "always";
         "window.customMenuBarAltFocus" = false;
         "window.titleBarStyle" = "custom";
+        "window.zoomLevel" = 0.5;
       };
     };
 }
