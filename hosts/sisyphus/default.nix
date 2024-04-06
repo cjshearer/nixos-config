@@ -93,6 +93,9 @@
     "flakes"
   ];
 
+  nixpkgs.config.allowUnfree = true;
+  programs.steam.enable = true;
+
   environment.gnome.excludePackages = with pkgs; [
     gnome-photos
     gnome-tour
