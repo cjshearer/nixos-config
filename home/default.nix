@@ -1,7 +1,7 @@
 {
   imports = [
     ./programs
-    ./gnomeExtensions.nix
+    ./gnome.nix
   ];
 
   nixpkgs = {

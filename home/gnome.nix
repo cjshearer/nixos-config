@@ -2,6 +2,11 @@
 {
   dconf.enable = true;
   dconf.settings = {
+    # Disable sleep mode while logged in
+    "org/gnome/settings-daemon/plugins/power" = {
+      sleep-inactive-ac-type = "nothing";
+    };
+
     "org/gnome/shell" = {
       enabled-extensions = [
         "pop-shell@system76.com"
