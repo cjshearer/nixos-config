@@ -43,17 +43,17 @@
   };
 
   services.xserver = {
-  # Enable the X11 windowing system.
+    # Enable the X11 windowing system.
     enable = true;
 
-  # Enable the GNOME Desktop Environment.
+    # Enable the GNOME Desktop Environment.
     displayManager.gdm.enable = true;
     desktopManager.gnome.enable = true;
 
     # Disable sleep mode at login screen
     displayManager.gdm.autoSuspend = false;
 
-  # Configure keymap in X11
+    # Configure keymap in X11
     layout = "us";
     xkbVariant = "";
   };
@@ -95,6 +95,11 @@
     "nix-command"
     "flakes"
   ];
+
+  services.tailscale.enable = true;
+  # I don't want to use authkeyfile. It's a workaround for https://github.com/nixos/nixpkgs/issues/276912
+  services.tailscale.authKeyFile = /home/cjshearer/.config/ts-auth-key;
+  services.tailscale.extraUpFlags = [ "--ssh" "--reset" ];
 
   nixpkgs.config.allowUnfree = true;
   programs.steam.enable = true;
