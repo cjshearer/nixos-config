@@ -1,7 +1,11 @@
 {
   imports = [
-    ./programs
+    ./browser.nix
+    ./discord.nix
+    ./email.nix
+    ./git.nix
     ./gnome.nix
+    ./vscode.nix
   ];
 
   nixpkgs = {
