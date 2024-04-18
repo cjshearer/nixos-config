@@ -9,6 +9,7 @@
     ./kitty.nix
     ./mako.nix
     ./rofi.nix
+    ./ssh.nix
     ./vscode.nix
     ./waybar.nix
   ];
