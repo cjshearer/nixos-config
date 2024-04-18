@@ -1,11 +1,16 @@
 {
   imports = [
     ./browser.nix
+    ./cliphist.nix
     ./discord.nix
     ./email.nix
     ./git.nix
-    ./gnome.nix
+    ./hypr.nix
+    ./kitty.nix
+    ./mako.nix
+    ./rofi.nix
     ./vscode.nix
+    ./waybar.nix
   ];
 
   nixpkgs = {
