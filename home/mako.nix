@@ -1,3 +1,1 @@
-{ pkgs, ... }: {
-  services.mako.enable = true;
-}
+{ lib, config, ... }: lib.mkIf config.services.mako.enable { }

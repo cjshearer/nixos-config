@@ -1,6 +1,4 @@
-{ pkgs, ... }: {
-  programs.waybar.enable = true;
-  # https =//nix-community.github.io/home-manager/options.xhtml#opt-programs.waybar.settings
+{ lib, config, pkgs, ... }: lib.mkIf config.programs.waybar.enable {
   # force reload waybar: pkill waybar && hyprctl dispatch exec waybar
   programs.waybar.settings = {
     mainBar = {
@@ -36,33 +34,15 @@
           car = "";
           default = [ "" "" "" ];
         };
-        # TODO: probably need home.packages = [pavucontrol]
-        on-click = "${pkgs.pavucontrol}/bin/pavucontrol";
+        on-click = lib.mkIf config.programs.pavucontrol.enable "${pkgs.pavucontrol}/bin/pavucontrol";
       };
     };
   };
+
+  fonts.fontAwesome.enable = true;
   programs.waybar.style = ''
     * {
       font-family: 'Roboto', 'Font Awesome';
     }
   '';
-
-  ## Font Awesome
-  home.packages = with pkgs; [ font-awesome ];
-  fonts.fontconfig.enable = true;
-
-  ## Hyprland
-  wayland.windowManager.hyprland.settings.exec-once = [ "waybar" ];
-  wayland.windowManager.hyprland.settings = {
-    # https://github.com/librephoenix/nixos-config/blob/e5260a945e77037aa01a49ced7166fb7533152b1/user/wm/hyprland/hyprland.nix#L193
-    # TODO: ensure window floats in correct position
-    "$pavucontrol" = "class:^(pavucontrol)$";
-    windowrulev2 = [
-      "float,$pavucontrol"
-      "size 86% 40%,$pavucontrol"
-      "move 50% 6%,$pavucontrol"
-      "workspace special silent,$pavucontrol"
-      "opacity 0.80,$pavucontrol"
-    ];
-  };
 } 

@@ -1,12 +1,8 @@
-{ inputs
-, pkgs
-, ...
-}: {
+{ inputs, lib, config, pkgs, ... }: lib.mkIf config.programs.vscode.enable {
   home.packages = with pkgs; [ nixpkgs-fmt ];
   nixpkgs.overlays = [ inputs.nix-vscode-extensions.overlays.default ];
   programs.vscode =
     {
-      enable = true;
       package = pkgs.vscodium;
       extensions =
         (with pkgs.vscode-extensions; [

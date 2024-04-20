@@ -1,11 +1,20 @@
-{ pkgs, ... }: {
-  wayland.windowManager.hyprland.enable = true;
+{ lib, config, pkgs, ... }:
+with lib;
+mkIf config.wayland.windowManager.hyprland.enable {
   wayland.windowManager.hyprland.settings = {
     # See https://wiki.hyprland.org/Configuring/Monitors/
     monitor = ",preferred,auto,auto";
 
     # Some default env vars.
     env = "XCURSOR_SIZE,24";
+
+    exec-once = optionals config.services.cliphist.enable [
+      "${pkgs.wl-clipboard}/bin/wl-copy --type text --watch cliphist store"
+      "${pkgs.wl-clipboard}/bin/wl-copy --type image --watch cliphist store"
+    ]
+    ++ optionals config.programs.waybar.enable [
+      "waybar"
+    ];
 
     # For all categories, see https://wiki.hyprland.org/Configuring/Variables/
     input = {
@@ -18,7 +27,7 @@
       kb_rules = "";
 
       follow_mouse = 1;
-      # fix steam menu pop-ups and HD2 mouse not moving camera in-game
+      # fix HD2 mouse not moving camera in-game
       mouse_refocus = false;
 
       touchpad = {
@@ -104,12 +113,6 @@
       sensitivity = -0.5;
     };
 
-    # Example windowrule v1
-    # windowrule = float, ^(kitty)$
-    # Example windowrule v2
-    # windowrulev2 = float,class:^(kitty)$,title:^(kitty)$
-    # See https://wiki.hyprland.org/Configuring/Window-Rules/ for more
-
     # See https://wiki.hyprland.org/Configuring/Keywords/ for more
     "$mainMod" = "SUPER";
 
@@ -136,7 +139,14 @@
       # Scroll through existing workspaces with mainMod + scroll
       "$mainMod, mouse_down, workspace, e+1"
       "$mainMod, mouse_up, workspace, e-1"
-    ] ++ map
+    ]
+    ++ optionals config.services.cliphist.enable [
+      "$mainMod, V, exec, cliphist list | rofi -dmenu | cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy"
+    ]
+    ++ optionals config.programs.rofi.enable [
+      "$mainMod, E, exec, rofi -show drun -show-icons"
+    ]
+    ++ map
       (n: "$mainMod SHIFT, ${toString n}, movetoworkspace, ${toString (
             if n == 0
             then 10
@@ -167,9 +177,19 @@
       ", XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl previous"
     ];
 
-    # fix steam menu pop-ups immediately closing
-    # https://www.reddit.com/r/hyprland/comments/17paps4/issues_with_steam_menu_popups
-    windowrulev2 = [ "stayfocused,class:(steam),title:(^$)" ];
+    # https://wiki.hyprland.org/Configuring/Window-Rules/
+    "$pavucontrol" = "class:^(pavucontrol)$";
+    windowrulev2 = [
+      "float,$pavucontrol"
+      "size 86% 40%,$pavucontrol"
+      "move 50% 6%,$pavucontrol"
+      "workspace special silent,$pavucontrol"
+      "opacity 0.80,$pavucontrol"
+
+      # fix steam menu pop-ups immediately closing
+      # https://www.reddit.com/r/hyprland/comments/17paps4/issues_with_steam_menu_popups
+      "stayfocused,class:(steam),title:(^$)"
+    ];
   };
 
   # https://wiki.hyprland.org/Nix/Hyprland-on-Home-Manager/#fixing-problems-with-themes

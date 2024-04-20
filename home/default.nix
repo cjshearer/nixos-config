@@ -1,15 +1,17 @@
 {
   imports = [
-    ./browser.nix
+    ./chrome.nix
     ./cliphist.nix
     ./discord.nix
-    ./email.nix
+    ./font-awesome.nix
     ./git.nix
     ./hypr.nix
     ./kitty.nix
     ./mako.nix
+    ./pavucontrol.nix
     ./rofi.nix
     ./ssh.nix
+    ./thunderbird.nix
     ./vscode.nix
     ./waybar.nix
   ];

@@ -1,3 +1,1 @@
-{ pkgs, ... }: {
-  programs.kitty.enable = true;
-}
+{ lib, config, ... }: lib.mkIf config.programs.kitty.enable { }

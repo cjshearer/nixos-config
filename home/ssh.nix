@@ -1,9 +1,8 @@
-{ osConfig, ... }: {
-  programs.ssh.enable = true;
+{ systemConfig, lib, config, ... }: lib.mkIf config.programs.ssh.enable {
   programs.ssh.matchBlocks."github.com" = {
     hostname = "ssh.github.com";
     port = 443;
     user = "git";
-    identityFile = [ "~/.ssh/${osConfig.networking.hostName}" ];
+    identityFile = [ "~/.ssh/${systemConfig.hostname}" ];
   };
 }
