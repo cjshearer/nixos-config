@@ -2,6 +2,7 @@
   imports = [
     ./bluetooth.nix
     ./hypr.nix
+    ./onedrive.nix
     ./pipewire.nix
     ./tailscale.nix
     ./tuigreet.nix

@@ -6,6 +6,7 @@
 
   services.greetd.tuigreet.desktop = "Hyprland";
   services.greetd.tuigreet.enable = true;
+  services.onedrive.enable = true;
   services.pipewire.enable = true;
   services.printing.enable = true;
   services.tailscale.enable = true;
