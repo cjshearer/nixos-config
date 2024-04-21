@@ -2,6 +2,7 @@
   imports = [
     ./bluetooth.nix
     ./hypr.nix
+    ./liquidctl.nix
     ./nemo.nix
     ./onedrive.nix
     ./pipewire.nix
