@@ -8,6 +8,7 @@
     ./git.nix
     ./hypr.nix
     ./kitty.nix
+    ./libreoffice.nix
     ./mako.nix
     ./pavucontrol.nix
     ./rofi.nix
