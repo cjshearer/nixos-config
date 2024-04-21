@@ -1,5 +1,6 @@
 {
   imports = [
+    ./blender.nix
     ./chrome.nix
     ./cliphist.nix
     ./discord.nix
