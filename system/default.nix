@@ -6,6 +6,7 @@
     ./nemo.nix
     ./onedrive.nix
     ./pipewire.nix
+    ./syncthing.nix
     ./tailscale.nix
     ./tuigreet.nix
   ];

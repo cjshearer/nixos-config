@@ -11,6 +11,7 @@
   services.onedrive.enable = true;
   services.pipewire.enable = true;
   services.printing.enable = true;
+  services.syncthing.enable = true;
   services.tailscale.enable = true;
 
   time.timeZone = "America/New_York";
