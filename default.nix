@@ -4,5 +4,5 @@ let
   pkgs = import nixpkgs { config = { }; overlays = [ ]; };
 in
 {
-  ideamaker = pkgs.callPackage ./ideamaker.nix { };
+  ideamaker = pkgs.libsForQt5.callPackage ./ideamaker.nix { };
 }
