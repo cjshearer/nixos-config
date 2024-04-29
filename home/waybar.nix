@@ -6,13 +6,9 @@
       position = "top";
       height = 30;
       spacing = 4;
-      modules-left = [
-        "hyprland/workspaces"
-      ];
       modules-center = [
+        "hyprland/workspaces"
         "clock"
-      ];
-      modules-right = [
         "pulseaudio"
       ];
       clock = {
