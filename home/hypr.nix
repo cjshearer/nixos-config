@@ -68,11 +68,9 @@ mkIf config.wayland.windowManager.hyprland.enable {
       "col.shadow" = "rgba(1a1a1aee)";
     };
 
+    # https://wiki.hyprland.org/Configuring/Animations/ for more
     animations = {
       enabled = true;
-
-      # Some default animations, see https://wiki.hyprland.org/Configuring/Animations/ for more
-
       bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
 
       animation = [
@@ -180,11 +178,11 @@ mkIf config.wayland.windowManager.hyprland.enable {
     # https://wiki.hyprland.org/Configuring/Window-Rules/
     "$pavucontrol" = "class:^(pavucontrol)$";
     windowrulev2 = [
-      "float,$pavucontrol"
-      "size 86% 40%,$pavucontrol"
-      "move 50% 6%,$pavucontrol"
-      "workspace special silent,$pavucontrol"
-      "opacity 0.80,$pavucontrol"
+      "float, $pavucontrol"
+      "size 15% 40%, $pavucontrol"
+      # TODO: close on lost focus https://wiki.hyprland.org/IPC/
+      # "workspace special scratchpad, $pavucontrol"
+      "move onscreen cursor -50% -50%, $pavucontrol"
 
       # fix steam menu pop-ups immediately closing
       # https://www.reddit.com/r/hyprland/comments/17paps4/issues_with_steam_menu_popups
