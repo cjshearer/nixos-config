@@ -7,6 +7,7 @@
     ./font-awesome.nix
     ./git.nix
     ./hypr.nix
+    ./hyprshot.nix
     ./kitty.nix
     ./libreoffice.nix
     ./mako.nix

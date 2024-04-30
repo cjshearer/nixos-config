@@ -1,6 +1,19 @@
 { lib, config, pkgs, ... }:
 with lib;
 mkIf config.wayland.windowManager.hyprland.enable {
+  # TODO: consider using https://github.com/hyprland-community/hyprnix, which supplies better configuration for things like keybinds 
+  wayland.windowManager.hyprland.extraConfig =
+    strings.optionalString config.programs.hyprshot.enable ''
+      bind = $mainMod, S, submap, screenshot
+      submap = screenshot
+      bind =, w, exec, hyprshot -m window
+      bind =, w, submap, reset
+      bind =, r, exec, hyprshot -m region
+      bind =, r, submap, reset
+      bind =, o, exec, hyprshot -m output
+      bind =, o, submap, reset
+      bind =, escape, submap, reset
+    '';
   wayland.windowManager.hyprland.settings = {
     # See https://wiki.hyprland.org/Configuring/Monitors/
     monitor = ",preferred,auto,auto";
@@ -129,10 +142,6 @@ mkIf config.wayland.windowManager.hyprland.enable {
       "$mainMod, right, movefocus, r"
       "$mainMod, up, movefocus, u"
       "$mainMod, down, movefocus, d"
-
-      # Example special workspace (scratchpad)
-      "$mainMod, S, togglespecialworkspace, magic"
-      "$mainMod SHIFT, S, movetoworkspace, special:magic"
 
       # Scroll through existing workspaces with mainMod + scroll
       "$mainMod, mouse_down, workspace, e+1"
