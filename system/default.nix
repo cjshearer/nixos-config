@@ -1,4 +1,4 @@
-{ systemConfig, ... }: {
+{ systemConfig, inputs, ... }: {
   imports = [
     ./bluetooth.nix
     ./hypr.nix
@@ -20,6 +20,16 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.overlays = [
+    (final: _prev: import ../pkgs final.pkgs)
+    (final: _prev: {
+      unstable = import inputs.nixpkgs-unstable {
+        system = final.system;
+        config.allowUnfree = true;
+      };
+    })
+    inputs.nix-vscode-extensions.overlays.default
+  ];
 
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
