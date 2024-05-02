@@ -8,6 +8,7 @@
     ./git.nix
     ./hypr.nix
     ./hyprshot.nix
+    ./ideamaker.nix
     ./kitty.nix
     ./libreoffice.nix
     ./mako.nix

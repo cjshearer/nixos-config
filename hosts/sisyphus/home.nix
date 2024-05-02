@@ -4,6 +4,7 @@
   programs.git.enable = true;
   programs.google-chrome.enable = true;
   programs.hyprshot.enable = true;
+  programs.ideamaker.enable = true;
   programs.kitty.enable = true;
   programs.libreoffice.enable = true;
   programs.obsidian.enable = true;
