@@ -26,10 +26,10 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   openssl_1_0_1 = openssl_1_1.overrideAttrs (previous: {
-    version = "1.0.1r";
+    version = "1.0.1u";
     src = fetchurl {
-      url = "https://www.openssl.org/source/openssl-1.0.1r.tar.gz";
-      sha256 = "0iik7a3b0mrfrxzngdf7ywfscg9inbw77y0jp2ccw0gdap9xhjvq";
+      url = "https://www.openssl.org/source/openssl-1.0.1u.tar.gz";
+      sha256 = "0fb7y9pwbd76pgzd7xzqfrzibmc0vf03sl07f34z5dhm2b5b84j3";
     };
     patches = [ ];
     withDocs = false;

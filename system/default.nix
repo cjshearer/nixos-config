@@ -27,7 +27,7 @@
         system = final.system;
         config.allowUnfree = true;
         config.permittedInsecurePackages = [
-          "openssl-1.0.1r" # required by ideamaker
+          "openssl-1.0.1u" # required by ideamaker
         ];
       };
     })
