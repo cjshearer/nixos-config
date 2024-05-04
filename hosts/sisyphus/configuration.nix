@@ -7,6 +7,8 @@
 
   services.greetd.tuigreet.desktop = "Hyprland";
   services.greetd.tuigreet.enable = true;
+  # Userspace virtual file system (enables external storage devices)
+  services.gvfs.enable = true;
   services.liquidctl.enable = true;
   services.onedrive.enable = true;
   services.pipewire.enable = true;
