@@ -1,11 +1,14 @@
 { stdenv
 , autoPatchelfHook
+, curl
 , dpkg
 , fetchurl
+, fetchzip
 , lib
 , libcork
 , libGLU
 , makeDesktopItem
+, openssl_1_1
 , qtbase
 , qtserialport
 , quazip
@@ -21,16 +24,41 @@ stdenv.mkDerivation (finalAttrs: {
     url = "https://download.raise3d.com/${finalAttrs.pname}/release/${finalAttrs.version}/ideaMaker_${finalAttrs.version}.${finalAttrs.buildNumber}-ubuntu_amd64.deb";
     sha256 = "sha256-aTVWCTgnVKD16uhJUVz0vR7KPGJqCVj0xoL53Qi3IKM=";
   };
-  # https://nixos.wiki/wiki/FAQ/Pinning_Nixpkgs
+
+  openssl_1_0_1 = openssl_1_1.overrideAttrs (previous: {
+    version = "1.0.1r";
+    src = fetchurl {
+      url = "https://www.openssl.org/source/openssl-1.0.1r.tar.gz";
+      sha256 = "0iik7a3b0mrfrxzngdf7ywfscg9inbw77y0jp2ccw0gdap9xhjvq";
+    };
+    patches = [ ];
+    withDocs = false;
+    outputs = lib.lists.remove "doc" previous.outputs;
+    meta.knownVulnerabilities = [
+      "OpenSSL 1.0.1 is reaching its end of life on 2016/12/31 https://endoflife.software/applications/security-libraries/openssl"
+    ];
+  });
+
   # we need curl 7.47.0, as the app segfaults on launch in 7.47.1 and beyond
   # (tested with 7.47.1, 7.50.3, 7.62, 7.79.1, and 8.7.1)
-  curl_7_47 = (import
-    (builtins.fetchTarball {
-      name = "nixos-unstable-2016-02-19";
-      url = "https://github.com/NixOS/nixpkgs/archive/5ed9176c52e4ceed2755a19b3e8357a0772de8ff.tar.gz";
-      sha256 = "0kxvhagyk72yj2al00zm0653bpql71b7i9gv24y56rxbdb3ywlia";
-    })
-    { inherit system; }).curl;
+  curl_7_47 = (curl.override {
+    gnutlsSupport = true;
+    gssSupport = false;
+    http2Support = false;
+    opensslSupport = false; # suppresses flags unsupported by curl 7.47.0
+    pslSupport = false;
+    scpSupport = false;
+  }).overrideAttrs (previous: {
+    version = "7.47.0";
+    src = fetchzip {
+      url = "https://curl.se/download/curl-7.47.0.tar.lzma";
+      sha256 = "sha256-XlZk1nJbSmiQp7jMSE2QRCY4C9w2us8BgosBSzlD4dE=";
+    };
+    configureFlags = previous.configureFlags ++ [
+      "--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt"
+      "--with-ssl=${lib.getLib finalAttrs.openssl_1_0_1}"
+    ];
+  });
 
   nativeBuildInputs = [
     autoPatchelfHook
@@ -38,6 +66,7 @@ stdenv.mkDerivation (finalAttrs: {
     shared-mime-info
     wrapQtAppsHook
   ];
+
   buildInputs = [
     finalAttrs.curl_7_47
     libcork

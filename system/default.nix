@@ -26,6 +26,9 @@
       unstable = import inputs.nixpkgs-unstable {
         system = final.system;
         config.allowUnfree = true;
+        config.permittedInsecurePackages = [
+          "openssl-1.0.1r" # required by ideamaker
+        ];
       };
     })
     inputs.nix-vscode-extensions.overlays.default
