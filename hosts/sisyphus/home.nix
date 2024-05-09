@@ -14,6 +14,7 @@
   programs.thunderbird.enable = true;
   programs.vscode.enable = true;
   programs.waybar.enable = true;
+  programs.wl-screenrec.enable = true;
 
   services.cliphist.enable = true;
   services.mako.enable = true;

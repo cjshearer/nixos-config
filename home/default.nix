@@ -19,6 +19,7 @@
     ./thunderbird.nix
     ./vscode.nix
     ./waybar.nix
+    ./wl-screenrec.nix
   ];
 
   programs.home-manager.enable = true;
