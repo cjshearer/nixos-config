@@ -133,6 +133,7 @@ mkIf config.wayland.windowManager.hyprland.enable {
       "$mainMod, C, killactive,"
       "$mainMod, M, exit,"
       "$mainMod, F, togglefloating,"
+      "$mainMod SHIFT, F, fullscreen,0"
       # dwindle
       "$mainMod, P, pseudo,"
       "$mainMod, J, togglesplit,"
