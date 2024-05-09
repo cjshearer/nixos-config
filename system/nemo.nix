@@ -8,5 +8,6 @@ in
 
   config = mkIf cfg.enable {
     environment.systemPackages = [ pkgs.cinnamon.nemo ];
+    xdg.mime.defaultApplications."inode/directory" = "nemo.desktop";
   };
 }
