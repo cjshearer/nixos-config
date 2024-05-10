@@ -6,31 +6,24 @@ mkIf config.wayland.windowManager.hyprland.enable {
     strings.optionalString config.programs.hyprshot.enable ''
       bind = $mainMod, s, submap, screenshot
       submap = screenshot
-      bind =, w, exec, hyprshot -m window
-      bind =, w, submap, reset
-      bind =, r, exec, hyprshot -m region
-      bind =, r, submap, reset
       bind =, o, exec, hyprshot -m output
       bind =, o, submap, reset
+      bind =, r, exec, hyprshot -m region
+      bind =, r, submap, reset
+      bind =, w, exec, hyprshot -m window
+      bind =, w, submap, reset
       bind =, escape, submap, reset
       submap = reset
     ''
-    + strings.optionalString config.programs.wl-screenrec.enable ''
+    + strings.optionalString config.programs.hyprec.enable ''
       bind = $mainMod, r, submap, screenrec
       submap = screenrec
-      bind =, t, submap, reset
-      bind =, r, exec, ${concatStringsSep " " [
-        "wl-screenrec -g \"$(${pkgs.slurp}/bin/slurp)\""
-          "-f ~/Videos/screencap-\"$(date --iso-8601=seconds).mp4\" --audio ;"
-        "if [[ -n $(${pkgs.libnotify}/bin/notify-send"
-          "-t 2500"
-          "--action='default=Open File Location'"
-          "'Recording Stopped' 'Open file location'"
-        ") ]]; then"
-          "xdg-open 'file://$HOME/Videos' ;"
-        "fi"
-      ]}
+      bind =, o, exec, hyprec -m output
+      bind =, o, submap, reset
+      bind =, r, exec, hyprec -m region
       bind =, r, submap, reset
+      bind =, w, exec, hyprec -m window
+      bind =, w, submap, reset
       bind =, s, exec, pkill wl-screenrec -SIGINT
       bind =, s, submap, reset
       bind =, escape, submap, reset

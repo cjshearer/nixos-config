@@ -7,6 +7,7 @@
     ./font-awesome.nix
     ./git.nix
     ./hypr.nix
+    ./hyprec.nix
     ./hyprshot.nix
     ./ideamaker.nix
     ./kitty.nix
@@ -19,7 +20,6 @@
     ./thunderbird.nix
     ./vscode.nix
     ./waybar.nix
-    ./wl-screenrec.nix
   ];
 
   programs.home-manager.enable = true;
