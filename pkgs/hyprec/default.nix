@@ -5,7 +5,6 @@
 }: writeShellApplication {
   name = "hyprec";
   runtimeInputs = with pkgs ; [
-    curl
     jq
     libnotify
     slurp
