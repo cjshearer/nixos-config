@@ -21,6 +21,8 @@
           stylelint.vscode-stylelint
           thinker.sort-json
           bradlc.vscode-tailwindcss
+        ]) ++ lib.optionals config.programs.direnv.enable (with pkgs.vscode-extensions; [
+          mkhl.direnv
         ]);
 
       keybindings = [

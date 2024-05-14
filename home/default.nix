@@ -3,6 +3,7 @@
     ./blender.nix
     ./chrome.nix
     ./cliphist.nix
+    ./direnv.nix
     ./discord.nix
     ./font-awesome.nix
     ./git.nix
