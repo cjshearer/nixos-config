@@ -75,6 +75,9 @@
       ];
 
       userSettings = {
+        "[html]" = {
+          "editor.defaultFormatter" = "esbenp.prettier-vscode";
+        };
         "[markdown]" = {
           "rewrap.autoWrap.enabled" = false;
         };
@@ -90,6 +93,7 @@
         "editor.rulers" = [ 100 ];
         "editor.tabSize" = 2;
         "editor.wordWrap" = "wordWrapColumn";
+        "editor.wordWrapColumn" = 100;
         "explorer.confirmDelete" = false;
         "explorer.confirmDragAndDrop" = false;
         "extensions.ignoreRecommendations" = true;
