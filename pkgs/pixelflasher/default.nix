@@ -1,7 +1,6 @@
 { lib
 , stdenv
 , android-tools
-, autoPatchelfHook
 , cacert
 , fetchFromGitHub
 , makeDesktopItem
@@ -51,10 +50,7 @@ stdenv.mkDerivation (finalAttrs: {
       --set REQUESTS_CA_BUNDLE "${cacert}/etc/ssl/certs/ca-bundle.crt"
   '';
 
-  nativeBuildInputs = [
-    autoPatchelfHook
-    makeWrapper
-  ];
+  nativeBuildInputs = [ makeWrapper ];
 
   buildInputs = with python311.pkgs; [
     android-tools
