@@ -1,3 +1,5 @@
+# Submitted to nixpkgs: https://github.com/NixOS/nixpkgs/pull/309130
+# Please 👍 the PR if you want this in nixpkgs
 { stdenv
 , autoPatchelfHook
 , curl

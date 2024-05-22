@@ -28,7 +28,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildPhase = ''
-    # https://github.com/pyinstaller/pyinstaller/issues/1684#issuecomment-590288201 
+    # https://github.com/badabing2005/PixelFlasher/issues/204
     sed -i 's/hiddenimports=\[\]/hiddenimports=\["_cffi_backend"\]/' build-on-*.spec
 
     # we set the default android-tools path for convenience
