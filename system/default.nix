@@ -6,6 +6,7 @@
     ./nemo.nix
     ./onedrive.nix
     ./pipewire.nix
+    ./pixelflasher.nix
     ./qbittorrent.nix
     ./syncthing.nix
     ./tailscale.nix
@@ -22,7 +23,6 @@
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = [
-    (final: _prev: import ../pkgs final.pkgs)
     (final: _prev: {
       unstable = import inputs.nixpkgs-unstable {
         system = final.system;
@@ -32,6 +32,7 @@
         ];
       };
     })
+    (final: _prev: import ../pkgs { pkgs = _prev.pkgs.unstable; })
     inputs.nix-vscode-extensions.overlays.default
   ];
 

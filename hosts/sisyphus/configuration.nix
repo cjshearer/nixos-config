@@ -3,6 +3,7 @@
 
   programs.hyprland.enable = true;
   programs.nemo.enable = true;
+  programs.pixelflasher.enable = true;
   programs.qbittorrent.enable = true;
   programs.steam.enable = true;
 
