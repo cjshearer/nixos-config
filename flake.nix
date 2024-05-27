@@ -18,6 +18,7 @@
           system = architecture;
           specialArgs = { inherit inputs systemConfig; };
           modules = [
+            ./overlays
             ./system
             ./hosts/${hostname}/configuration.nix
             ./hosts/${hostname}/hardware-configuration.nix
