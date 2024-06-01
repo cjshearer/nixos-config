@@ -6,6 +6,7 @@
   programs.pixelflasher.enable = true;
   programs.qbittorrent.enable = true;
   programs.steam.enable = true;
+  programs.ytmdesktop.enable = true;
 
   services.greetd.tuigreet.desktop = "Hyprland";
   services.greetd.tuigreet.enable = true;

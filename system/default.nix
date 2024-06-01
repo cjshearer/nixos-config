@@ -11,6 +11,7 @@
     ./syncthing.nix
     ./tailscale.nix
     ./tuigreet.nix
+    ./ytmdesktop.nix
   ];
 
   boot.loader.efi.canTouchEfiVariables = true;
