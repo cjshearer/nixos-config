@@ -11,7 +11,7 @@
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
   };
 
-  outputs = { self, nixpkgs, home-manager, ... } @ inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ... } @ inputs:
     let
       mkSystem = { username, hostname, architecture } @ systemConfig: {
         ${hostname} = nixpkgs.lib.nixosSystem {
@@ -43,6 +43,6 @@
         architecture = "x86_64-linux";
       };
 
-      packages.x86_64-linux = import ./pkgs nixpkgs.legacyPackages.x86_64-linux;
+      packages.x86_64-linux = import ./pkgs nixpkgs-unstable.legacyPackages.x86_64-linux;
     };
 }
