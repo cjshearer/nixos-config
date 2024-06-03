@@ -21,5 +21,6 @@ $ nix flake show
 └───packages
     └───x86_64-linux
         ├───hyprec: package 'hyprec'
-        └───pixelflasher: package 'PixelFlasher-6.9.5.0'
+        ├───pixelflasher: package 'PixelFlasher-6.9.5.0'
+        └───ytmdesktop: package 'ytmdesktop-2.0.5'
 ```
