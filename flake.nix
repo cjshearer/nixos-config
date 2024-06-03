@@ -2,10 +2,10 @@
   description = "Cody Shearer's NixOS Configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOs/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOs/nixpkgs/release-24.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager/release-23.11";
+    home-manager.url = "github:nix-community/home-manager/release-24.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";

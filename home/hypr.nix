@@ -135,9 +135,12 @@ mkIf config.wayland.windowManager.hyprland.enable {
 
     # Example per-device config
     # See https://wiki.hyprland.org/Configuring/Keywords/#executing for more
-    "device:epic-mouse-v1" = {
-      sensitivity = -0.5;
-    };
+    device = [
+      {
+        name = "epic-mouse-v1";
+        sensitivity = "-0.5";
+      }
+    ];
 
     # See https://wiki.hyprland.org/Configuring/Keywords/ for more
     "$mainMod" = "SUPER";
