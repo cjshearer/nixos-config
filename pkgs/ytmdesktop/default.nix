@@ -1,15 +1,14 @@
-{
-  lib,
-  asar,
-  binutils,
-  commandLineArgs ? "",
-  electron_28,
-  fetchurl,
-  libsecret,
-  makeDesktopItem,
-  makeWrapper,
-  stdenvNoCC,
-  zstd,
+{ lib
+, asar
+, binutils
+, commandLineArgs ? ""
+, electron_30
+, fetchurl
+, makeDesktopItem
+, makeWrapper
+, stdenvNoCC
+, zstd
+,
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "ytmdesktop";
@@ -42,16 +41,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
   nativeBuildInputs = [
     asar
     binutils
-    # while upstream uses electron v29, there's an electron bug that breaks 
-    # safeStorage outside of predefined desktop environments, which breaks
-    # the last.fm and companion server integrations:
-    # https://github.com/electron/electron/issues/39789
-    electron_28
+    electron_30
     makeWrapper
     zstd
   ];
-
-  runtignomeDependencies = [ libsecret ];
 
   src = fetchurl {
     url = "${finalAttrs.meta.downloadPage}/download/v${finalAttrs.version}/youtube-music-desktop-app_${finalAttrs.version}_amd64.deb";
@@ -83,7 +76,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     mkdir -p $out/lib
     cp -r {locales,resources{,.pak}} $out/lib
 
-    makeWrapper ${lib.getExe electron_28} $out/bin/${finalAttrs.pname} \
+    makeWrapper ${lib.getExe electron_30} $out/bin/${finalAttrs.pname} \
       --add-flags $out/lib/resources/app.asar \
       --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}" \
       --add-flags ${lib.escapeShellArg commandLineArgs}
