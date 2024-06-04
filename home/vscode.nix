@@ -1,5 +1,4 @@
 { inputs, lib, config, pkgs, ... }: lib.mkIf config.programs.vscode.enable {
-  home.packages = with pkgs; [ nixpkgs-fmt ];
   programs.vscode =
     {
       package = pkgs.vscodium;
@@ -113,6 +112,7 @@
         "window.customMenuBarAltFocus" = false;
         "window.titleBarStyle" = "custom";
         "window.zoomLevel" = 0.5;
+        "nix.formatterPath" = lib.getExe pkgs.nixpkgs-fmt;
       };
     };
 }
