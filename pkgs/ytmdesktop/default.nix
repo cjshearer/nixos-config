@@ -1,3 +1,5 @@
+# Submitted to nixpkgs: https://github.com/NixOS/nixpkgs/pull/317309
+# Please 👍 the PR if you want it merged
 { lib
 , asar
 , binutils
