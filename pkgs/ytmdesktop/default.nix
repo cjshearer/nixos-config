@@ -8,7 +8,6 @@
 , makeWrapper
 , stdenvNoCC
 , zstd
-,
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "ytmdesktop";
