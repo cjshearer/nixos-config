@@ -4,6 +4,7 @@
     ./hypr.nix
     ./liquidctl.nix
     ./nemo.nix
+    ./ollama.nix
     ./onedrive.nix
     ./pipewire.nix
     ./pixelflasher.nix

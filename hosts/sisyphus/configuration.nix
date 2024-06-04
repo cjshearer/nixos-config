@@ -13,6 +13,7 @@
   # Userspace virtual file system (enables external storage devices)
   services.gvfs.enable = true;
   services.liquidctl.enable = true;
+  services.ollama.enable = true;
   services.onedrive.enable = true;
   services.pipewire.enable = true;
   services.printing.enable = true;
