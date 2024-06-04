@@ -11,13 +11,13 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "PixelFlasher";
-  version = "6.9.5.0";
+  version = "6.9.6.0";
 
   src = fetchFromGitHub {
     owner = "badabing2005";
     repo = "PixelFlasher";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-8wwlQp0CJezNQjvR+wgoSEC5CRy4H5yiQfhoWctzf98=";
+    hash = "sha256-nHWSlxQetggw/QBJC8NjzSiA1T9KdSef5XXUmLwquoA=";
   };
 
   phases = [
@@ -28,9 +28,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildPhase = ''
-    # https://github.com/badabing2005/PixelFlasher/issues/204
-    sed -i 's/hiddenimports=\[\]/hiddenimports=\["_cffi_backend"\]/' build-on-*.spec
-
     # we set the default android-tools path for convenience
     sed -i 's#platform_tools_path = None#platform_tools_path = "${android-tools}\/bin"#' config.py
 
