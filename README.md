@@ -17,6 +17,7 @@ $ tree -v --dirsfirst -L 1
 $ nix flake show
 .
 ├───nixosConfigurations
+│   ├───athamas: NixOS configuration
 │   └───sisyphus: NixOS configuration
 └───packages
     └───x86_64-linux

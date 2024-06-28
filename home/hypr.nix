@@ -1,7 +1,8 @@
-{ lib, config, pkgs, ... }:
+{ systemConfig, lib, config, pkgs, ... }:
 with lib;
 mkIf config.wayland.windowManager.hyprland.enable {
-  # TODO: consider using https://github.com/hyprland-community/hyprnix, which supplies better configuration for things like keybinds 
+  home.sessionVariables.NIXOS_OZONE_WL = "1";
+
   wayland.windowManager.hyprland.extraConfig =
     strings.optionalString config.programs.hyprshot.enable ''
       bind = $mainMod, s, submap, screenshot
@@ -31,7 +32,10 @@ mkIf config.wayland.windowManager.hyprland.enable {
     '';
   wayland.windowManager.hyprland.settings = {
     # See https://wiki.hyprland.org/Configuring/Monitors/
-    monitor = ",preferred,auto,auto";
+    monitor = {
+      sisyphus = ",preferred,auto,auto";
+      athamas = ",preferred,auto,1.20";
+    }.${systemConfig.hostname};
 
     # Some default env vars.
     env = "XCURSOR_SIZE,24";
@@ -58,9 +62,7 @@ mkIf config.wayland.windowManager.hyprland.enable {
       # fix HD2 mouse not moving camera in-game
       mouse_refocus = false;
 
-      touchpad = {
-        natural_scroll = false;
-      };
+      touchpad.natural_scroll = true;
 
       sensitivity = 0; # -1.0 - 1.0, 0 means no modification.
     };
@@ -122,10 +124,7 @@ mkIf config.wayland.windowManager.hyprland.enable {
       new_is_master = true;
     };
 
-    gestures = {
-      # See https://wiki.hyprland.org/Configuring/Variables/ for more
-      workspace_swipe = false;
-    };
+    gestures.workspace_swipe = true;
 
     misc = {
       # See https://wiki.hyprland.org/Configuring/Variables/ for more
@@ -133,14 +132,8 @@ mkIf config.wayland.windowManager.hyprland.enable {
       force_default_wallpaper = 0;
     };
 
-    # Example per-device config
     # See https://wiki.hyprland.org/Configuring/Keywords/#executing for more
-    device = [
-      {
-        name = "epic-mouse-v1";
-        sensitivity = "-0.5";
-      }
-    ];
+    device = [ ];
 
     # See https://wiki.hyprland.org/Configuring/Keywords/ for more
     "$mainMod" = "SUPER";

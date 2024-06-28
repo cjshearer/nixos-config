@@ -18,7 +18,7 @@
           id = "MCRXYZA-654GQQ3-5IOWJOH-MRY3NOP-NUVUAUL-KZGK4TJ-3WYS2E7-GZCL5Q3";
         };
       };
-      folders = {
+      folders = lib.filterAttrs (_: v: builtins.elem systemConfig.hostname v.devices) {
         "audiobooks" = {
           path = "/home/${systemConfig.username}/OneDrive/audiobooks";
           devices = [ "salmoneus" "sisyphus" ];

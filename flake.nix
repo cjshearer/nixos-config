@@ -2,6 +2,8 @@
   description = "Cody Shearer's NixOS Configuration";
 
   inputs = {
+    nixos-hardware.url = "github:NixOs/nixos-hardware/master";
+
     nixpkgs.url = "github:NixOs/nixpkgs/release-24.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
@@ -11,37 +13,40 @@
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ... } @ inputs:
+  outputs = { self, nixpkgs, nixos-hardware, nixpkgs-unstable, home-manager, ... } @ inputs:
     let
-      mkSystem = { username, hostname, architecture } @ systemConfig: {
-        ${hostname} = nixpkgs.lib.nixosSystem {
-          system = architecture;
-          specialArgs = { inherit inputs systemConfig; };
-          modules = [
-            ./overlays
-            ./system
-            ./hosts/${hostname}/configuration.nix
-            ./hosts/${hostname}/hardware-configuration.nix
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.users.${username}.imports = [
-                ./home
-                ./hosts/${hostname}/home.nix
-              ];
-              home-manager.extraSpecialArgs = { inherit inputs systemConfig; };
-            }
-          ];
-        };
-      };
+      mkSystems = systems: builtins.listToAttrs (map
+        (systemConfig: {
+          name = systemConfig.hostname;
+          value = nixpkgs.lib.nixosSystem {
+            system = systemConfig.architecture;
+            specialArgs = { inherit inputs systemConfig; };
+            modules = [
+              ./overlays
+              ./system
+              ./hosts/${systemConfig.hostname}/configuration.nix
+              ./hosts/${systemConfig.hostname}/hardware-configuration.nix
+              home-manager.nixosModules.home-manager
+              {
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.users.${systemConfig.username}.imports = [
+                  ./home
+                  ./hosts/${systemConfig.hostname}/home.nix
+                ];
+                home-manager.extraSpecialArgs = { inherit inputs systemConfig; };
+              }
+            ];
+          };
+        })
+        systems
+      );
     in
     {
-      nixosConfigurations = mkSystem {
-        username = "cjshearer";
-        hostname = "sisyphus";
-        architecture = "x86_64-linux";
-      };
+      nixosConfigurations = mkSystems [
+        { username = "cjshearer"; hostname = "sisyphus"; architecture = "x86_64-linux"; }
+        { username = "cjshearer"; hostname = "athamas"; architecture = "x86_64-linux"; }
+      ];
 
       packages.x86_64-linux = import ./pkgs nixpkgs-unstable.legacyPackages.x86_64-linux;
     };
