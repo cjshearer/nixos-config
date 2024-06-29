@@ -38,7 +38,14 @@
   fonts.fontAwesome.enable = true;
   programs.waybar.style = ''
     * {
+      border: none;
+      border-radius: 0px;
       font-family: 'Roboto', 'Font Awesome';
+    }
+
+    window#waybar {
+      background-color: transparent;
+      color: #ffffff;
     }
   '';
 } 
