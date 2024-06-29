@@ -2,6 +2,8 @@
   hardware.bluetooth.enable = true;
 
   programs.hyprland.enable = true;
+  programs.light.brightnessKeys.enable = true;
+  programs.light.enable = true;
   programs.nemo.enable = true;
   programs.pixelflasher.enable = true;
   programs.ytmdesktop.enable = true;
