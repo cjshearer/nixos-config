@@ -4,8 +4,6 @@
       package = pkgs.vscodium;
       extensions =
         (with pkgs.vscode-extensions; [
-          dbaeumer.vscode-eslint
-          esbenp.prettier-vscode
           golang.go
           jnoortheen.nix-ide
           rust-lang.rust-analyzer
@@ -17,8 +15,6 @@
           budparr.language-hugo-vscode
           joshbolduc.commitlint
           phil294.git-log--graph
-          stylelint.vscode-stylelint
-          thinker.sort-json
           bradlc.vscode-tailwindcss
         ]) ++ lib.optionals config.programs.direnv.enable (with pkgs.vscode-extensions; [
           mkhl.direnv
@@ -76,9 +72,6 @@
       ];
 
       userSettings = {
-        "[html]" = {
-          "editor.defaultFormatter" = "esbenp.prettier-vscode";
-        };
         "[markdown]" = {
           "rewrap.autoWrap.enabled" = false;
         };
