@@ -19,13 +19,10 @@
   programs.waybar.settings = {
     mainBar = {
       backlight = {
-        format = " {percent}%";
-        interval = 2;
-        on-scroll-down = "brightnessctl set 2%-";
-        on-scroll-up = "brightnessctl set +2%";
+        format = " {percent}%";
       };
       battery = {
-        format = " {icon} {capacity}%";
+        format = " {capacity}%";
         format-discharging = "{icon} {capacity}%";
         format-icons = [
           ""
@@ -34,7 +31,7 @@
           ""
           ""
         ];
-        interval = 10;
+        interval = 3;
         states = {
           critical = 15;
           warning = 30;
@@ -50,7 +47,7 @@
         interval = 1;
       };
       cpu = {
-        format = " {usage}% ({load})";
+        format = " {usage:2}%";
         interval = 3;
         states = {
           critical = 90;
@@ -73,6 +70,7 @@
       ];
       modules-left = [
         "hyprland/workspaces"
+        "tray"
       ];
       modules-right = [
         "network"
@@ -81,11 +79,10 @@
         "memory"
         "temperature"
         "backlight"
-        "tray"
         "battery"
       ];
       network = {
-        format-disconnected = " Disconnected";
+        format-disconnected = " offline";
         format-ethernet = " {ifname}: {ipaddr}/{cidr}";
         format-wifi = " {essid}";
         interval = 3;
@@ -113,7 +110,7 @@
         format-source = "  {volume}%";
         format-source-muted = " {volume}%";
         on-click = lib.getExe pkgs.pavucontrol;
-        scroll-step = 2;
+        scroll-step = 1;
         tooltip = true;
       };
       temperature = {
@@ -203,6 +200,10 @@
     }
 
     #cpu.critical {
+      color: @error_color;
+    }
+
+    #temperature.critical {
       color: @error_color;
     }
 
