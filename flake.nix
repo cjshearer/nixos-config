@@ -2,8 +2,6 @@
   description = "Cody Shearer's NixOS Configuration";
 
   inputs = {
-    nixos-hardware.url = "github:NixOs/nixos-hardware/master";
-
     nixpkgs.url = "github:NixOs/nixpkgs/release-24.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
@@ -13,7 +11,7 @@
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
   };
 
-  outputs = { self, nixpkgs, nixos-hardware, nixpkgs-unstable, home-manager, ... } @ inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ... } @ inputs:
     let
       mkSystems = systems: builtins.listToAttrs (map
         (systemConfig: {

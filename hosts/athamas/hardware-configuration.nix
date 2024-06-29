@@ -2,10 +2,7 @@
 # and may be overwritten by future invocations.  Please make changes
 # to /etc/nixos/configuration.nix instead.
 { inputs, config, lib, pkgs, modulesPath, ... }: {
-  imports = [
-    inputs.nixos-hardware.nixosModules.microsoft-surface-go
-    (modulesPath + "/installer/scan/not-detected.nix")
-  ];
+  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
   boot.initrd.availableKernelModules = [
     "xhci_pci"
