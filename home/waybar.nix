@@ -163,7 +163,7 @@
       min-height: 0;
       margin: 0;
       padding: 0;
-      font-family: 'monospace', 'Font Awesome';
+      font-family: monospace, 'Font Awesome 6 Free';
     }
 
     .module {
