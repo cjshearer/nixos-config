@@ -121,7 +121,7 @@ mkIf config.wayland.windowManager.hyprland.enable {
 
     master = {
       # See https://wiki.hyprland.org/Configuring/Master-Layout/ for more
-      new_is_master = true;
+      new_status = true;
     };
 
     gestures.workspace_swipe = true;
