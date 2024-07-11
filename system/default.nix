@@ -4,7 +4,6 @@
     ./hypr.nix
     ./liquidctl.nix
     ./nemo.nix
-    ./nextcloud.nix
     ./ollama.nix
     ./onedrive.nix
     ./pipewire.nix
