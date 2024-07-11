@@ -18,10 +18,11 @@ $ nix flake show
 .
 ├───nixosConfigurations
 │   ├───athamas: NixOS configuration
+│   ├───charon: NixOS configuration
 │   └───sisyphus: NixOS configuration
 └───packages
     └───x86_64-linux
         ├───hyprec: package 'hyprec'
-        ├───pixelflasher: package 'PixelFlasher-6.9.6.0'
+        ├───pixelflasher: package 'PixelFlasher-6.9.8.0'
         └───ytmdesktop: package 'ytmdesktop-2.0.5'
 ```

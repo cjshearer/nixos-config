@@ -44,6 +44,7 @@
       nixosConfigurations = mkSystems [
         { username = "cjshearer"; hostname = "sisyphus"; architecture = "x86_64-linux"; }
         { username = "cjshearer"; hostname = "athamas"; architecture = "x86_64-linux"; }
+        { username = "cjshearer"; hostname = "charon"; architecture = "aarch64-linux"; }
       ];
 
       packages.x86_64-linux = import ./pkgs nixpkgs-unstable.legacyPackages.x86_64-linux;
