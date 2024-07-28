@@ -2,6 +2,7 @@
   hardware.bluetooth.enable = true;
 
   programs.hyprland.enable = true;
+  programs.ledger-live-desktop.enable = true;
   programs.nemo.enable = true;
   programs.pixelflasher.enable = true;
   programs.qbittorrent.enable = true;

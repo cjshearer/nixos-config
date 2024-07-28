@@ -2,6 +2,7 @@
   imports = [
     ./bluetooth.nix
     ./hypr.nix
+    ./ledger-live-desktop.nix
     ./liquidctl.nix
     ./nemo.nix
     ./ollama.nix
