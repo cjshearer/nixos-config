@@ -6,6 +6,7 @@
   programs.nemo.enable = true;
   programs.pixelflasher.enable = true;
   programs.qbittorrent.enable = true;
+  programs.remmina.enable = true;
   programs.steam.enable = true;
   programs.teams-for-linux.enable = true;
   programs.ytmdesktop.enable = true;

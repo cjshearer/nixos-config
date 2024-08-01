@@ -10,6 +10,7 @@
     ./pipewire.nix
     ./pixelflasher.nix
     ./qbittorrent.nix
+    ./remmina.nix
     ./syncthing.nix
     ./tailscale.nix
     ./teams-for-linux.nix
