@@ -12,6 +12,7 @@
     ./qbittorrent.nix
     ./syncthing.nix
     ./tailscale.nix
+    ./teams-for-linux.nix
     ./tuigreet.nix
     ./ytmdesktop.nix
   ];
