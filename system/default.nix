@@ -1,6 +1,7 @@
 { systemConfig, inputs, ... }: {
   imports = [
     ./bluetooth.nix
+    ./citrix_workspace.nix
     ./hypr.nix
     ./ledger-live-desktop.nix
     ./liquidctl.nix

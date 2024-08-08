@@ -1,6 +1,7 @@
 {
   hardware.bluetooth.enable = true;
 
+  programs.citrix_workspace.enable = true;
   programs.hyprland.enable = true;
   programs.ledger-live-desktop.enable = true;
   programs.nemo.enable = true;
