@@ -1,7 +1,9 @@
 { inputs, lib, config, pkgs, ... }: lib.mkIf config.programs.vscode.enable {
   programs.vscode =
     {
-      package = pkgs.vscodium;
+      package = (pkgs.vscodium.override {
+        commandLineArgs = "--password-store=\"gnome-libsecret\"";
+      });
       extensions =
         (with pkgs.vscode-extensions; [
           golang.go
