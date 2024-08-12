@@ -9,7 +9,6 @@
   programs.qbittorrent.enable = true;
   programs.remmina.enable = true;
   programs.steam.enable = true;
-  programs.teams-for-linux.enable = true;
   programs.ytmdesktop.enable = true;
 
   services.greetd.tuigreet.desktop = "Hyprland";
