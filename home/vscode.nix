@@ -1,4 +1,4 @@
-{ inputs, lib, config, pkgs, ... }: lib.mkIf config.programs.vscode.enable {
+{ inputs, systemConfig, lib, config, pkgs, ... }: lib.mkIf config.programs.vscode.enable {
   programs.vscode =
     {
       package = (pkgs.vscodium.override {
@@ -107,7 +107,17 @@
         "window.customMenuBarAltFocus" = false;
         "window.titleBarStyle" = "custom";
         "window.zoomLevel" = 0.5;
+        "nix.enableLanguageServer" = true;
         "nix.formatterPath" = lib.getExe pkgs.nixpkgs-fmt;
+        "nix.serverSettings" = {
+          "nixd" = {
+            "formatting.command" = [ "${lib.getExe pkgs.nixpkgs-fmt}" ];
+            "options" = {
+              "nixos.expr" = ''(builtins.getFlake "${inputs.self.outPath}").nixosConfigurations.${systemConfig.hostname}.options'';
+            };
+          };
+        };
+        "nix.serverPath" = lib.getExe pkgs.nixd;
       };
     };
 }

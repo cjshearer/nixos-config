@@ -11,7 +11,7 @@
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ... } @ inputs:
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, ... } @ inputs:
     let
       mkSystems = systems: builtins.listToAttrs (map
         (systemConfig: {
