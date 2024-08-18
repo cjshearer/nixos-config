@@ -5,7 +5,6 @@
 , fetchFromGitHub
 , makeDesktopItem
 , makeWrapper
-, pyinstaller
 , python311
 , substituteAll
 }:
