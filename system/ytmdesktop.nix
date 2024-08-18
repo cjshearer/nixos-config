@@ -8,7 +8,7 @@ in
 
   config = mkIf cfg.enable {
     environment.systemPackages = [
-      (pkgs.ytmdesktop.override {
+      (pkgs.unstable.ytmdesktop.override {
         commandLineArgs = "--password-store=\"gnome-libsecret\"";
       })
     ];

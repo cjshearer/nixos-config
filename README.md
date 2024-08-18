@@ -23,6 +23,10 @@ $ nix flake show
 └───packages
     └───x86_64-linux
         ├───hyprec: package 'hyprec'
-        ├───pixelflasher: package 'PixelFlasher-6.9.8.0'
-        └───ytmdesktop: package 'ytmdesktop-2.0.5'
+        └───pixelflasher: package 'PixelFlasher-6.9.8.0'
 ```
+
+## Upstream Contributions
+
+- [ideamaker: init at 4.3.3](https://github.com/NixOS/nixpkgs/pull/309130)
+- [ytmdesktop: init at 2.0.5](https://github.com/NixOS/nixpkgs/pull/317309)
