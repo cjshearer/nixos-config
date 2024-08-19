@@ -10,13 +10,13 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "PixelFlasher";
-  version = "6.9.8.0";
+  version = "7.3.2.0";
 
   src = fetchFromGitHub {
     owner = "badabing2005";
     repo = "PixelFlasher";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-vmBkFJC6MS47nOPFJqqNeUcsl2s32TQhcfxjIEBCWJM=";
+    hash = "sha256-U7fZ3Tx5TjYTus6IwOW9gAejY6jn7weGwcnyfS7IGSc=";
   };
 
   phases = [
