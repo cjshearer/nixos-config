@@ -23,6 +23,7 @@
 
   networking.hostName = systemConfig.hostname;
   networking.networkmanager.enable = true;
+  networking.stevenblack.enable = true;
 
   nix.gc = {
     automatic = true;
