@@ -16,6 +16,7 @@
     ./tailscale.nix
     ./tuigreet.nix
     ./ytmdesktop.nix
+    ./zoom-us.nix
   ];
 
   boot.loader.efi.canTouchEfiVariables = true;

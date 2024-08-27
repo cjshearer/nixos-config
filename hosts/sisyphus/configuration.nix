@@ -10,6 +10,7 @@
   programs.remmina.enable = true;
   programs.steam.enable = true;
   programs.ytmdesktop.enable = true;
+  programs.zoom-us.enable = true;
 
   services.greetd.tuigreet.desktop = "Hyprland";
   services.greetd.tuigreet.enable = true;
