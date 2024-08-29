@@ -223,13 +223,13 @@ mkIf config.wayland.windowManager.hyprland.enable {
   gtk = {
     enable = true;
     theme = {
-      package = pkgs.flat-remix-gtk;
-      name = "Flat-Remix-GTK-Blue-Dark";
+      name = "Adwaita-dark";
+      package = pkgs.gnome.gnome-themes-extra;
     };
 
     iconTheme = {
       package = pkgs.gnome.adwaita-icon-theme;
-      name = "Adwaita";
+      name = "Adwaita-dark";
     };
   };
 }
