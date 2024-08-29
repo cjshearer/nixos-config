@@ -7,6 +7,7 @@
       extensions =
         (with pkgs.vscode-extensions; [
           github.copilot
+          github.copilot-chat
           golang.go
           jnoortheen.nix-ide
           rust-lang.rust-analyzer
