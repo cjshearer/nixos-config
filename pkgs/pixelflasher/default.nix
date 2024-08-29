@@ -1,16 +1,30 @@
-{ lib
-, stdenv
-, android-tools
-, cacert
-, fetchFromGitHub
-, makeDesktopItem
-, makeWrapper
-, python311
-, substituteAll
+{
+  lib,
+  android-tools,
+  cacert,
+  fetchFromGitHub,
+  makeDesktopItem,
+  makeWrapper,
+  python311,
+  stdenv,
+  substituteAll,
 }:
 stdenv.mkDerivation (finalAttrs: {
-  pname = "PixelFlasher";
+  pname = "pixelflasher";
   version = "7.3.2.0";
+
+  desktopItem = makeDesktopItem {
+    desktopName = "PixelFlasher";
+    name = "pixelflasher";
+    exec = "pixelflasher";
+    icon = "pixelflasher";
+    categories = [ "Utility" ];
+    genericName = finalAttrs.meta.description;
+    noDisplay = false;
+    startupNotify = true;
+    terminal = false;
+    type = "Application";
+  };
 
   src = fetchFromGitHub {
     owner = "badabing2005";
@@ -19,30 +33,23 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-U7fZ3Tx5TjYTus6IwOW9gAejY6jn7weGwcnyfS7IGSc=";
   };
 
-  phases = [
-    "unpackPhase"
-    "buildPhase"
-    "installPhase"
-    "fixupPhase"
-  ];
-
   buildPhase = ''
     # we set the default android-tools path for convenience
-    sed -i 's#platform_tools_path = None#platform_tools_path = "${android-tools}\/bin"#' config.py
+    substituteInPlace config.py --replace-fail \
+      "platform_tools_path = None" "platform_tools_path = '$android-tools/bin'"
 
     sh build.sh
   '';
 
   installPhase = ''
-    install -D dist/${finalAttrs.pname} $out/bin/${finalAttrs.pname}
-
-    install -D images/icon-dark-256.png $out/share/pixmaps/${finalAttrs.pname}.png
+    install -D dist/PixelFlasher $out/bin/pixelflasher
+    install -D images/icon-dark-256.png $out/share/pixmaps/pixelflasher.png
 
     ln -s ${finalAttrs.desktopItem}/share/applications $out/share/
   '';
 
   fixupPhase = ''
-    wrapProgram $out/bin/${finalAttrs.pname} \
+    wrapProgram $out/bin/pixelflasher \
       --set REQUESTS_CA_BUNDLE "${cacert}/etc/ssl/certs/ca-bundle.crt"
   '';
 
@@ -71,25 +78,12 @@ stdenv.mkDerivation (finalAttrs: {
     wxpython
   ];
 
-  desktopItem = makeDesktopItem {
-    name = finalAttrs.pname;
-    exec = finalAttrs.pname;
-    icon = finalAttrs.pname;
-    desktopName = finalAttrs.pname;
-    categories = [ "Utility" ];
-    genericName = finalAttrs.meta.description;
-    noDisplay = false;
-    startupNotify = true;
-    terminal = false;
-    type = "Application";
-  };
-
   meta = {
     description = "Pixel™ phone flashing GUI utility with features";
     homepage = "https://github.com/badabing2005/PixelFlasher";
     license = lib.licenses.gpl3Only;
-    maintainers = with lib.maintainers; [ ];
-    mainProgram = "PixelFlasher";
+    maintainers = [ lib.maintainers.cjshearer ];
+    mainProgram = "pixelflasher";
     platforms = lib.platforms.all;
   };
 })
