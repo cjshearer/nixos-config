@@ -6,6 +6,7 @@
       });
       extensions =
         (with pkgs.vscode-extensions; [
+          github.copilot
           golang.go
           jnoortheen.nix-ide
           rust-lang.rust-analyzer
