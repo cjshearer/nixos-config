@@ -36,6 +36,9 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  qt.enable = true;
+  qt.style = "adwaita-dark";
+
   users.users.${systemConfig.username} = {
     isNormalUser = true;
     extraGroups = [
