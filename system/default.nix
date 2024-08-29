@@ -8,6 +8,7 @@
     ./nemo.nix
     ./ollama.nix
     ./onedrive.nix
+    ./picard.nix
     ./pipewire.nix
     ./pixelflasher.nix
     ./qbittorrent.nix
