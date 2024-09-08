@@ -13,9 +13,11 @@
           rust-lang.rust-analyzer
           stkb.rewrap
           streetsidesoftware.code-spell-checker
+          tamasfe.even-better-toml
           timonwong.shellcheck
           waderyan.gitblame
         ]) ++ (with pkgs.vscode-marketplace; [
+          biomejs.biome
           budparr.language-hugo-vscode
           joshbolduc.commitlint
           phil294.git-log--graph
@@ -80,9 +82,9 @@
           "rewrap.autoWrap.enabled" = false;
         };
         "[yaml]" = {
-          "editor.tabSize" = 2;
           "editor.autoIndent" = "advanced";
           "editor.insertSpaces" = true;
+          "editor.tabSize" = 2;
         };
         "editor.formatOnSave" = true;
         "editor.formatOnSaveMode" = "file";
@@ -105,11 +107,11 @@
         "javascript.inlayHints.propertyDeclarationTypes.enabled" = true;
         "javascript.referencesCodeLens.showOnAllFunctions" = true;
         "javascript.updateImportsOnFileMove.enabled" = "always";
+        "nix.formatterPath" = lib.getExe pkgs.nixpkgs-fmt;
         "typescript.updateImportsOnFileMove.enabled" = "always";
         "window.customMenuBarAltFocus" = false;
         "window.titleBarStyle" = "custom";
         "window.zoomLevel" = 0.5;
-        "nix.formatterPath" = lib.getExe pkgs.nixpkgs-fmt;
       };
     };
 }
