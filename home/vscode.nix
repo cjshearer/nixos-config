@@ -1,7 +1,7 @@
 { inputs, lib, config, pkgs, ... }: lib.mkIf config.programs.vscode.enable {
   programs.vscode =
     {
-      package = (pkgs.vscodium.override {
+      package = (pkgs.unstable.vscodium.override {
         commandLineArgs = "--password-store=\"gnome-libsecret\"";
       });
       extensions =
