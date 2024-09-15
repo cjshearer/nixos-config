@@ -22,7 +22,7 @@
           joshbolduc.commitlint
           phil294.git-log--graph
           bradlc.vscode-tailwindcss
-        ]) ++ lib.optionals config.programs.direnv.enable (with pkgs.vscode-extensions; [
+        ]) ++ lib.optionals config.programs.direnv.enable (with pkgs.unstable.vscode-extensions; [
           mkhl.direnv
         ]);
 
@@ -89,6 +89,9 @@
           "editor.insertSpaces" = true;
           "editor.tabSize" = 2;
         };
+        "cSpell.diagnosticLevel" = "Hint";
+        "cSpell.diagnosticLevelFlaggedWords" = "Hint";
+        "cSpell.textDecorationColor" = "royalblue";
         "editor.codeActionsOnSave" = {
           "source.fixAll" = "explicit";
         };
