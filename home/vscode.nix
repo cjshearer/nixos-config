@@ -5,7 +5,7 @@
         commandLineArgs = "--password-store=\"gnome-libsecret\"";
       });
       extensions =
-        (with pkgs.vscode-extensions; [
+        (with pkgs.unstable.vscode-extensions; [
           github.copilot
           github.copilot-chat
           golang.go
