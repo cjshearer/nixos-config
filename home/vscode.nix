@@ -81,10 +81,16 @@
         "[markdown]" = {
           "rewrap.autoWrap.enabled" = false;
         };
+        "[nix]" = {
+          "editor.defaultFormatter" = "jnoortheen.nix-ide";
+        };
         "[yaml]" = {
           "editor.autoIndent" = "advanced";
           "editor.insertSpaces" = true;
           "editor.tabSize" = 2;
+        };
+        "editor.codeActionsOnSave" = {
+          "source.fixAll" = "explicit";
         };
         "editor.formatOnSave" = true;
         "editor.formatOnSaveMode" = "file";
