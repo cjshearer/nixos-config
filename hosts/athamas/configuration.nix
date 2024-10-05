@@ -1,11 +1,13 @@
 {
   hardware.bluetooth.enable = true;
 
+  programs.citrix_workspace.enable = true;
   programs.hyprland.enable = true;
   programs.light.brightnessKeys.enable = true;
   programs.light.enable = true;
   programs.nemo.enable = true;
   programs.pixelflasher.enable = true;
+  programs.remmina.enable = true;
   programs.ytmdesktop.enable = true;
 
   services.greetd.tuigreet.desktop = "Hyprland";
