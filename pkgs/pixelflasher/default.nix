@@ -11,7 +11,7 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "pixelflasher";
-  version = "7.3.2.0";
+  version = "7.5.0.0";
 
   desktopItem = makeDesktopItem {
     desktopName = "PixelFlasher";
@@ -30,13 +30,13 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "badabing2005";
     repo = "PixelFlasher";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-U7fZ3Tx5TjYTus6IwOW9gAejY6jn7weGwcnyfS7IGSc=";
+    hash = "sha256-wX67Me3JOikxtg6N7WeIJxjbiwfyL38+WfhxFx/eRCw=";
   };
 
   buildPhase = ''
     # we set the default android-tools path for convenience
     substituteInPlace config.py --replace-fail \
-      "platform_tools_path = None" "platform_tools_path = '$android-tools/bin'"
+      "platform_tools_path = None" "platform_tools_path = '${lib.getBin android-tools}/bin'"
 
     sh build.sh
   '';
@@ -50,7 +50,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   fixupPhase = ''
     wrapProgram $out/bin/pixelflasher \
-      --set REQUESTS_CA_BUNDLE "${cacert}/etc/ssl/certs/ca-bundle.crt"
+      --set REQUESTS_CA_BUNDLE "${cacert}/etc/ssl/certs/ca-bundle.crt" \
+      --set PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION python
   '';
 
   nativeBuildInputs = [ makeWrapper ];
