@@ -11,7 +11,7 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "pixelflasher";
-  version = "7.5.0.0";
+  version = "7.6.0.0";
 
   desktopItem = makeDesktopItem {
     desktopName = "PixelFlasher";
@@ -30,7 +30,7 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "badabing2005";
     repo = "PixelFlasher";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-wX67Me3JOikxtg6N7WeIJxjbiwfyL38+WfhxFx/eRCw=";
+    hash = "sha256-5LKvLb7QiHZl80+T3+IcuhLyySkVQJl4E6ItJ8Cmdsw=";
   };
 
   buildPhase = ''
