@@ -1,4 +1,4 @@
-{ inputs, ... }: {
+{ inputs, pkgs, ... }: {
   nixpkgs.overlays = [
     (final: _prev: {
       unstable = import inputs.nixpkgs-unstable {
@@ -10,7 +10,7 @@
         ];
       };
     })
-    (final: _prev: import ../pkgs { pkgs = _prev.pkgs.unstable; })
+    (final: _prev: import ../pkgs { inherit pkgs; })
     inputs.nix-vscode-extensions.overlays.default
   ];
 }

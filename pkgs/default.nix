@@ -1,5 +1,5 @@
 { pkgs, ... }:
 {
   hyprec = pkgs.callPackage ./hyprec { };
-  pixelflasher = pkgs.callPackage ./pixelflasher { };
+  pixelflasher = pkgs.unstable.callPackage ./pixelflasher { };
 }
