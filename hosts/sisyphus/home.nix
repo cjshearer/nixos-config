@@ -1,5 +1,6 @@
 {
   programs.blender.enable = true;
+  programs.blueman.enable = true;
   programs.direnv.enable = true;
   programs.discord.enable = true;
   programs.git.enable = true;

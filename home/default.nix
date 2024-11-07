@@ -1,6 +1,7 @@
 { inputs, ... }: {
   imports = [
     ./blender.nix
+    ./blueman.nix
     ./chrome.nix
     ./cliphist.nix
     ./direnv.nix
