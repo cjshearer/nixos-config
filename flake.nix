@@ -2,16 +2,18 @@
   description = "Cody Shearer's NixOS Configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOs/nixpkgs/release-24.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.follows = "nixos-cosmic/nixpkgs";
 
-    home-manager.url = "github:nix-community/home-manager/release-24.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager.url = "github:nix-community/home-manager";
 
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+    nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
+
+    nixos-cosmic.url = "github:lilyinstarlight/nixos-cosmic";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ... } @ inputs:
+  outputs = { self, nixos-cosmic, nixpkgs, home-manager, ... } @ inputs:
     let
       mkSystems = systems: builtins.listToAttrs (map
         (systemConfig: {
@@ -21,6 +23,7 @@
             specialArgs = { inherit inputs systemConfig; };
             modules = [
               ./overlays
+              nixos-cosmic.nixosModules.default
               ./system
               ./hosts/${systemConfig.hostname}/configuration.nix
               ./hosts/${systemConfig.hostname}/hardware-configuration.nix
@@ -47,6 +50,6 @@
         { username = "cjshearer"; hostname = "charon"; architecture = "aarch64-linux"; }
       ];
 
-      packages.x86_64-linux = import ./pkgs nixpkgs-unstable.legacyPackages.x86_64-linux;
+      packages.x86_64-linux = import ./pkgs nixpkgs.legacyPackages.x86_64-linux;
     };
 }

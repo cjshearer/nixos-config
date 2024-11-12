@@ -1,23 +1,14 @@
 {
-  hardware.bluetooth.enable = true;
-
   programs.citrix_workspace.enable = true;
-  programs.hyprland.enable = true;
   programs.light.brightnessKeys.enable = true;
   programs.light.enable = true;
-  programs.nemo.enable = true;
   # pyinstaller broken on unstable:
   # https://github.com/NixOS/nixpkgs/commit/89a1044a08f38490c527032ef4b0f2143bcae57b
   # programs.pixelflasher.enable = true;
   programs.remmina.enable = true;
   programs.ytmdesktop.enable = true;
 
-  services.greetd.tuigreet.desktop = "Hyprland";
-  services.greetd.tuigreet.enable = true;
-  # Userspace virtual file system (enables external storage devices)
-  services.gvfs.enable = true;
-  services.pipewire.enable = true;
-  services.printing.enable = true;
+  services.desktopManager.cosmic.enable = true;
   services.syncthing.enable = true;
   services.tailscale.enable = true;
 

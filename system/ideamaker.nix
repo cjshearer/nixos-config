@@ -7,6 +7,6 @@ in
   options.programs.ideamaker.enable = mkEnableOption "ideamaker";
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs.unstable; [ ideamaker ];
+    environment.systemPackages = with pkgs; [ ideamaker ];
   };
 }

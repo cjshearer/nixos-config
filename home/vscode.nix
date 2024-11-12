@@ -1,11 +1,11 @@
 { inputs, lib, config, pkgs, ... }: lib.mkIf config.programs.vscode.enable {
   programs.vscode =
     {
-      package = (pkgs.unstable.vscodium.override {
+      package = (pkgs.vscodium.override {
         commandLineArgs = "--password-store=\"gnome-libsecret\"";
       });
       extensions =
-        (with pkgs.unstable.vscode-extensions; [
+        (with pkgs.vscode-extensions; [
           github.copilot
           github.copilot-chat
           golang.go
@@ -22,7 +22,7 @@
           joshbolduc.commitlint
           phil294.git-log--graph
           bradlc.vscode-tailwindcss
-        ]) ++ lib.optionals config.programs.direnv.enable (with pkgs.unstable.vscode-extensions; [
+        ]) ++ lib.optionals config.programs.direnv.enable (with pkgs.vscode-extensions; [
           mkhl.direnv
         ]);
 

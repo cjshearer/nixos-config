@@ -1,21 +1,18 @@
 { systemConfig, inputs, ... }: {
   imports = [
-    ./bluetooth.nix
     ./citrix_workspace.nix
-    ./hypr.nix
+    ./cosmic.nix
+    ./ideamaker.nix
     ./ledger-live-desktop.nix
     ./liquidctl.nix
-    ./nemo.nix
     ./ollama.nix
     ./onedrive.nix
     ./picard.nix
-    ./pipewire.nix
     ./pixelflasher.nix
     ./qbittorrent.nix
     ./remmina.nix
     ./syncthing.nix
     ./tailscale.nix
-    ./tuigreet.nix
     ./ytmdesktop.nix
     ./zoom-us.nix
   ];

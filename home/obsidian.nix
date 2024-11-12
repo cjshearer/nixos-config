@@ -7,6 +7,6 @@ in
   options.programs.obsidian.enable = mkEnableOption "obsidian";
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [ unstable.obsidian ];
+    home.packages = with pkgs; [ obsidian ];
   };
 }

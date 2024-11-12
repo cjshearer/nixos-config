@@ -22,7 +22,6 @@ $ nix flake show
 │   └───sisyphus: NixOS configuration
 └───packages
     └───x86_64-linux
-        ├───hyprec: package 'hyprec'
         └───pixelflasher: package 'pixelflasher-7.6.0.0'
 ```
 

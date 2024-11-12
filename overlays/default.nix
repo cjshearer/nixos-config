@@ -1,7 +1,7 @@
 { inputs, pkgs, ... }: {
   nixpkgs.overlays = [
     (final: _prev: {
-      unstable = import inputs.nixpkgs-unstable {
+      nixpkgs = import inputs.nixpkgs {
         system = final.system;
         config.allowUnfree = true;
         config.permittedInsecurePackages = [
