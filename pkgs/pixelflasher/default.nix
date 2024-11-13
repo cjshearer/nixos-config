@@ -4,11 +4,11 @@
   fetchFromGitHub,
   lib,
   makeDesktopItem,
-  makeWrapper,
   nix-update-script,
-  python311,
+  python3,
   stdenv,
   substituteAll,
+  wrapGAppsHook3,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -22,9 +22,11 @@ stdenv.mkDerivation (finalAttrs: {
     hash = "sha256-5LKvLb7QiHZl80+T3+IcuhLyySkVQJl4E6ItJ8Cmdsw=";
   };
 
-  nativeBuildInputs = [ makeWrapper ];
+  disabled = python3.pythonOlder "3.11";
 
-  buildInputs = with python311.pkgs; [
+  nativeBuildInputs = [ wrapGAppsHook3 ];
+
+  buildInputs = with python3.pkgs; [
     android-tools
     attrdict
     beautifulsoup4
@@ -60,14 +62,14 @@ stdenv.mkDerivation (finalAttrs: {
   installPhase = ''
     install -D dist/PixelFlasher $out/bin/pixelflasher
     install -D images/icon-dark-256.png $out/share/pixmaps/pixelflasher.png
-
     ln -s ${finalAttrs.desktopItem}/share/applications $out/share/
   '';
 
-  fixupPhase = ''
-    wrapProgram $out/bin/pixelflasher \
-      --set REQUESTS_CA_BUNDLE "${cacert}/etc/ssl/certs/ca-bundle.crt" \
+  preFixup = ''
+    gappsWrapperArgs+=(
+      --set REQUESTS_CA_BUNDLE "${cacert}/etc/ssl/certs/ca-bundle.crt"
       --set PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION python
+    )
   '';
 
   desktopItem = makeDesktopItem {
