@@ -5,9 +5,7 @@
   # programs.ideamaker.enable = true;
   programs.ledger-live-desktop.enable = true;
   programs.picard.enable = true;
-  # pyinstaller broken on unstable:
-  # https://github.com/NixOS/nixpkgs/commit/89a1044a08f38490c527032ef4b0f2143bcae57b
-  # programs.pixelflasher.enable = true;
+  programs.pixelflasher.enable = true;
   programs.qbittorrent.enable = true;
   programs.remmina.enable = true;
   programs.steam.enable = true;
