@@ -11,4 +11,10 @@
           "--advertise-exit-node" = [ "charon" ];
         }
     );
+
+  services.tailscale.useRoutingFeatures = {
+    athamas = "client";
+    charon = "server";
+    sisyphus = "client";
+  }.${systemConfig.hostname};
 }
