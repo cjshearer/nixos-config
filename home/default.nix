@@ -2,6 +2,7 @@
   imports = [
     ./blender.nix
     ./chrome.nix
+    ./cosmic.nix
     ./direnv.nix
     ./discord.nix
     ./font-awesome.nix

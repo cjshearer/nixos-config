@@ -6,6 +6,8 @@
 
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
+    home-manager-cosmic.url = "github:tristanbeedell/hm-cosmic";
+    home-manager-cosmic.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
@@ -13,7 +15,7 @@
     nixos-cosmic.url = "github:lilyinstarlight/nixos-cosmic";
   };
 
-  outputs = { self, nixos-cosmic, nixpkgs, home-manager, ... } @ inputs:
+  outputs = { self, nixos-cosmic, nixpkgs, home-manager, home-manager-cosmic, ... } @ inputs:
     let
       mkSystems = systems: builtins.listToAttrs (map
         (systemConfig: {
@@ -32,6 +34,7 @@
                 home-manager.useGlobalPkgs = true;
                 home-manager.useUserPackages = true;
                 home-manager.users.${systemConfig.username}.imports = [
+                  home-manager-cosmic.homeManagerModules.cosmic
                   ./home
                   ./hosts/${systemConfig.hostname}/home.nix
                 ];
