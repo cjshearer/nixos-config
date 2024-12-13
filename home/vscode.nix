@@ -101,7 +101,7 @@
         "editor.inlineSuggest.enabled" = true;
         "editor.rulers" = [ 100 ];
         "editor.tabSize" = 2;
-        "editor.wordWrap" = "wordWrapColumn";
+        "editor.wordWrap" = "bounded";
         "editor.wordWrapColumn" = 100;
         "explorer.confirmDelete" = false;
         "explorer.confirmDragAndDrop" = false;
