@@ -7,6 +7,7 @@ in lib.mkIf config.programs.cosmic.enable {
       cursor_follows_focus = true;
       focus_follows_cursor = true;
       focus_follows_cursor_delay = 20;
+      input_touchpad.scroll_config.natural_scroll = true;
     };
     input.binds = mapBinds
       {
