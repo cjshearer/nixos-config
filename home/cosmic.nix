@@ -1,6 +1,8 @@
 { pkgs, config, lib, ... }:
 let inherit (config.lib.cosmic) Actions mapBinds;
 in lib.mkIf config.programs.cosmic.enable {
+  # list current cosmic configurations with:
+  # find ~/.config/cosmic -type f -exec echo -e '\n// {}\n' >> cosmic.ron \; -exec cat {} >> cosmic.ron \;
   programs.cosmic = {
     comp.settings = {
       autotile = true;
