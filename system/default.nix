@@ -5,7 +5,6 @@
     ./ideamaker.nix
     ./ledger-live-desktop.nix
     ./liquidctl.nix
-    ./ollama.nix
     ./onedrive.nix
     ./picard.nix
     ./pipewire.nix

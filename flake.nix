@@ -2,17 +2,19 @@
   description = "Cody Shearer's NixOS Configuration";
 
   inputs = {
-    nixpkgs.follows = "nixos-cosmic/nixpkgs";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
     home-manager-cosmic.url = "github:tristanbeedell/hm-cosmic";
-    home-manager-cosmic.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager-cosmic.inputs.home-manager.follows = "nixpkgs";
 
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
 
     nixos-cosmic.url = "github:lilyinstarlight/nixos-cosmic";
+    nixos-cosmic.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixos-cosmic, nixpkgs, home-manager, home-manager-cosmic, ... } @ inputs:
