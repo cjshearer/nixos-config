@@ -1,5 +1,6 @@
 {
   hardware.bluetooth.enable = true;
+  hardware.keyboard.zsa.enable = true;
 
   programs.citrix_workspace.enable = true;
   # programs.ideamaker.enable = true;
