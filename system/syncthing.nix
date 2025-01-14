@@ -19,10 +19,6 @@
         };
       };
       folders = lib.filterAttrs (_: v: builtins.elem systemConfig.hostname v.devices) {
-        "audiobooks" = {
-          path = "/home/${systemConfig.username}/OneDrive/audiobooks";
-          devices = [ "salmoneus" "sisyphus" ];
-        };
         "my-notes" = {
           path = "/home/${systemConfig.username}/OneDrive/documents/my-notes";
           devices = [ "athamas" "salmoneus" "sisyphus" ];
