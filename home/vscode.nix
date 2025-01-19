@@ -6,6 +6,7 @@
       });
       extensions =
         (with pkgs.vscode-extensions; [
+          bierner.markdown-mermaid
           github.copilot
           github.copilot-chat
           golang.go
