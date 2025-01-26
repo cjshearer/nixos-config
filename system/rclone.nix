@@ -14,28 +14,6 @@
   config = lib.mkIf config.services.rclone.enable {
     environment.systemPackages = [ pkgs.rclone ];
 
-    # fileSystems."/mnt/onedrive" = {
-    #   device = "onedrive:/sync";
-    #   fsType = "rclone";
-    #   options = [
-    #     "uid=${toString config.users.users.${systemConfig.username}.uid}"
-    #     "_netdev" # don't mount until device is queried
-    #     "allow_other" # allow access for other users
-    #     "nodev" # ignore device files on mount
-    #     "nofail" # don’t fail if mount fails
-    #     "rw" # read/write mode
-    #     "vfs-cache-mode=full"
-    #     "config=${config.services.rclone.conf}"
-    #     "cache-dir=${config.services.rclone.cachedir}"
-    #     "onedrive-delta"
-    #   ];
-    # };
-
-    # TODO: convert to fileSystems."/mnt/OneDrive" = { ... } once rclone supports --remount
-    # https://github.com/rclone/rclone/issues/6488. That said, running rclone as root, as would 
-    # happen in this case, would cause the vfs file cache to be owned by root, which would require
-    # running syncthing as root as well. If I recall correctly, that didn't work when I tried it.
-
     # TODO: see what config options I can reuse from here to make rclone faster:
     # https://github.com/insertokname/nixos_config/blob/2594ebbf6c75593f10d9b72190056f647f0bceab/hardware/laptop/services/rclone.nix#L10
 
@@ -45,6 +23,9 @@
 
     programs.fuse.userAllowOther = true;
 
+    # My userdirs are stored in OneDrive, so I want to symlink them to my home directory. If this
+    # becomes troublesome, consider changing the default XDG user dirs to point to OneDrive, but
+    # consider the edge case where OneDrive is not mounted.
     systemd.services.mnt-onedrive-symlinks = {
       description = "Symlink OneDrive folders to home directory";
       serviceConfig = {
@@ -75,6 +56,14 @@
       wantedBy = [ "multi-user.target" ];
     };
 
+    # While I could use the `fileSystems` option to mount OneDrive, using an fstab entry would cause
+    # rclone to be run as root, which makes the vfs cache owned by root. This was problematic when I
+    # tried to use syncthing to sync the vfs cache between devices, as syncthing would also need to
+    # run as root, but I don't remember that working when I tried last. Furthermore, updating the
+    # mount when using `fileSystems` would sometimes throw an error about --remount not being
+    # supported (https://github.com/rclone/rclone/issues/6488). If and when that is supported, I
+    # could consider using it, since the experiment with syncing the vfs cache did not have the
+    # desired effect (an open file was not updated when its underlying cache was updated).
     systemd.services.mnt-onedrive = {
       description = "rclone mount of OneDrive";
       serviceConfig = {
@@ -94,11 +83,8 @@
       wantedBy = [ "multi-user.target" ];
     };
 
-    # TODO: setup automatic vfs refresh on peer change:
-    # https://forum.rclone.org/t/refreshing-rclone-cache-for-specific-paths/38786
-    # https://rclone.org/rc/. I tried something like this, where I setup syncthing to sync the vfs
-    # cache between devices, but found that an open file is not updated when its underlying cache
-    # is updated. I may need to use the rc command to refresh the cache, but I should first try a
-    # small scale test to see if it works.
+    # TODO: explore options for updating peers' files when they change:
+    # - https://forum.rclone.org/t/refreshing-rclone-cache-for-specific-paths/38786
+    # - use rclone to mount the mounted mount? (e.g. salmoneus -> sisyphus:/mnt/onedrive)
   };
 }
