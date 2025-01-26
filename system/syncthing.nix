@@ -18,9 +18,9 @@
           id = "MCRXYZA-654GQQ3-5IOWJOH-MRY3NOP-NUVUAUL-KZGK4TJ-3WYS2E7-GZCL5Q3";
         };
       };
-      folders = lib.filterAttrs (_: v: builtins.elem systemConfig.hostname v.devices) {
-        "my-notes" = {
-          path = "/home/${systemConfig.username}/OneDrive/documents/my-notes";
+      folders = {
+        "rclone-cache" = lib.mkIf config.services.rclone.enable {
+          path = config.services.rclone.cachedir;
           devices = [ "athamas" "salmoneus" "sisyphus" ];
         };
       };
@@ -32,6 +32,8 @@
         urAccepted = -1;
       };
     };
+
     user = systemConfig.username;
+    group = "root";
   };
 }

@@ -16,8 +16,8 @@
   services.desktopManager.cosmic.enable = true;
   services.liquidctl.enable = true;
   services.logiops.enable = true;
-  services.onedrive.enable = true;
   services.pipewire.enable = true;
+  services.rclone.enable = true;
   services.syncthing.enable = true;
   services.tailscale.enable = true;
 

@@ -10,6 +10,7 @@
     ./pipewire.nix
     ./pixelflasher.nix
     ./qbittorrent.nix
+    ./rclone.nix
     ./remmina.nix
     ./syncthing.nix
     ./tailscale.nix
@@ -42,11 +43,10 @@
   qt.enable = true;
   qt.style = "adwaita-dark";
 
-  users.users.${systemConfig.username} = {
-    isNormalUser = true;
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-    ];
-  };
+  users.users.cjshearer.extraGroups = [
+    "networkmanager"
+    "wheel"
+  ];
+  users.users.cjshearer.isNormalUser = true;
+  users.users.cjshearer.uid = 1000;
 }

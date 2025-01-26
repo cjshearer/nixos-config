@@ -6,6 +6,7 @@
   programs.ytmdesktop.enable = true;
 
   services.desktopManager.cosmic.enable = true;
+  services.rclone.enable = true;
   services.syncthing.enable = true;
   services.tailscale.enable = true;
 
