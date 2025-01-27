@@ -1,4 +1,6 @@
-{ systemConfig, lib, pkgs, config, ... }: {
+{ systemConfig, lib, pkgs, config, ... }:
+let cfg = config.services.rclone; in
+{
   options.services.rclone.enable = lib.mkEnableOption "rclone";
   options.services.rclone.conf = lib.mkOption {
     type = lib.types.str;
@@ -10,8 +12,18 @@
     default = "/home/${systemConfig.username}/.cache/rclone";
     description = "Path to rclone cache directory";
   };
+  options.services.rclone.onedrive.mount = lib.mkOption {
+    type = lib.types.str;
+    default = "/mnt/onedrive";
+    description = "Path to mount OneDrive";
+  };
+  options.services.rclone.onedrive.symlinks = lib.mkOption {
+    type = lib.types.str;
+    default = "/home/${systemConfig.username}";
+    description = "Path to symlink OneDrive folders to";
+  };
 
-  config = lib.mkIf config.services.rclone.enable {
+  config = lib.mkIf cfg.enable {
     environment.systemPackages = [ pkgs.rclone ];
 
     # TODO: see what config options I can reuse from here to make rclone faster:
@@ -31,16 +43,16 @@
       serviceConfig = {
         Type = "simple";
         ExecStart = pkgs.writeShellScript "mnt-onedrive-symlinks" ''
-          ln -sf /mnt/onedrive/* /home/${systemConfig.username}/
-          ${pkgs.inotify-tools}/bin/inotifywait -m -e create,delete,moved_to,moved_from /mnt/onedrive | while read path action file; do
+          ln -sf ${cfg.onedrive.mount}/* ${cfg.onedrive.symlinks}
+          ${pkgs.inotify-tools}/bin/inotifywait -m -e create,delete,moved_to,moved_from ${cfg.onedrive.mount} | while read path action file; do
             if [ $action = "CREATE" ] || [ $action = "MOVED_TO" ]; then
-              ln -sf "/mnt/onedrive/$file" /home/${systemConfig.username}/
-            elif [ -L "/home/${systemConfig.username}/$file" ] && ([ $action = "DELETE" ] || [ $action = "MOVED_FROM" ]); then
-              rm "/home/${systemConfig.username}/$file"
+              ln -sf "${cfg.onedrive.mount}/$file" ${cfg.onedrive.symlinks}
+            elif [ -L "${cfg.onedrive.symlinks}/$file" ] && ([ $action = "DELETE" ] || [ $action = "MOVED_FROM" ]); then
+              rm "${cfg.onedrive.symlinks}/$file"
             fi
           done
         '';
-        ExecStop = "${pkgs.findutils}/bin/find /home/${systemConfig.username}/ -maxdepth 1 -xtype l -delete";
+        ExecStop = "${pkgs.findutils}/bin/find ${cfg.onedrive.symlinks} -maxdepth 1 -xtype l -delete";
         RestartSec = 10;
         Restart = "on-failure";
         User = systemConfig.username;
@@ -68,11 +80,11 @@
       description = "rclone mount of OneDrive";
       serviceConfig = {
         Type = "notify";
-        ExecStart = "${pkgs.rclone}/bin/rclone mount --allow-other --default-permissions --vfs-cache-mode full --config ${config.services.rclone.conf} --cache-dir ${config.services.rclone.cachedir} --onedrive-delta onedrive:/sync /mnt/onedrive";
+        ExecStart = "${pkgs.rclone}/bin/rclone mount --allow-other --default-permissions --vfs-cache-mode full --config ${cfg.conf} --cache-dir ${cfg.cachedir} --onedrive-delta onedrive:/sync ${cfg.onedrive.mount}";
 
         # TODO: prefetch directory/filenames at rclone mount: https://github.com/rclone/rclone/issues/4291
 
-        ExecStop = "${pkgs.fuse3}/bin/fusermount3 -uz /mnt/onedrive";
+        ExecStop = "${pkgs.fuse3}/bin/fusermount3 -uz ${cfg.onedrive.mount}";
         Restart = "on-failure";
         RestartSec = "10s";
         User = systemConfig.username;
