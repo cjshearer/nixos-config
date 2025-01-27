@@ -33,7 +33,43 @@ let cfg = config.services.rclone; in
       "d /mnt/onedrive 0755 ${systemConfig.username} root -"
     ];
 
+    # TODO: see why I need --allow-other, despite running rclone as my user
     programs.fuse.userAllowOther = true;
+
+    # While I could use the `fileSystems` option to mount OneDrive, using an fstab entry would cause
+    # rclone to be run as root, which makes the vfs cache owned by root. This was problematic when I
+    # tried to use syncthing to sync the vfs cache between devices, as syncthing would also need to
+    # run as root, but I don't remember that working when I tried last. Furthermore, updating the
+    # mount when using `fileSystems` would sometimes throw an error about --remount not being
+    # supported (https://github.com/rclone/rclone/issues/6488). If and when that is supported, I
+    # could consider using it, since the experiment with syncing the vfs cache did not have the
+    # desired effect (an open file was not updated when its underlying cache was updated).
+    systemd.services.mnt-onedrive = {
+      description = "rclone mount of OneDrive";
+      serviceConfig = {
+        Type = "notify";
+        ExecStart = pkgs.writeShellScript "mnt-onedrive" ''
+          ${pkgs.rclone}/bin/rclone mount onedrive:/sync ${cfg.onedrive.mount} \
+            --allow-other \
+            --cache-dir ${cfg.cachedir} \
+            --config ${cfg.conf} \
+            --default-permissions \
+            --onedrive-delta \
+            --vfs-cache-mode full
+        '';
+
+        # TODO: prefetch directory/filenames at rclone mount: https://github.com/rclone/rclone/issues/4291
+
+        ExecStop = "${pkgs.fuse3}/bin/fusermount3 -uz ${cfg.onedrive.mount}";
+        Restart = "on-failure";
+        RestartSec = "10s";
+        User = systemConfig.username;
+        Group = "root";
+        Environment = [ "PATH=/run/wrappers/bin/:$PATH" ];
+      };
+      requires = [ "network-online.target" ];
+      wantedBy = [ "multi-user.target" ];
+    };
 
     # My userdirs are stored in OneDrive, so I want to symlink them to my home directory. If this
     # becomes troublesome, consider changing the default XDG user dirs to point to OneDrive, but
@@ -65,33 +101,6 @@ let cfg = config.services.rclone; in
       requires = [ "mnt-onedrive.service" ];
       after = [ "mnt-onedrive.service" ];
       bindsTo = [ "mnt-onedrive.service" ];
-      wantedBy = [ "multi-user.target" ];
-    };
-
-    # While I could use the `fileSystems` option to mount OneDrive, using an fstab entry would cause
-    # rclone to be run as root, which makes the vfs cache owned by root. This was problematic when I
-    # tried to use syncthing to sync the vfs cache between devices, as syncthing would also need to
-    # run as root, but I don't remember that working when I tried last. Furthermore, updating the
-    # mount when using `fileSystems` would sometimes throw an error about --remount not being
-    # supported (https://github.com/rclone/rclone/issues/6488). If and when that is supported, I
-    # could consider using it, since the experiment with syncing the vfs cache did not have the
-    # desired effect (an open file was not updated when its underlying cache was updated).
-    systemd.services.mnt-onedrive = {
-      description = "rclone mount of OneDrive";
-      serviceConfig = {
-        Type = "notify";
-        ExecStart = "${pkgs.rclone}/bin/rclone mount --allow-other --default-permissions --vfs-cache-mode full --config ${cfg.conf} --cache-dir ${cfg.cachedir} --onedrive-delta onedrive:/sync ${cfg.onedrive.mount}";
-
-        # TODO: prefetch directory/filenames at rclone mount: https://github.com/rclone/rclone/issues/4291
-
-        ExecStop = "${pkgs.fuse3}/bin/fusermount3 -uz ${cfg.onedrive.mount}";
-        Restart = "on-failure";
-        RestartSec = "10s";
-        User = systemConfig.username;
-        Group = "root";
-        Environment = [ "PATH=/run/wrappers/bin/:$PATH" ];
-      };
-      requires = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
     };
 
