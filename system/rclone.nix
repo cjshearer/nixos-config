@@ -103,9 +103,5 @@ let cfg = config.services.rclone; in
       bindsTo = [ "mnt-onedrive.service" ];
       wantedBy = [ "multi-user.target" ];
     };
-
-    # TODO: explore options for updating peers' files when they change:
-    # - https://forum.rclone.org/t/refreshing-rclone-cache-for-specific-paths/38786
-    # - use rclone to mount the mounted mount? (e.g. salmoneus -> sisyphus:/mnt/onedrive)
   };
 }
