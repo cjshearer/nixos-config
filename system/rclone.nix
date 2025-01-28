@@ -26,9 +26,6 @@ let cfg = config.services.rclone; in
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ pkgs.rclone ];
 
-    # TODO: see what config options I can reuse from here to make rclone faster:
-    # https://github.com/insertokname/nixos_config/blob/2594ebbf6c75593f10d9b72190056f647f0bceab/hardware/laptop/services/rclone.nix#L10
-
     systemd.tmpfiles.rules = [
       "d /mnt/onedrive 0755 ${systemConfig.username} root -"
     ];
@@ -48,27 +45,22 @@ let cfg = config.services.rclone; in
       description = "rclone mount of OneDrive";
       serviceConfig = {
         Type = "notify";
+        # The systemd-notify signal work when using pkgs.writeShellScript, but I still want to use
+        # multiline strings for readability. Multiline strings don't work with ExecStart, so I use
+        # builtins.replaceStrings to remove the newlines.
         ExecStart = builtins.replaceStrings [ "\n" ] [ "" ] ''
           ${pkgs.rclone}/bin/rclone mount onedrive:/sync ${cfg.onedrive.mount}
             --allow-other
             --cache-dir ${cfg.cachedir}
             --config ${cfg.conf}
             --default-permissions
+            --dir-cache-time 52w
             --onedrive-delta
-            --rc
+            --poll-interval 30s
+            --vfs-cache-max-age 2w
             --vfs-cache-mode full
+            --vfs-refresh
         '';
-        # We prefetch the directory/filenames to speed up access to the files
-        ExecStartPost=builtins.replaceStrings [ "\n" ] [ "" ] ''
-          ${pkgs.rclone}/bin/rclone rc vfs/refresh
-            _async=true
-            --rc-addr 127.0.0.1:5572 
-            recursive=true
-        '';
-
-        # TODO: prefetch directory/filenames at rclone mount: https://github.com/rclone/rclone/issues/4291
-
-        ExecStop = "${pkgs.fuse3}/bin/fusermount3 -uz ${cfg.onedrive.mount}";
         Restart = "on-failure";
         RestartSec = "10s";
         User = systemConfig.username;
