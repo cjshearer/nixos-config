@@ -48,14 +48,15 @@ let cfg = config.services.rclone; in
       description = "rclone mount of OneDrive";
       serviceConfig = {
         Type = "notify";
-        ExecStart = pkgs.writeShellScript "mnt-onedrive" ''
-          ${pkgs.rclone}/bin/rclone mount onedrive:/sync ${cfg.onedrive.mount} \
-            --allow-other \
-            --cache-dir ${cfg.cachedir} \
-            --config ${cfg.conf} \
-            --default-permissions \
-            --onedrive-delta \
+        ExecStart = builtins.replaceStrings [ "\n" ] [ "" ] ''
+          ${pkgs.rclone}/bin/rclone mount
+            --allow-other
+            --cache-dir ${cfg.cachedir}
+            --config ${cfg.conf}
+            --default-permissions
+            --onedrive-delta
             --vfs-cache-mode full
+            onedrive:/sync ${cfg.onedrive.mount}
         '';
 
         # TODO: prefetch directory/filenames at rclone mount: https://github.com/rclone/rclone/issues/4291
