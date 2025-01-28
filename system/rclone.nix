@@ -49,14 +49,21 @@ let cfg = config.services.rclone; in
       serviceConfig = {
         Type = "notify";
         ExecStart = builtins.replaceStrings [ "\n" ] [ "" ] ''
-          ${pkgs.rclone}/bin/rclone mount
+          ${pkgs.rclone}/bin/rclone mount onedrive:/sync ${cfg.onedrive.mount}
             --allow-other
             --cache-dir ${cfg.cachedir}
             --config ${cfg.conf}
             --default-permissions
             --onedrive-delta
+            --rc
             --vfs-cache-mode full
-            onedrive:/sync ${cfg.onedrive.mount}
+        '';
+        # We prefetch the directory/filenames to speed up access to the files
+        ExecStartPost=builtins.replaceStrings [ "\n" ] [ "" ] ''
+          ${pkgs.rclone}/bin/rclone rc vfs/refresh
+            _async=true
+            --rc-addr 127.0.0.1:5572 
+            recursive=true
         '';
 
         # TODO: prefetch directory/filenames at rclone mount: https://github.com/rclone/rclone/issues/4291
