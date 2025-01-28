@@ -12,7 +12,6 @@
     ./qbittorrent.nix
     ./rclone.nix
     ./remmina.nix
-    ./syncthing.nix
     ./tailscale.nix
     ./ytmdesktop.nix
     ./zoom-us.nix
