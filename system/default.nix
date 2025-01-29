@@ -42,6 +42,8 @@
   qt.enable = true;
   qt.style = "adwaita-dark";
 
+  system.etc.overlay.mutable = false;
+
   users.users.cjshearer.extraGroups = [
     "networkmanager"
     "wheel"
