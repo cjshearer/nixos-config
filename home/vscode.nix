@@ -12,6 +12,7 @@
           golang.go
           jnoortheen.nix-ide
           rust-lang.rust-analyzer
+          # TODO: add or wait for dnut.rewrap-revived to be added to vscode-extensions and replace:
           stkb.rewrap
           streetsidesoftware.code-spell-checker
           tamasfe.even-better-toml
@@ -75,6 +76,11 @@
           key = "ctrl+shift+alt+down";
           command = "-editor.action.copyLinesDownAction";
           when = "editorTextFocus && !editorReadonly";
+        }
+        {
+          key = "f5";
+          command = "workbench.action.files.revert";
+          when = "editorFocus";
         }
       ];
 
