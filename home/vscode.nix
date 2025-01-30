@@ -119,6 +119,12 @@
         "git.autofetch" = true;
         "git.confirmSync" = true;
         "git.terminalGitEditor" = true;
+        "github.copilot.enable" = {
+          "*" = true;
+          "plaintext" = false;
+          "markdown" = true;
+          "scminput" = false;
+        };
         "javascript.inlayHints.parameterNames.enabled" = "literals";
         "javascript.inlayHints.propertyDeclarationTypes.enabled" = true;
         "javascript.referencesCodeLens.showOnAllFunctions" = true;
