@@ -52,7 +52,7 @@ stdenv.mkDerivation (finalAttrs: {
   patchPhase = ''
     # we set the default android-tools path for convenience
     substituteInPlace config.py --replace-fail \
-      "platform_tools_path = None" "platform_tools_path = '${lib.getBin android-tools}/bin'"
+      "platform_tools_path = None" "platform_tools_path = '/run/current-system/sw/bin/'"
   '';
 
   buildPhase = ''
