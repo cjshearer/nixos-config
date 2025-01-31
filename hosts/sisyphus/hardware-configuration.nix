@@ -34,6 +34,8 @@
   # networking.interfaces.eno2.useDHCP = lib.mkDefault true;
   # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
 
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  hardware.amdgpu.opencl.enable = true;
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  nixpkgs.config.rocmSupport = true;
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 }
