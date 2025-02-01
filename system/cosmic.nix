@@ -1,4 +1,4 @@
-{ lib, config, nixos-cosmic, ... }: lib.mkIf config.services.desktopManager.cosmic.enable {
+{ lib, config, pkgs, nixos-cosmic, ... }: lib.mkIf config.services.desktopManager.cosmic.enable {
   services.displayManager.cosmic-greeter.enable = true;
 
   # https://github.com/lilyinstarlight/nixos-cosmic?tab=readme-ov-file#cosmic-utilities---clipboard-manager-not-working
@@ -6,6 +6,8 @@
     NIXOS_OZONE_WL = 1;
     COSMIC_DATA_CONTROL_ENABLED = 1;
   };
+
+  environment.systemPackages = [ pkgs.wl-clipboard ];
 
   nix.settings.substituters = [ "https://cosmic.cachix.org/" ];
   nix.settings.trusted-public-keys = [
