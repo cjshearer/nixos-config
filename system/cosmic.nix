@@ -7,7 +7,10 @@
     COSMIC_DATA_CONTROL_ENABLED = 1;
   };
 
-  environment.systemPackages = [ pkgs.wl-clipboard ];
+  environment.systemPackages = [
+    pkgs.wl-clipboard
+    pkgs.cosmic-ext-applet-clipboard-manager
+  ];
 
   nix.settings.substituters = [ "https://cosmic.cachix.org/" ];
   nix.settings.trusted-public-keys = [
