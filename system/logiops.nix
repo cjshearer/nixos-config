@@ -29,9 +29,22 @@ in
           on: true;
           threshold: 10;
         };
+        # fixes inconsistent scrolling
+        # https://github.com/PixlOne/logiops/issues/116#issuecomment-1902559105
         hiresscroll: {
-          hires: true;
-          target: false;
+          hires: false;
+          invert: false;
+          target: true;
+          up: {
+            mode: "Axis";
+            axis: "REL_WHEEL";
+            axis_multiplier: 2.0;
+          },
+          down: {
+            mode: "Axis";
+            axis: "REL_WHEEL";
+            axis_multiplier: -2.0;
+          }
         };
 
         buttons: (
