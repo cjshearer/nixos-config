@@ -7,6 +7,6 @@ in
   options.programs.libreoffice.enable = mkEnableOption "libreoffice";
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [ libreoffice-qt ];
+    environment.systemPackages = [ pkgs.libreoffice-qt ];
   };
 }

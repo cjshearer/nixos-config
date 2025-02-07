@@ -1,18 +1,29 @@
 { systemConfig, inputs, ... }: {
   imports = [
+    ./blender.nix
     ./citrix_workspace.nix
     ./cosmic.nix
+    ./cosmic.nix
+    ./direnv.nix
+    ./discord.nix
+    ./git.nix
+    ./google-chrome.nix
     ./ideamaker.nix
     ./ledger-live-desktop.nix
+    ./libreoffice.nix
     ./liquidctl.nix
     ./logiops.nix
+    ./obsidian.nix
     ./picard.nix
     ./pipewire.nix
     ./pixelflasher.nix
     ./qbittorrent.nix
     ./rclone.nix
     ./remmina.nix
+    ./ssh.nix
     ./tailscale.nix
+    ./thunderbird.nix
+    ./vscode.nix
     ./ytmdesktop.nix
     ./zoom-us.nix
   ];

@@ -1,6 +1,13 @@
-{ inputs, lib, config, pkgs, ... }: lib.mkIf config.programs.vscode.enable {
-  programs.vscode =
-    {
+{ inputs, lib, config, systemConfig, pkgs, ... }: with lib;
+let
+  cfg = config.programs.vscode;
+in
+{
+  options.programs.vscode.enable = mkEnableOption "vscode";
+
+  config = mkIf cfg.enable {
+    home-manager.users.${systemConfig.username}.programs.vscode = {
+      enable = true;
       package = (pkgs.vscodium.override {
         commandLineArgs = "--password-store=\"gnome-libsecret\"";
       });
@@ -136,4 +143,5 @@
         "window.zoomLevel" = 0.5;
       };
     };
+  };
 }

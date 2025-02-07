@@ -7,6 +7,6 @@ in
   options.programs.blender.enable = mkEnableOption "blender";
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [ blender ];
+    environment.systemPackages = with pkgs; [ blender ];
   };
 }

@@ -27,20 +27,18 @@
             specialArgs = { inherit inputs systemConfig; };
             modules = [
               ./overlays
+              ./modules
               nixos-cosmic.nixosModules.default
-              ./system
-              ./hosts/${systemConfig.hostname}/configuration.nix
-              ./hosts/${systemConfig.hostname}/hardware-configuration.nix
+              ./hosts/${systemConfig.hostname}.nix
               home-manager.nixosModules.home-manager
               {
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.users.${systemConfig.username}.imports = [
-                  home-manager-cosmic.homeManagerModules.cosmic
-                  ./home
-                  ./hosts/${systemConfig.hostname}/home.nix
-                ];
                 home-manager.extraSpecialArgs = { inherit inputs systemConfig; };
+                home-manager.useGlobalPkgs = true;
+                home-manager.users.${systemConfig.username} = {
+                  imports = [ home-manager-cosmic.homeManagerModules.cosmic ];
+                  programs.home-manager.enable = true;
+                };
+                home-manager.useUserPackages = true;
               }
             ];
           };

@@ -7,6 +7,6 @@ in
   options.programs.discord.enable = mkEnableOption "discord";
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [ discord ];
+    environment.systemPackages = [ pkgs.discord ];
   };
 }
