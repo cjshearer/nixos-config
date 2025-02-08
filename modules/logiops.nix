@@ -14,6 +14,8 @@ in
       serviceConfig = {
         Type = "simple";
         ExecStart = "${pkgs.logiops}/bin/logid";
+        Restart = "on-failure";
+        RestartSec = "5s";
       };
       wantedBy = [ "multi-user.target" ];
     };
