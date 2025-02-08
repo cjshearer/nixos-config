@@ -21,7 +21,7 @@ in
     environment.etc."logid.cfg".text = ''
       devices: ({
         name: "Wireless Mouse MX Master 3";
-        dpi: 1000; // max 4000
+        dpi: 3000; // max 4000
         thumbwheel: {
           invert: false;
         };
@@ -54,7 +54,7 @@ in
             action =
             {
                 type: "Keypress";
-                keys: ["KEY_KPLEFTPAREN"];
+                keys: ["KEY_O"];
             };
           },
 
@@ -64,7 +64,7 @@ in
             action =
             {
                 type: "Keypress";
-                keys: ["KEY_KPRIGHTPAREN"];
+                keys: ["KEY_P"];
             };
           }
         );

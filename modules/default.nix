@@ -50,9 +50,6 @@
     "curl-7.47.0" # required by ideamaker
   ];
 
-  qt.enable = true;
-  qt.style = "adwaita-dark";
-
   system.etc.overlay.mutable = false;
 
   users.users.cjshearer.extraGroups = [

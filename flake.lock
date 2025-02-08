@@ -70,46 +70,6 @@
         "type": "github"
       }
     },
-    "home-manager-cosmic": {
-      "inputs": {
-        "home-manager": [
-          "nixpkgs"
-        ],
-        "home-manager-cosmic": "home-manager-cosmic_2"
-      },
-      "locked": {
-        "lastModified": 1733104727,
-        "narHash": "sha256-2a4w7OxuncH/qh+eBou65v+Ow7ZH8CobfFId3ckSQdo=",
-        "owner": "tristanbeedell",
-        "repo": "hm-cosmic",
-        "rev": "8c7ae2855827101eff7e52dd320599a487c78936",
-        "type": "github"
-      },
-      "original": {
-        "owner": "tristanbeedell",
-        "repo": "hm-cosmic",
-        "type": "github"
-      }
-    },
-    "home-manager-cosmic_2": {
-      "inputs": {
-        "nixpkgs": "nixpkgs"
-      },
-      "locked": {
-        "lastModified": 1733103810,
-        "narHash": "sha256-S1jGheeLQJPaY80+iFu7Iv4Az3BHmVlv8PxngnK8Aog=",
-        "owner": "tristanbeedell",
-        "repo": "home-manager",
-        "rev": "efa4d272f6c2b14d4a3b67b0b1e4b38ae46e5588",
-        "type": "github"
-      },
-      "original": {
-        "owner": "tristanbeedell",
-        "ref": "cosmic",
-        "repo": "home-manager",
-        "type": "github"
-      }
-    },
     "nix-vscode-extensions": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -205,7 +165,6 @@
     "root": {
       "inputs": {
         "home-manager": "home-manager",
-        "home-manager-cosmic": "home-manager-cosmic",
         "nix-vscode-extensions": "nix-vscode-extensions",
         "nixos-cosmic": "nixos-cosmic",
         "nixpkgs": "nixpkgs_2"
