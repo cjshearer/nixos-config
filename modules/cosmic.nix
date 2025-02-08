@@ -27,18 +27,26 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
       theme.package = pkgs.gnome-themes-extra;
     };
 
-    # Workflow for adding relevant configurations:
+    # Initial setup:
     # 1. If you have existing manual configs, move them from ~/.config/cosmic to a temporary
     #    location, or remove them if you don't care about them.
-    # 3. Restart the session `pkill cosmic-session`.
-    # 4. Run:
-    #    `find ~/.config/cosmic -type f -exec echo -e '\n// {}\n' >> cosmic.ron \; -exec cat {} >> cosmic.ron \;` and temporarily stage them with git. This will help you ignore default values.
-    # 5. Restore your manual configs or make changes to the settings and rerun the above command.
-    # 6. Save the diff between the staged default values and your now unstaged changes to
-    #    cosmic.ron below.
+    # 2. Restart your session: `pkill cosmic-session`. This was necessary for me, as cosmic
+    #    settings "desynced" from the actual settings.
+    # 3. Run:
+    #    `find ~/.config/cosmic -type f -exec echo -e '\n// {}\n' >> cosmic.ron \; -exec cat {} >> cosmic.ron \;`
+    #    and temporarily stage it with git. This will help you ignore default values.
+    # 4. Make changes to the settings (initial setup: restore your backup) and rerun the above
+    #    command.
+    # 5. Use the diff between the staged default values and your now unstaged changes to
+    #    cosmic.ron below. Remove cosmic.ron after you're done.
+    #
+    # To update settings: repeat steps 3-5.
     # 
-    # If you have issues with any of the settings not working, try deleting the backup files that 
-    # home-manager creates: `find ~/.config/cosmic/ -name "*.bak" -type f -delete`.
+    # Troubleshooting:
+    # - If home-manager fails to apply the settings, you may need to set a backup extension to allow
+    #   home-manager to overwrite the existing files. I use .bak.
+    # - If you have issues with settings not applying, try deleting the backup files that
+    #   home-manager creates: `find ~/.config/cosmic/ -name "*.bak" -type f -delete`.
     home.file.".config/cosmic/com.system76.CosmicComp/v1/autotile".text = "true";
     home.file.".config/cosmic/com.system76.CosmicComp/v1/cursor_follows_focus".text = "true";
     home.file.".config/cosmic/com.system76.CosmicComp/v1/focus_follows_cursor_delay".text = "50";
