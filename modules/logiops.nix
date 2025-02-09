@@ -17,7 +17,7 @@ in
         Restart = "on-failure";
         RestartSec = "5s";
       };
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = [ "graphical.target" ];
     };
 
     environment.etc."logid.cfg".text = ''
