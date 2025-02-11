@@ -33,7 +33,7 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
     # 2. Restart your session: `pkill cosmic-session`. This was necessary for me, as cosmic
     #    settings "desynced" from the actual settings.
     # 3. Run:
-    #    `find ~/.config/cosmic -type f -exec echo -e '\n// {}\n' >> cosmic.ron \; -exec cat {} >> cosmic.ron \;`
+    #    `find ~/.config/cosmic -type f,l -exec echo -e '\n// {}\n' >> cosmic.ron \; -exec cat {} > cosmic.ron \;`
     #    and temporarily stage it with git. This will help you ignore default values.
     # 4. Make changes to the settings (initial setup: restore your backup) and rerun the above
     #    command.
