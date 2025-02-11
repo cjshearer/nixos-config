@@ -49,7 +49,7 @@ let cfg = config.services.rclone; in
         # multiline strings for readability. Multiline strings don't work with ExecStart, so I use
         # builtins.replaceStrings to remove the newlines.
         ExecStart = builtins.replaceStrings [ "\n" ] [ "" ] ''
-          ${pkgs.rclone}/bin/rclone mount onedrive:/sync ${cfg.onedrive.mount}
+          ${pkgs.rclone}/bin/rclone mount onedrive: ${cfg.onedrive.mount}
             --allow-other
             --cache-dir ${cfg.cachedir}
             --config ${cfg.conf}
