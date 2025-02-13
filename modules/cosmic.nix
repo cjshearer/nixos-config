@@ -77,6 +77,7 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
       Some(500)
     '';
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/border_radius".text = "8";
+    home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/exclusive_zone".text = "false";
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/expand_to_edges".text = "false";
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/margin".text = "4";
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/plugins_center".text = "Some([])";
