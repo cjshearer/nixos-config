@@ -60,6 +60,17 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
         )),
       )
     '';
+    home.file.".config/cosmic/com.system76.CosmicComp/v1/input_touchpad".text = ''
+      (
+      state: Enabled,
+      scroll_config: Some((
+        method: None,
+        natural_scroll: Some(true),
+        scroll_button: None,
+        scroll_factor: None,
+      )),
+      )
+    '';
 
     home.file.".config/cosmic/com.system76.CosmicIdle/v1/screen_off_time".text = "Some(300000)";
     home.file.".config/cosmic/com.system76.CosmicIdle/v1/suspend_on_ac_time".text =
