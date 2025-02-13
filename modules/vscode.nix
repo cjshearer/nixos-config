@@ -89,6 +89,11 @@ in
           command = "workbench.action.files.revert";
           when = "editorFocus";
         }
+        {
+          key = "ctrl+i";
+          command = "-editor.action.triggerSuggest";
+          when = "editorHasCompletionItemProvider && textInputFocus && !editorReadonly && !suggestWidgetVisible";
+        }
       ];
 
       userSettings = {
