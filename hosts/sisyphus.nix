@@ -25,6 +25,7 @@
 
   networking.useDHCP = lib.mkDefault true;
 
+  programs.atuin.enable = true;
   # programs.blender.enable = true;
   programs.citrix_workspace.enable = true;
   programs.direnv.enable = true;

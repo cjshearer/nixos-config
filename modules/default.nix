@@ -1,5 +1,6 @@
 { systemConfig, inputs, ... }: {
   imports = [
+    ./atuin.nix
     ./blender.nix
     ./citrix_workspace.nix
     ./cosmic.nix

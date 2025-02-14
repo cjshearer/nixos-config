@@ -30,6 +30,7 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
+  programs.atuin.enable = true;
   programs.citrix_workspace.enable = true;
   programs.direnv.enable = true;
   programs.discord.enable = true;
