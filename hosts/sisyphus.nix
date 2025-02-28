@@ -32,7 +32,7 @@
   programs.discord.enable = true;
   programs.git.enable = true;
   programs.google-chrome.enable = true;
-  # programs.ideamaker.enable = true;
+  programs.ideamaker.enable = true;
   programs.ledger-live-desktop.enable = true;
   programs.libreoffice.enable = true;
   programs.obsidian.enable = true;
