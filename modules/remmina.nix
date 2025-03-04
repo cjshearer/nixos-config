@@ -19,8 +19,16 @@ in
       Service = {
         Type = "simple";
         ExecStart = pkgs.writeShellScript "launch-work-rdp" ''
+          PATH=${
+            lib.makeBinPath [
+              pkgs.inotify-tools
+              pkgs.remmina
+              pkgs.gnused
+              pkgs.findutils
+            ]
+          }
           find ~/Downloads/ -name "app*.rdp" -delete
-          ${pkgs.inotify-tools}/bin/inotifywait -m -e create ~/Downloads | while read path action file; do
+          inotifywait -m -e create ~/Downloads | while read path action file; do
             if [ "$file" != "app.rdp" ]; then
               continue
             fi
