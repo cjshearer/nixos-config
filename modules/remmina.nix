@@ -36,7 +36,7 @@ in
             loadbalanceinfo=$(sed -nr 's/loadbalanceinfo:s:(.*)/\1/p' "$path/$file")
             find ~/Downloads/ -name "app*.rdp" -delete
             remmina --update-profile ~/.local/share/remmina/work.remmina --set-option execpath="$execpath" --set-option loadbalanceinfo="$loadbalanceinfo"
-            remmina -c ~/.local/share/remmina/work.remmina --enable-extra-hardening
+            remmina -c ~/.local/share/remmina/work.remmina --enable-extra-hardening --no-tray-icon
           done
         '';
         RestartSec = 10;
