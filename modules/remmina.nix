@@ -9,7 +9,7 @@ in
   config = mkIf cfg.enable {
     environment.systemPackages = with pkgs; [ remmina ];
 
-    home-manager.users.${systemConfig.username}.systemd.user.services.launch-work-rdp = {
+    home-manager.users.${systemConfig.username}.systemd.user.services.remmina = {
       Unit = {
         Description = "Launches work RDP upon detection of ~/Downloads/app.rdp";
       };
@@ -18,7 +18,7 @@ in
       };
       Service = {
         Type = "simple";
-        ExecStart = pkgs.writeShellScript "launch-work-rdp" ''
+        ExecStart = pkgs.writeShellScript "remmina" ''
           PATH=${
             lib.makeBinPath [
               pkgs.inotify-tools
