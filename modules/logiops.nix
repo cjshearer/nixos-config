@@ -1,4 +1,4 @@
-{ lib, pkgs, config, ... }:
+{ lib, pkgs, systemConfig, config, ... }:
 with lib;
 let
   cfg = config.services.logiops;
@@ -7,17 +7,21 @@ in
   options.services.logiops.enable = mkEnableOption "logiops";
 
   config = mkIf cfg.enable {
-    environment.systemPackages = [ pkgs.logiops ];
+    services.udev.packages = [ pkgs.logitech-udev-rules ];
 
-    systemd.services.logiops = {
-      description = "An unofficial userspace driver for HID++ Logitech devices";
-      serviceConfig = {
+    home-manager.users.${systemConfig.username}.systemd.user.services.logiops = {
+      Unit = {
+        Description = "An unofficial userspace driver for HID++ Logitech devices";
+      };
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
+      Service = {
         Type = "simple";
-        ExecStart = "${pkgs.logiops}/bin/logid";
+        ExecStart = "${pkgs.logiops_0_2_3}/bin/logid";
         Restart = "on-failure";
         RestartSec = "5s";
       };
-      wantedBy = [ "graphical.target" ];
     };
 
     environment.etc."logid.cfg".text = ''
