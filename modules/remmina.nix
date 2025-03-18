@@ -14,7 +14,7 @@ in
         Description = "Launches work RDP upon detection of ~/Downloads/app.rdp";
       };
       Install = {
-        WantedBy = [ "graphical.target" ];
+        WantedBy = [ "default.target" ];
       };
       Service = {
         Type = "simple";
