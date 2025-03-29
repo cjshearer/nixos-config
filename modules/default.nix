@@ -10,6 +10,7 @@
     ./git.nix
     ./google-chrome.nix
     ./ideamaker.nix
+    ./kicad.nix
     ./ledger-live-desktop.nix
     ./libreoffice.nix
     ./liquidctl.nix
