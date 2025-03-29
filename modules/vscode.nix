@@ -18,7 +18,8 @@ in
           github.copilot-chat
           golang.go
           jnoortheen.nix-ide
-          rust-lang.rust-analyzer
+          # Failed to find package "@vscode/vsce-sign-linux-x64" on the file system
+          # rust-lang.rust-analyzer 
           # TODO: add or wait for dnut.rewrap-revived to be added to vscode-extensions and replace:
           stkb.rewrap
           streetsidesoftware.code-spell-checker

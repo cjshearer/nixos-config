@@ -45,9 +45,9 @@ let cfg = config.services.rclone; in
       description = "rclone mount of OneDrive";
       serviceConfig = {
         Type = "notify";
-        # The systemd-notify signal work when using pkgs.writeShellScript, but I still want to use
-        # multiline strings for readability. Multiline strings don't work with ExecStart, so I use
-        # builtins.replaceStrings to remove the newlines.
+        # The systemd-notify signal doesn't work when using pkgs.writeShellScript, but I still want
+        # to use multiline strings for readability. Multiline strings don't work with ExecStart, so
+        # I use builtins.replaceStrings to remove the newlines.
         ExecStart = builtins.replaceStrings [ "\n" ] [ "" ] ''
           ${pkgs.rclone}/bin/rclone mount onedrive: ${cfg.onedrive.mount}
             --allow-other
