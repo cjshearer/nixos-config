@@ -27,7 +27,7 @@
 }:
 let
   pname = "ideamaker";
-  version = "5.1.4.8480";
+  version = "5.2.1.8560";
   semver = lib.strings.concatStringsSep "." (
     lib.lists.init (builtins.splitVersion version)
   );
@@ -36,8 +36,8 @@ in
 stdenv.mkDerivation {
   inherit pname version;
   src = fetchurl {
-    url = "https://downcdn.raise3d.com/ideamaker/release/${semver}/ideaMaker_${version}-ubuntu_amd64.deb";
-    hash = "sha256-vOiHqdegFHqA1PYYvtXBQSIl+OVq2oyAT80ZFtaIxl8=";
+    url = "https://downcdn.raise3d.com/ideamaker/beta/${semver}/ideaMaker_${version}-ubuntu_amd64.deb";
+    hash = "sha256-AUeHcCbXTJeIWRkdRs6bpdiA2i81OPY4npyivXscqjs=";
   };
 
   nativeBuildInputs = [
