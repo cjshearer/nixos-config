@@ -13,13 +13,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "pixelflasher";
-  version = "7.9.2.4";
+  version = "7.11.2.1";
 
   src = fetchFromGitHub {
     owner = "badabing2005";
     repo = "PixelFlasher";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-bksTk6Zbj8/4FQ7gUGXfJa+kkJE/bFbJF7A4AY6zIRk=";
+    rev = "5ab80658f1479ce5fb59db24634d020fbe496ffb";
+    hash = "sha256-FW5Ve95Po0GoQCLhSVgBR20mVA1Hh9GUDeq2VbziVBQ=";
   };
 
   disabled = python3.pythonOlder "3.11";
