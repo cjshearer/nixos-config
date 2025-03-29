@@ -2,7 +2,6 @@
   imports = [
     ./atuin.nix
     ./blender.nix
-    ./citrix_workspace.nix
     ./cosmic.nix
     ./cosmic.nix
     ./direnv.nix

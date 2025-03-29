@@ -7,6 +7,7 @@ in
   options.programs.remmina.enable = mkEnableOption "remmina";
 
   config = mkIf cfg.enable {
+    # evaluate rustdesk as alternative for this and citrix_workspace
     environment.systemPackages = with pkgs; [ remmina ];
 
     home-manager.users.${systemConfig.username}.systemd.user.services.remmina = {
