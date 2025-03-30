@@ -72,6 +72,8 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
       )
     '';
 
+    home.file.".config/cosmic/com.system76.CosmicEdit/v1/tab_width".text = "2";
+
     home.file.".config/cosmic/com.system76.CosmicIdle/v1/screen_off_time".text = "Some(300000)";
     home.file.".config/cosmic/com.system76.CosmicIdle/v1/suspend_on_ac_time".text =
       if systemConfig.hostname == "sisyphus" then "None" else "Some(1800000)";
