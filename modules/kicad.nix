@@ -7,6 +7,6 @@ in
   options.programs.kicad.enable = mkEnableOption "kicad";
 
   config = mkIf cfg.enable {
-    environment.systemPackages = with pkgs; [ kicad-small ];
+    environment.systemPackages = with pkgs; [ kicad ];
   };
 }
