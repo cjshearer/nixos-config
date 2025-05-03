@@ -40,5 +40,5 @@ nixos-rebuild switch --flake . --target-host user@targetHost --use-remote-sudo
 ## Upstream Contributions
 
 - [ideamaker: init at 4.3.3](https://github.com/NixOS/nixpkgs/pull/309130)
-- [pixelflasher: init at 7.9.2.4](https://github.com/NixOS/nixpkgs/pull/336191) (open, add a 👍 if you want it merged)
+- [pixelflasher: init at 7.9.2.4](https://github.com/NixOS/nixpkgs/pull/336191)
 - [ytmdesktop: init at 2.0.5](https://github.com/NixOS/nixpkgs/pull/317309)
