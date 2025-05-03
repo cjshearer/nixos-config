@@ -9,6 +9,12 @@ in
   config = mkIf cfg.enable {
     services.udev.packages = [ pkgs.logitech-udev-rules ];
 
+    # we restart logiops when a Logitech device connects to avoid timing issues that prevent the
+    # mouse from working on reboot
+    services.udev.extraRules = ''
+      ACTION=="add", SUBSYSTEM=="input", ATTRS{id/vendor}=="046d", RUN{program}="${pkgs.systemd}/bin/systemctl --machine=${systemConfig.username}@.host --user restart logiops.service"
+    '';
+
     home-manager.users.${systemConfig.username}.systemd.user.services.logiops = {
       Unit = {
         Description = "An unofficial userspace driver for HID++ Logitech devices";
