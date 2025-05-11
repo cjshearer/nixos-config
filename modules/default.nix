@@ -6,6 +6,7 @@
     ./cosmic.nix
     ./direnv.nix
     ./discord.nix
+    ./fusion360.nix
     ./git.nix
     ./google-chrome.nix
     ./ideamaker.nix

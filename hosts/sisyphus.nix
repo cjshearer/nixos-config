@@ -31,6 +31,7 @@
   programs.discord.enable = true;
   programs.citrix_workspace.enable = true;
   programs.git.enable = true;
+  programs.fusion360.enable = true;
   programs.google-chrome.enable = true;
   programs.ideamaker.enable = true;
   programs.kicad.enable = true;
