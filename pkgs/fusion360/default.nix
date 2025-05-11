@@ -1,131 +1,123 @@
-# Documentation for install script:
-# https://github.com/cryinkfly/Autodesk-Fusion-360-for-Linux/wiki/Documentation
-#
-# Troubleshooting error on install
-# https://www.reddit.com/r/linuxquestions/comments/17d8vr2/how_do_i_get_fusion_360/
-
+# https://github.com/loucass003/dotfiles/blob/main/pkgs/fusion360/default.nix
 { pkgs
 , stdenv
 , lib
-, fetchurl
-, makeDesktopItem
-, imagemagick
-, makeWrapper
+, ...
 }:
 let
-  version = "v7.6.9";
-
-  srcs = {
-    fusion360-installer = fetchurl {
-      url = "https://raw.githubusercontent.com/cryinkfly/Autodesk-Fusion-360-for-Linux/0df56158500bc1c8bb19c209e14747fef76b411f/files/builds/stable-branch/bin/install.sh";
-      sha256 = "0c0qlw2qr1xyn3lax033pwh8q12l4x1l46vw7cajwcbklig5m9s1";
-    };
+  installer = pkgs.fetchurl {
+    url = "https://dl.appstreaming.autodesk.com/production/installers/Fusion%20Admin%20Install.exe";
+    name = "FusionInstaller.exe";
+    sha256 = "xn2cauJw57mayQuGIjwBN8+IciwEACwtdw4rQsfB0Co=";
   };
 
-  icons = stdenv.mkDerivation {
-    name = "fusion360";
-
-    src = ./favicon.ico;
-
-    nativeBuildInputs = [ imagemagick ];
-    dontUnpack = true;
-
-    installPhase = ''
-      for n in 16 24 32 48 64 96 128 256; do
-        size=$n"x"$n
-        mkdir -p $out/hicolor/$size/apps
-        convert $src\[2\] -resize $size $out/hicolor/$size/apps/fusion360.png
-      done;
-    '';
+  webview = pkgs.fetchurl {
+    url = "https://github.com/aedancullen/webview2-evergreen-standalone-installer-archive/releases/download/109.0.1518.78/MicrosoftEdgeWebView2RuntimeInstallerX64.exe";
+    name = "EdgeInstaller.exe";
+    sha256 = "8sxJhj4iFALUZk2fqUSkfyJUPaLcs2NDjD5Zh4m5/Vs=";
   };
-  # fake pacman since script expects a standard distro
-  # like Arch
-  pacman = pkgs.writeShellScriptBin "pacman" ''
-    exit 0
+
+  xml = pkgs.writeText "NMachineSpecificOptions.xml" ''
+    <?xml version="1.0" encoding="UTF-16" standalone="no" ?>
+    <OptionGroups>
+      <BootstrapOptionsGroup SchemaVersion="2" ToolTip="Special preferences that require the application to be restarted after a change." UserName="Bootstrap">
+        <driverOptionId ToolTip="The driver used to display the graphics" UserName="Graphics driver" Value="VirtualDeviceDx9"/></BootstrapOptionsGroup>
+    </OptionGroups>
   '';
-  runtime-paths = lib.makeBinPath [
-    pacman
-    # pkgs.wineWowPackages.waylandFull
-    pkgs.wineWowPackages.stagingFull
-    pkgs.winetricks
-    pkgs.yad
-    pkgs.cabextract
-    pkgs.curl
-    pkgs.samba
-    pkgs.p7zip
-    pkgs.ppp
-    pkgs.wget
+
+  WINEPREFIX = "$HOME/Fusion360";
+
+  pname = "fusion360";
+  version = "1.0.0";
+
+  tricksFmt = builtins.concatStringsSep " " [
+    "arial"
+    "vcrun2019"
+    "win10"
   ];
+
+  wine = pkgs.wineWowPackages.wayland;
+  winetricks = pkgs.winetricks;
+
+  script = pkgs.writeShellScriptBin pname ''
+    # export WINEARCH="win64"
+    export WINEFSYNC=1
+    export WINEESYNC=1
+    export WINEPREFIX="${WINEPREFIX}"
+    # export WINEDLLOVERRIDES="api-ms-win-crt-private-l1-1-0,api-ms-win-crt-conio-l1-1-0,api-ms-win-crt-convert-l1-1-0,api-ms-win-crt-environment-l1-1-0,api-ms-win-crt-filesystem-l1-1-0,api-ms-win-crt-heap-l1-1-0,api-ms-win-crt-locale-l1-1-0,api-ms-win-crt-math-l1-1-0,api-ms-win-crt-multibyte-l1-1-0,api-ms-win-crt-process-l1-1-0,api-ms-win-crt-runtime-l1-1-0,api-ms-win-crt-stdio-l1-1-0,api-ms-win-crt-string-l1-1-0,api-ms-win-crt-utility-l1-1-0,api-ms-win-crt-time-l1-1-0,atl140,concrt140,msvcp140,msvcp140_1,msvcp140_atomic_wait,ucrtbase,vcomp140,vccorlib140,vcruntime140,vcruntime140_1=n,b;adpclientservice.exe="
+    # export FUSION_IDSDK=false
+    USER="$(whoami)"
+    PATH=${wine}/bin:${winetricks}/bin:$PATH
+    FUSION_LAUNCHER="$WINEPREFIX/drive_c/Users/$USER/Desktop/Autodesk Fusion.lnk"
+
+    if [ ! -d "$WINEPREFIX" ]; then
+      # create the wine prefix
+      # wine wineboot
+      # echo "Wineboot is done!"
+      # install tricks
+      winetricks -q -f ${tricksFmt}
+      wineserver -w
+      echo "Winetricks is done!"
+
+      #Remove tracking metrics/calling home
+      wine REG ADD "HKCU\Software\Wine\DllOverrides" /v "adpclientservice.exe" /t REG_SZ /d "" /f
+      #Navigation bar does not work well with anything other than the wine builtin DX9
+      wine REG ADD "HKCU\Software\Wine\DllOverrides" /v "AdCefWebBrowser.exe" /t REG_SZ /d builtin /f
+      #Use Visual Studio Redist that is bundled with the application
+      wine REG ADD "HKCU\Software\Wine\DllOverrides" /v "msvcp140" /t REG_SZ /d native /f
+      wine REG ADD "HKCU\Software\Wine\DllOverrides" /v "mfc140u" /t REG_SZ /d native /f
+
+      wine ${webview} /install
+
+      wine ${installer}
+
+      mkdir -p "$WINEPREFIX/drive_c/users/$USER/AppData/Roaming/Autodesk/Neutron Platform/Options"
+      cp ${xml} "$WINEPREFIX/drive_c/users/$USER/AppData/Roaming/Autodesk/Neutron Platform/Options"
+
+      # Disable Debug messages on regular runs, we dont have a terminal, so speed up the system by not wasting time prining them into the Void
+      # sed -i 's/=env WINEPREFIX=/=env WINEDEBUG=-all env WINEPREFIX=/g' "$HOME/.local/share/applications/wine/Programs/Autodesk/Autodesk Fusion.desktop"
+
+      wineserver -w
+    fi
+
+    cd "$WINEPREFIX"
+
+    xdg-mime default adskidmgr-opener.desktop x-scheme-handler/adskidmgr
+
+    wine "$FUSION_LAUNCHER" "$@"
+    wineserver -w
+  '';
 in
 stdenv.mkDerivation rec {
-  name = "fusion360";
-  src = srcs.fusion360-installer;
+  inherit version pname;
 
   dontUnpack = true;
 
+  src = installer;
+
   nativeBuildInputs = [
-    makeWrapper
+    pkgs.copyDesktopItems
+  ];
+
+  desktopItems = [
+    (pkgs.makeDesktopItem {
+      desktopName = "adskidmgr-opener.desktop";
+      name = "adskidmgr Scheme Handler";
+      exec = ''env WINEPREFIX="\\$HOME/Fusion360" wine "C:\users\$USER\AppData\Local\Autodesk\webdeploy\production\57cd45aa09be2d79663784069561ec17eda99ca8\Autodesk Identity Manager\AdskIdentityManager.exe" %u'';
+      mimeTypes = [ "x-scheme-handler/adskidmgr" ];
+    })
   ];
 
   installPhase = ''
-    runHook preInstall
+    mkdir -p $out/share/applications
+    copyDesktopItems
 
-    mkdir -p $out/bin
-    cp ${src} $out/bin/fusion360-installer
-    chmod +x $out/bin/fusion360-installer
-    ${pkgs.gnused}/bin/sed -i 's#/bin/bash#/usr/bin/env bash#g' $out/bin/fusion360-installer
-
-    cat > $out/bin/fusion360 << EOF
-      if [ -f ~/.fusion360/bin/launcher.sh ]; then
-        ${pkgs.bashInteractive}/bin/bash ~/.fusion360/bin/launcher.sh
-      else
-        $out/bin/fusion360-installer
-      fi
-    EOF
-
-    chmod +x $out/bin/fusion360
-
-    wrapProgram "$out/bin/fusion360" \
-      --suffix PATH : ${runtime-paths} \
-      --set FUSION_IDSDK false \
-      --set WINEPREFIX /home/cjshearer/.fusion360
-
-    mkdir -p $out/share/icons
-    ln -s ${icons}/hicolor $out/share/icons
-
-    runHook postInstall
+    install -D ${script}/bin/fusion360 $out/bin/fusion360
   '';
 
-  desktopItems =
-    let
-      mimeTypes = [
-        "x-world/x-3dmf"
-        "application/x-3dmf"
-      ];
-    in
-    [
-      (makeDesktopItem rec {
-        inherit mimeTypes;
-        inherit name;
-
-        exec = name;
-        icon = name;
-        desktopName = "Fusion 360";
-        genericName = "3D Model Editor";
-        categories = [
-          "Development"
-          "Graphics"
-        ];
-      })
-    ];
-
-  meta = with lib; {
+  meta = {
     description = "Autodesk Fusion 360";
-    homepage = "https://www.autodesk.com/products/fusion-360";
-    license = licenses.unfree;
-    maintainers = [ "erahhal" ];
-    platforms = [
-      "x86_64-linux"
-    ];
+    license = lib.licenses.unfree;
+    platforms = [ "x86_64-linux" ];
   };
 }
