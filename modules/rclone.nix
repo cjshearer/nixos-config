@@ -61,6 +61,9 @@ let cfg = config.services.rclone; in
             --vfs-cache-mode full
             --vfs-refresh
         '';
+        ExecStop = ''
+          ${pkgs.umount}/bin/umount -l ${cfg.onedrive.mount}
+        '';
         Restart = "on-failure";
         RestartSec = "10s";
         User = systemConfig.username;
