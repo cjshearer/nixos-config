@@ -46,10 +46,6 @@
   nix.settings.trusted-users = [ "cjshearer" ];
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = [
-    "openssl-1.0.1u" # required by ideamaker
-    "curl-7.47.0" # required by ideamaker
-  ];
 
   system.etc.overlay.mutable = false;
 
