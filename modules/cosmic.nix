@@ -1,22 +1,7 @@
 { lib, systemConfig, config, pkgs, ... }:
 lib.mkIf config.services.desktopManager.cosmic.enable {
+  services.desktopManager.cosmic.xwayland.enable = true;
   services.displayManager.cosmic-greeter.enable = true;
-
-  # https://github.com/lilyinstarlight/nixos-cosmic?tab=readme-ov-file#cosmic-utilities---clipboard-manager-not-working
-  environment.sessionVariables = {
-    NIXOS_OZONE_WL = 1;
-    COSMIC_DATA_CONTROL_ENABLED = 1;
-  };
-
-  environment.systemPackages = [
-    pkgs.wl-clipboard
-    pkgs.cosmic-ext-applet-clipboard-manager
-  ];
-
-  nix.settings.substituters = [ "https://cosmic.cachix.org/" ];
-  nix.settings.trusted-public-keys = [
-    "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
-  ];
 
   home-manager.users.${systemConfig.username} = {
     gtk = {
@@ -47,6 +32,7 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
     #   home-manager to overwrite the existing files. I use .bak.
     # - If you have issues with settings not applying, try deleting the backup files that
     #   home-manager creates: `find ~/.config/cosmic/ -name "*.bak" -type f -delete`.
+
     home.file.".config/cosmic/com.system76.CosmicComp/v1/autotile".text = "true";
     home.file.".config/cosmic/com.system76.CosmicComp/v1/cursor_follows_focus".text = "true";
     home.file.".config/cosmic/com.system76.CosmicComp/v1/focus_follows_cursor_delay".text = "50";
@@ -212,6 +198,11 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
         ): Disable,
       }
     '';
+    home.file.".config/cosmic/com.system76.CosmicSettings.Wallpaper/v1/custom-colors".text = ''
+      [
+        Single((0.0, 0.0, 0.0)),
+      ]
+    '';
 
     home.file.".config/cosmic/com.system76.CosmicTheme.Dark/v1/active_hint".text = "1";
     home.file.".config/cosmic/com.system76.CosmicTheme.Dark/v1/gaps".text = "(0, 3)";
@@ -232,6 +223,7 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
 
     home.file.".config/cosmic/com.system76.CosmicTk/v1/header_size".text = "Compact";
     home.file.".config/cosmic/com.system76.CosmicTk/v1/interface_density".text = "Compact";
+
   };
 
   qt.enable = true;

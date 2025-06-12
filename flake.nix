@@ -9,12 +9,9 @@
 
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
-
-    nixos-cosmic.url = "github:lilyinstarlight/nixos-cosmic";
-    nixos-cosmic.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixos-cosmic, nixpkgs, home-manager, ... } @ inputs:
+  outputs = { self, nixpkgs, home-manager, ... } @ inputs:
     let
       mkSystems = systems: builtins.listToAttrs (map
         (systemConfig: {
@@ -25,7 +22,6 @@
             modules = [
               ./overlays
               ./modules
-              nixos-cosmic.nixosModules.default
               ./hosts/${systemConfig.hostname}.nix
               home-manager.nixosModules.home-manager
               {
