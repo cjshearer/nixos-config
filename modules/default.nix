@@ -23,6 +23,7 @@
     ./rclone.nix
     ./remmina.nix
     ./ssh.nix
+    ./steam.nix
     ./tailscale.nix
     ./thunderbird.nix
     ./vscode.nix
