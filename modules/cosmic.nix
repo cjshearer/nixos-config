@@ -1,6 +1,5 @@
 { lib, systemConfig, config, pkgs, ... }:
 lib.mkIf config.services.desktopManager.cosmic.enable {
-  services.desktopManager.cosmic.xwayland.enable = true;
   services.displayManager.cosmic-greeter.enable = true;
 
   home-manager.users.${systemConfig.username} = {
