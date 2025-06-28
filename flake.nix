@@ -17,7 +17,6 @@
         (systemConfig: {
           name = systemConfig.hostname;
           value = nixpkgs.lib.nixosSystem {
-            system = systemConfig.architecture;
             specialArgs = { inherit inputs systemConfig; };
             modules = [
               ./overlays
@@ -39,9 +38,9 @@
     in
     {
       nixosConfigurations = mkSystems [
-        { username = "cjshearer"; hostname = "sisyphus"; architecture = "x86_64-linux"; }
-        { username = "cjshearer"; hostname = "athamas"; architecture = "x86_64-linux"; }
-        { username = "cjshearer"; hostname = "charon"; architecture = "aarch64-linux"; }
+        { username = "cjshearer"; hostname = "athamas"; }
+        { username = "cjshearer"; hostname = "charon"; }
+        { username = "cjshearer"; hostname = "sisyphus"; }
       ];
 
       packages.x86_64-linux = import ./pkgs nixpkgs.legacyPackages.x86_64-linux;

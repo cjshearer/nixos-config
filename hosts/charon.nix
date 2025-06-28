@@ -21,7 +21,7 @@
 
   networking.useDHCP = lib.mkDefault true;
 
-  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
+  nixpkgs.hostPlatform = "aarch64-linux";
   services.tailscale.enable = true;
 
   time.timeZone = "America/New_York";
