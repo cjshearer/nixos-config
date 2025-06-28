@@ -1,4 +1,4 @@
-{ inputs, lib, config, systemConfig, pkgs, ... }: with lib;
+{ inputs, lib, config, pkgs, ... }: with lib;
 let
   cfg = config.programs.vscode;
 in

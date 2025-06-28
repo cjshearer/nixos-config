@@ -1,4 +1,4 @@
-{ systemConfig, lib, config, ... }: with lib;
+{ lib, config, ... }: with lib;
 let
   cfg = config.programs.ssh;
 in
@@ -12,7 +12,7 @@ in
         hostname = "ssh.github.com";
         port = 443;
         user = "git";
-        identityFile = [ "~/.ssh/${systemConfig.hostname}" ];
+        identityFile = [ "~/.ssh/${config.networking.hostName}" ];
       };
     };
   };

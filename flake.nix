@@ -11,38 +11,33 @@
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, ... } @ inputs:
-    let
-      mkSystems = systems: builtins.listToAttrs (map
-        (systemConfig: {
-          name = systemConfig.hostname;
-          value = nixpkgs.lib.nixosSystem {
-            specialArgs = { inherit inputs systemConfig; };
-            modules = [
-              ./overlays
-              ./modules
-              ./hosts/${systemConfig.hostname}.nix
-              home-manager.nixosModules.home-manager
-              {
-                home-manager.backupFileExtension = "bak";
-                home-manager.extraSpecialArgs = { inherit inputs systemConfig; };
-                home-manager.useGlobalPkgs = true;
-                home-manager.users.cjshearer.programs.home-manager.enable = true;
-                home-manager.useUserPackages = true;
-              }
-            ];
-          };
-        })
-        systems
-      );
-    in
-    {
-      nixosConfigurations = mkSystems [
-        { username = "cjshearer"; hostname = "athamas"; }
-        { username = "cjshearer"; hostname = "charon"; }
-        { username = "cjshearer"; hostname = "sisyphus"; }
-      ];
+  outputs = { self, nixpkgs, home-manager, ... } @ inputs: {
+    nixosConfigurations = (nixpkgs.lib.pipe ./hosts [
+      nixpkgs.lib.fileset.toList
+      (map (path: nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf path)))
+      (map (hostname: {
+        name = hostname;
+        value = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs; };
+          modules = [
+            ./overlays
+            ./modules
+            ./hosts/${hostname}.nix
+            home-manager.nixosModules.home-manager
+            {
+              networking.hostName = hostname;
+              home-manager.backupFileExtension = "bak";
+              home-manager.extraSpecialArgs = { inherit inputs; };
+              home-manager.useGlobalPkgs = true;
+              home-manager.users.cjshearer.programs.home-manager.enable = true;
+              home-manager.useUserPackages = true;
+            }
+          ];
+        };
+      }))
+      builtins.listToAttrs
+    ]);
 
-      packages.x86_64-linux = import ./pkgs nixpkgs.legacyPackages.x86_64-linux;
-    };
+    packages.x86_64-linux = import ./pkgs nixpkgs.legacyPackages.x86_64-linux;
+  };
 }

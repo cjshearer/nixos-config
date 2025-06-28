@@ -1,4 +1,4 @@
-{ systemConfig, lib, pkgs, config, ... }:
+{ lib, pkgs, config, ... }:
 let cfg = config.services.rclone; in
 {
   options.services.rclone.enable = lib.mkEnableOption "rclone";

@@ -1,4 +1,4 @@
-{ lib, pkgs, systemConfig, config, ... }:
+{ lib, pkgs, config, ... }:
 with lib;
 let
   cfg = config.programs.remmina;

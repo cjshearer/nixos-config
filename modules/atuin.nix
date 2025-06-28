@@ -1,4 +1,4 @@
-{ lib, systemConfig, pkgs, config, ... }:
+{ lib, pkgs, config, ... }:
 with lib;
 let
   cfg = config.programs.atuin;

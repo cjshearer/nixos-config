@@ -1,4 +1,4 @@
-{ systemConfig, inputs, ... }: {
+{
   imports = [
     ./atuin.nix
     ./blender.nix
@@ -33,7 +33,6 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.systemd-boot.enable = true;
 
-  networking.hostName = systemConfig.hostname;
   networking.networkmanager.enable = true;
   networking.stevenblack.enable = true;
 

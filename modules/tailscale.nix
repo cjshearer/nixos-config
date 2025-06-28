@@ -1,11 +1,11 @@
-{ systemConfig, lib, config, pkgs, ... }: lib.mkIf config.services.tailscale.enable {
+{ lib, config, pkgs, ... }: lib.mkIf config.services.tailscale.enable {
   services.tailscale.extraUpFlags =
     [
       "--ssh"
       "--reset"
     ] ++ builtins.attrNames (
       lib.filterAttrs
-        (flag: hostnames: builtins.elem systemConfig.hostname hostnames)
+        (flag: hostnames: builtins.elem config.networking.hostName hostnames)
         {
           "--advertise-exit-node" = [ "charon" ];
         }
@@ -15,7 +15,7 @@
     athamas = "client";
     charon = "server";
     sisyphus = "client";
-  }.${systemConfig.hostname};
+  }.${config.networking.hostName};
 
   # Workaround for "Failed to start Network Manager Wait Online." Toggle this on while switching
   # configurations if you see this failure

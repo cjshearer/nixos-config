@@ -1,4 +1,4 @@
-{ lib, config, systemConfig, ... }: lib.mkIf config.programs.git.enable {
+{ lib, config, ... }: lib.mkIf config.programs.git.enable {
   home-manager.users.cjshearer.programs.git = {
     enable = true;
     userName = "cjshearer";
