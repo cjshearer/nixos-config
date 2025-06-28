@@ -26,7 +26,7 @@
   networking.useDHCP = lib.mkDefault true;
 
   programs.atuin.enable = true;
-  # programs.blender.enable = true;
+  programs.blender.enable = true;
   programs.direnv.enable = true;
   programs.discord.enable = true;
   programs.freecad.enable = true;
@@ -47,7 +47,7 @@
   programs.thunderbird.enable = true;
   programs.vscode.enable = true;
   programs.ytmdesktop.enable = true;
-  # programs.zoom-us.enable = true;
+  programs.zoom-us.enable = true;
 
   services.desktopManager.cosmic.enable = true;
   services.liquidctl.enable = true;
