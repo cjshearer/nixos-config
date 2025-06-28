@@ -1,5 +1,5 @@
 { lib, config, systemConfig, ... }: lib.mkIf config.programs.git.enable {
-  home-manager.users.${systemConfig.username}.programs.git = {
+  home-manager.users.cjshearer.programs.git = {
     enable = true;
     userName = "cjshearer";
     userEmail = "cjshearer@live.com";

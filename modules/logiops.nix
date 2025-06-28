@@ -12,10 +12,10 @@ in
     # we restart logiops when a Logitech device connects to avoid timing issues that prevent the
     # mouse from working on reboot
     services.udev.extraRules = ''
-      ACTION=="add", SUBSYSTEM=="input", ATTRS{id/vendor}=="046d", RUN{program}="${pkgs.systemd}/bin/systemctl --machine=${systemConfig.username}@.host --user restart logiops.service"
+      ACTION=="add", SUBSYSTEM=="input", ATTRS{id/vendor}=="046d", RUN{program}="${pkgs.systemd}/bin/systemctl --machine=cjshearer@.host --user restart logiops.service"
     '';
 
-    home-manager.users.${systemConfig.username}.systemd.user.services.logiops = {
+    home-manager.users.cjshearer.systemd.user.services.logiops = {
       Unit = {
         Description = "An unofficial userspace driver for HID++ Logitech devices";
       };

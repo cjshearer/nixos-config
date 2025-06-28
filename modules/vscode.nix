@@ -6,7 +6,7 @@ in
   options.programs.vscode.enable = mkEnableOption "vscode";
 
   config = mkIf cfg.enable {
-    home-manager.users.${systemConfig.username}.programs.vscode = {
+    home-manager.users.cjshearer.programs.vscode = {
       enable = true;
       package = (pkgs.vscodium.override {
         commandLineArgs = "--password-store=\"gnome-libsecret\"";

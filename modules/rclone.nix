@@ -4,12 +4,12 @@ let cfg = config.services.rclone; in
   options.services.rclone.enable = lib.mkEnableOption "rclone";
   options.services.rclone.conf = lib.mkOption {
     type = lib.types.str;
-    default = "/home/${systemConfig.username}/.config/rclone/rclone.conf";
+    default = "/home/cjshearer/.config/rclone/rclone.conf";
     description = "Path to rclone configuration file";
   };
   options.services.rclone.cachedir = lib.mkOption {
     type = lib.types.str;
-    default = "/home/${systemConfig.username}/.cache/rclone";
+    default = "/home/cjshearer/.cache/rclone";
     description = "Path to rclone cache directory";
   };
   options.services.rclone.onedrive.mount = lib.mkOption {
@@ -19,7 +19,7 @@ let cfg = config.services.rclone; in
   };
   options.services.rclone.onedrive.symlinks = lib.mkOption {
     type = lib.types.str;
-    default = "/home/${systemConfig.username}";
+    default = "/home/cjshearer";
     description = "Path to symlink OneDrive folders to";
   };
 
@@ -27,7 +27,7 @@ let cfg = config.services.rclone; in
     environment.systemPackages = [ pkgs.rclone ];
 
     systemd.tmpfiles.rules = [
-      "d /mnt/onedrive 0755 ${systemConfig.username} root -"
+      "d /mnt/onedrive 0755 cjshearer root -"
     ];
 
     # TODO: see why I need --allow-other, despite running rclone as my user
@@ -66,7 +66,7 @@ let cfg = config.services.rclone; in
         '';
         Restart = "on-failure";
         RestartSec = "10s";
-        User = systemConfig.username;
+        User = "cjshearer";
         Group = "root";
         Environment = [ "PATH=/run/wrappers/bin/:$PATH" ];
       };
@@ -94,7 +94,7 @@ let cfg = config.services.rclone; in
         ExecStop = "${pkgs.findutils}/bin/find ${cfg.onedrive.symlinks} -maxdepth 1 -xtype l -delete";
         RestartSec = 10;
         Restart = "on-failure";
-        User = systemConfig.username;
+        User = "cjshearer";
         Group = "root";
       };
       # This unit must be started after rclone mount, as inotify would otherwise be watching the

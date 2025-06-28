@@ -10,7 +10,7 @@ in
     # evaluate rustdesk as alternative for this and citrix_workspace
     environment.systemPackages = with pkgs; [ remmina ];
 
-    home-manager.users.${systemConfig.username}.systemd.user.services.remmina = {
+    home-manager.users.cjshearer.systemd.user.services.remmina = {
       Unit = {
         Description = "Launches work RDP upon detection of ~/Downloads/app.rdp";
       };

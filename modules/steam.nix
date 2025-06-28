@@ -1,5 +1,5 @@
 { lib, systemConfig, config, pkgs, ... }: lib.mkIf config.programs.steam.enable {
-  home-manager.users.${systemConfig.username}.home.file.".config/autostart/steam.desktop".text = ''
+  home-manager.users.cjshearer.home.file.".config/autostart/steam.desktop".text = ''
     [Desktop Entry]
     Name=Steam
     Exec=steam %U -silent

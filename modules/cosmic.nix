@@ -2,7 +2,7 @@
 lib.mkIf config.services.desktopManager.cosmic.enable {
   services.displayManager.cosmic-greeter.enable = true;
 
-  home-manager.users.${systemConfig.username} = {
+  home-manager.users.cjshearer = {
     gtk = {
       enable = true;
       iconTheme.name = "Adwaita-dark";

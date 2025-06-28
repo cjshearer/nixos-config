@@ -27,7 +27,7 @@
                 home-manager.backupFileExtension = "bak";
                 home-manager.extraSpecialArgs = { inherit inputs systemConfig; };
                 home-manager.useGlobalPkgs = true;
-                home-manager.users.${systemConfig.username}.programs.home-manager.enable = true;
+                home-manager.users.cjshearer.programs.home-manager.enable = true;
                 home-manager.useUserPackages = true;
               }
             ];

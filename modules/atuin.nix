@@ -7,7 +7,7 @@ in
   options.programs.atuin.enable = mkEnableOption "atuin";
 
   config = mkIf cfg.enable {
-    home-manager.users.${systemConfig.username}.programs = {
+    home-manager.users.cjshearer.programs = {
       atuin = {
         enable = true;
         enableBashIntegration = true;
