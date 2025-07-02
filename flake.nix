@@ -18,7 +18,7 @@
       (map (hostname: {
         name = hostname;
         value = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
+          specialArgs = inputs;
           modules = [
             ./overlays
             ./modules
@@ -27,9 +27,7 @@
             {
               networking.hostName = hostname;
               home-manager.backupFileExtension = "bak";
-              home-manager.extraSpecialArgs = { inherit inputs; };
               home-manager.useGlobalPkgs = true;
-              home-manager.users.cjshearer.programs.home-manager.enable = true;
               home-manager.useUserPackages = true;
             }
           ];

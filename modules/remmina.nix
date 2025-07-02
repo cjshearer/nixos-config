@@ -1,16 +1,10 @@
-{ lib, pkgs, config, ... }:
-with lib;
-let
-  cfg = config.programs.remmina;
-in
-{
-  options.programs.remmina.enable = mkEnableOption "remmina";
+{ pkgs, lib, config, ... }: {
+  options.users.cjshearer.services.remmina.enable = lib.mkEnableOption "remmina";
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf config.users.cjshearer.services.remmina.enable {
     # evaluate rustdesk as alternative for this and citrix_workspace
-    environment.systemPackages = with pkgs; [ remmina ];
-
-    home-manager.users.cjshearer.systemd.user.services.remmina = {
+    home-manager.users.cjshearer.services.remmina.enable = true;
+    home-manager.users.cjshearer.systemd.user.services.remmina-auto-launch = {
       Unit = {
         Description = "Launches work RDP upon detection of ~/Downloads/app.rdp";
       };

@@ -18,10 +18,11 @@ $ nix flake show
 ├───nixosConfigurations
 │   ├───athamas: NixOS configuration
 │   ├───charon: NixOS configuration
+│   ├───installer: NixOS configuration
 │   └───sisyphus: NixOS configuration
 └───packages
     └───x86_64-linux
-        └───pixelflasher: package 'pixelflasher-7.9.2.4'
+        └───ideamaker: package 'ideamaker-5.2.1.8560'
 ```
 
 ## Common Commands

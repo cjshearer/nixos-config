@@ -1,11 +1,7 @@
-{ lib, config, ... }: with lib;
-let
-  cfg = config.programs.ssh;
-in
-{
-  options.programs.ssh.enable = mkEnableOption "ssh";
+{ config, lib, options, ... }: {
+  options.users.cjshearer.programs.ssh.enable = lib.mkEnableOption "ssh";
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf config.users.cjshearer.programs.ssh.enable {
     home-manager.users.cjshearer.programs.ssh = {
       enable = true;
       matchBlocks."github.com" = {

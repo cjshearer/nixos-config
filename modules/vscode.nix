@@ -1,11 +1,7 @@
-{ inputs, lib, config, pkgs, ... }: with lib;
-let
-  cfg = config.programs.vscode;
-in
-{
-  options.programs.vscode.enable = mkEnableOption "vscode";
+{ config, pkgs, lib, options, ... }: {
+  options.users.cjshearer.programs.vscode.enable = lib.mkEnableOption "vscode";
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf config.users.cjshearer.programs.vscode.enable {
     home-manager.users.cjshearer.programs.vscode = {
       enable = true;
       package = (pkgs.vscodium.override {

@@ -1,18 +1,10 @@
-{ lib, pkgs, config, ... }:
-with lib;
-let
-  cfg = config.programs.atuin;
-in
-{
-  options.programs.atuin.enable = mkEnableOption "atuin";
+{ lib, config, ... }: {
+  options.users.cjshearer.programs.atuin.enable = lib.mkEnableOption "atuin";
 
-  config = mkIf cfg.enable {
-    home-manager.users.cjshearer.programs = {
-      atuin = {
-        enable = true;
-        enableBashIntegration = true;
-      };
-      bash.enable = true;
+  config = lib.mkIf config.users.cjshearer.programs.atuin.enable {
+    home-manager.users.cjshearer.programs.atuin = {
+      enable = true;
     };
+    home-manager.users.cjshearer.programs.bash.enable = true;
   };
 }

@@ -30,18 +30,19 @@
 
   nixpkgs.hostPlatform = "x86_64-linux";
 
-  programs.atuin.enable = true;
+  users.cjshearer.programs.atuin.enable = true;
+  users.cjshearer.programs.git.enable = true;
+  users.cjshearer.programs.ssh.enable = true;
+  users.cjshearer.programs.thunderbird.enable = true;
+  users.cjshearer.programs.vscode.enable = true;
+  users.cjshearer.services.remmina.enable = true;
+
   programs.direnv.enable = true;
   programs.discord.enable = true;
-  programs.git.enable = true;
   programs.google-chrome.enable = true;
   programs.light.brightnessKeys.enable = true;
   programs.light.enable = true;
   programs.obsidian.enable = true;
-  programs.remmina.enable = true;
-  programs.ssh.enable = true;
-  programs.thunderbird.enable = true;
-  programs.vscode.enable = true;
   programs.ytmdesktop.enable = true;
 
   services.desktopManager.cosmic.enable = true;

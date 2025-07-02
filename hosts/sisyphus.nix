@@ -25,13 +25,18 @@
 
   networking.useDHCP = lib.mkDefault true;
 
-  programs.atuin.enable = true;
+  users.cjshearer.programs.vscode.enable = true;
+  users.cjshearer.programs.atuin.enable = true;
+  users.cjshearer.programs.git.enable = true;
+  users.cjshearer.programs.ssh.enable = true;
+  users.cjshearer.programs.thunderbird.enable = true;
+  users.cjshearer.services.remmina.enable = true;
+
   programs.blender.enable = true;
   programs.direnv.enable = true;
   programs.discord.enable = true;
   programs.freecad.enable = true;
   programs.citrix_workspace.enable = true;
-  programs.git.enable = true;
   programs.google-chrome.enable = true;
   programs.ideamaker.enable = true;
   programs.kicad.enable = true;
@@ -41,11 +46,7 @@
   programs.picard.enable = true;
   programs.pixelflasher.enable = true;
   programs.qbittorrent.enable = true;
-  programs.remmina.enable = true;
-  programs.ssh.enable = true;
   programs.steam.enable = true;
-  programs.thunderbird.enable = true;
-  programs.vscode.enable = true;
   programs.ytmdesktop.enable = true;
   programs.zoom-us.enable = true;
 
