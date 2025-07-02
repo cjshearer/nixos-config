@@ -12,10 +12,8 @@
     );
 
   services.tailscale.useRoutingFeatures = {
-    athamas = "client";
     charon = "server";
-    sisyphus = "client";
-  }.${config.networking.hostName};
+  }.${config.networking.hostName} or "client";
 
   # Workaround for "Failed to start Network Manager Wait Online." Toggle this on while switching
   # configurations if you see this failure
