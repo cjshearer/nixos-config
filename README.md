@@ -18,11 +18,12 @@ $ nix flake show
 ├───nixosConfigurations
 │   ├───athamas: NixOS configuration
 │   ├───charon: NixOS configuration
-│   ├───installer: NixOS configuration
+│   ├───clotho: NixOS configuration
 │   └───sisyphus: NixOS configuration
 └───packages
     └───x86_64-linux
-        └───ideamaker: package 'ideamaker-5.2.1.8560'
+        ├───ideamaker: package 'ideamaker-5.2.1.8560'
+        └───prepare-nixos-disk: package 'prepare-nixos-disk'
 ```
 
 ## Common Commands
@@ -33,6 +34,16 @@ sudo nixos-rebuild switch --flake .
 
 # build target configuration locally and push over ssh
 nixos-rebuild switch --flake . --target-host user@targetHost --use-remote-sudo
+
+# provisioning a new host with a USB drive:
+sudo nix run .#prepare-nixos-disk
+nix build .#nixosConfigurations.clotho.config.system.build.isoImage
+sudo cp result/iso/*.iso /dev/sdX
+# don't forget to disable secure boot
+# set passwd
+# sudo tailscale login --qr
+# follow https://nixos.org/manual/nixos/stable/#sec-installation-manual-partitioning
+
 ```
 
 > [!TIP]
