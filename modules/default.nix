@@ -20,6 +20,7 @@
     ./pipewire.nix
     ./pixelflasher.nix
     ./qbittorrent.nix
+    ./rbw.nix
     ./rclone.nix
     ./remmina.nix
     ./ssh.nix
