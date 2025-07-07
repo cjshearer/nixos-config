@@ -2,7 +2,9 @@
   options.users.cjshearer.services.remmina.enable = lib.mkEnableOption "remmina";
 
   config = lib.mkIf config.users.cjshearer.services.remmina.enable {
-    # evaluate rustdesk as alternative for this and citrix_workspace
+    # TODO: evaluate rustdesk as alternative for this and citrix_workspace
+    # TODO: alternatively, get the important parts of ~/.local/share/remmina/work.remmina added to
+    # home-manager
     home-manager.users.cjshearer.services.remmina.enable = true;
     home-manager.users.cjshearer.systemd.user.services.remmina-auto-launch = {
       Unit = {
