@@ -121,6 +121,7 @@
         "editor.wordWrapColumn" = 100;
         "explorer.confirmDelete" = false;
         "explorer.confirmDragAndDrop" = false;
+        "extensions.autoUpdate" = false;
         "extensions.ignoreRecommendations" = true;
         "files.exclude" = {
           "**/.git" = false;
