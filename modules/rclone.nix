@@ -141,32 +141,5 @@
 
         Install.WantedBy = [ "default.target" ];
       };
-
-    home-manager.users.cjshearer.systemd.user.services."rclone-mount\:@onedrive-token-sidecar" = {
-      Unit = {
-        Description = "Saves OneDrive Token with systemd-creds";
-        PartOf = "rclone-mount\:@onedrive.service";
-        After = "rclone-mount\:@onedrive.service";
-      };
-
-      Service = {
-        Type = "notify";
-        # PreExecStart = "${pkgs.rbw}/bin/rbw get 62ce2991-91ad-4de3-a61f-acd200201a26 --field onedrive_token > /run/rclone/onedrive-token";
-        ExecStart = pkgs.writeShellScript "rclone-mount\:@onedrive-token-sidecar" ''
-          ${pkgs.inotify-tools}/bin/inotifywait \
-            -m \
-            -e modify,create,delete \
-            ${pkgs.rbw}/bin/rbw get 62ce2991-91ad-4de3-a61f-acd200201a26 --field onedrive_token | \
-            while read; do
-              # Save the token to systemd-creds
-              systemd-creds encrypt \
-                --user \
-                --name onedrive-token \< ${pkgs.rbw}/bin/rbw get 62ce2991-91ad-4de3-a61f-acd200201a26 --field onedrive_token
-            done
-        '';
-      };
-
-      Install.WantedBy = [ "default.target" ];
-    };
   };
 }
