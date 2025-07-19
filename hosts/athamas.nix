@@ -32,6 +32,7 @@
 
   users.cjshearer.programs.atuin.enable = true;
   users.cjshearer.programs.git.enable = true;
+  users.cjshearer.programs.rclone.enable = true;
   users.cjshearer.programs.ssh.enable = true;
   users.cjshearer.programs.thunderbird.enable = true;
   users.cjshearer.programs.vscode.enable = true;
@@ -46,7 +47,6 @@
   programs.ytmdesktop.enable = true;
 
   services.desktopManager.cosmic.enable = true;
-  services.rclone.enable = true;
   services.tailscale.enable = true;
 
   swapDevices = [{ device = "/dev/disk/by-uuid/f957ab19-5cde-41d7-8866-e0d85c25bc12"; }];

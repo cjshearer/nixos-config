@@ -25,11 +25,12 @@
 
   networking.useDHCP = lib.mkDefault true;
 
-  users.cjshearer.programs.vscode.enable = true;
   users.cjshearer.programs.atuin.enable = true;
   users.cjshearer.programs.git.enable = true;
+  users.cjshearer.programs.rclone.enable = true;
   users.cjshearer.programs.ssh.enable = true;
   users.cjshearer.programs.thunderbird.enable = true;
+  users.cjshearer.programs.vscode.enable = true;
   users.cjshearer.services.remmina.enable = true;
 
   programs.blender.enable = true;
@@ -54,7 +55,6 @@
   services.liquidctl.enable = true;
   services.logiops.enable = true;
   services.pipewire.enable = true;
-  services.rclone.enable = true;
   services.tailscale.enable = true;
 
   swapDevices = [ ];
