@@ -25,11 +25,14 @@
   nixpkgs.hostPlatform = "x86_64-linux";
 
   users.cjshearer.programs.git.enable = true;
+  users.cjshearer.programs.rbw.enable = true;
+  users.cjshearer.programs.rclone.enable = true;
   users.cjshearer.programs.ssh.enable = true;
   users.cjshearer.programs.vscode.enable = true;
   users.cjshearer.services.remmina.enable = true;
 
   programs.blender.enable = true;
+  # programs.citrix_workspace.enable = true;
   programs.direnv.enable = true;
   programs.discord.enable = true;
   programs.freecad.enable = true;

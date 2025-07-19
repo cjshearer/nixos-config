@@ -20,11 +20,13 @@
     ./pipewire.nix
     ./pixelflasher.nix
     ./qbittorrent.nix
+    ./rbw.nix
     ./rclone.nix
     ./remmina.nix
     ./ssh.nix
     ./steam.nix
     ./tailscale.nix
+    ./test-secret.nix
     ./thunderbird.nix
     ./vscode.nix
     ./ytmdesktop.nix
@@ -46,7 +48,9 @@
   nix.settings.trusted-users = [ "cjshearer" ];
 
   nixpkgs.config.allowUnfree = true;
-
+  nixpkgs.config.permittedInsecurePackages = [
+    "libxml2-2.13.8"
+  ];
   system.etc.overlay.mutable = false;
 
   users.users.cjshearer.extraGroups = [

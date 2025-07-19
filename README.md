@@ -35,15 +35,28 @@ sudo nixos-rebuild switch --flake .
 # build target configuration locally and push over ssh
 nixos-rebuild switch --flake . --target-host user@targetHost --use-remote-sudo
 
-# provisioning a new host with a USB drive:
+# create NixOS installation media
 sudo nix run .#prepare-nixos-disk
 nix build .#nixosConfigurations.clotho.config.system.build.isoImage
 sudo cp result/iso/*.iso /dev/sdX
-# don't forget to disable secure boot
-# set passwd
-# sudo tailscale login --qr
-# follow https://nixos.org/manual/nixos/stable/#sec-installation-manual-partitioning
 
+# initial NixOS installation:
+# 1. disable secure boot
+# 2. boot from the installation media
+# 3. connect to the network (`nmtui` for wireless or share internet from phone over USB)
+# TODO: script this or use disko:
+# 4. follow remaining instructions starting from here:
+#    https://nixos.org/manual/nixos/stable/#sec-installation-manual-partitioning
+# 5. setup rbw using client_id, client_secret, and TOTP in Bitwarden
+rbw register
+rbw login
+
+# secrets management, on reboot or restart of certain systemd unit (nixos-rebuild switch):
+# 1. log into rbw
+# 2. systemd unit pushes select rbw credentials from systemd unit to various encrypted credential
+#    files in `/run/bitwarden/secrets` (https://systemd.io/CREDENTIALS/)
+# 3. reference secrets using standard NixOS pattern of referencing a file
+#    (e.g. `readFile /run/bitwarden/secrets/my-secret`)
 ```
 
 > [!TIP]
