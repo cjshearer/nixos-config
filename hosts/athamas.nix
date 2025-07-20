@@ -1,4 +1,10 @@
-{ config, lib, modulesPath, ... }: {
+{
+  config,
+  lib,
+  modulesPath,
+  ...
+}:
+{
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
   boot.initrd.availableKernelModules = [
@@ -21,7 +27,10 @@
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/1E23-D587";
     fsType = "vfat";
-    options = [ "fmask=0022" "dmask=0022" ];
+    options = [
+      "fmask=0022"
+      "dmask=0022"
+    ];
   };
 
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
@@ -49,7 +58,7 @@
   services.desktopManager.cosmic.enable = true;
   services.tailscale.enable = true;
 
-  swapDevices = [{ device = "/dev/disk/by-uuid/f957ab19-5cde-41d7-8866-e0d85c25bc12"; }];
+  swapDevices = [ { device = "/dev/disk/by-uuid/f957ab19-5cde-41d7-8866-e0d85c25bc12"; } ];
 
   time.timeZone = "America/New_York";
 

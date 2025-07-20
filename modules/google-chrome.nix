@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 with lib;
 let
   cfg = config.programs.google-chrome;
@@ -10,7 +15,7 @@ in
     environment.systemPackages = with pkgs; [ google-chrome ];
 
     # https://github.com/justinhschaaf/nixos-config/blob/8985aa030ebac955d0c23a35a0381ba64b4c6e4c/modules/programs/desktop.nix#L194
-    # https://gist.github.com/velzie/053ffedeaecea1a801a2769ab86ab376 
+    # https://gist.github.com/velzie/053ffedeaecea1a801a2769ab86ab376
     # https://cloud.google.com/docs/chrome-enterprise/policies/
     environment.etc =
       let

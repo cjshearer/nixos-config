@@ -1,4 +1,9 @@
-{ config, lib, options, ... }: {
+{
+  config,
+  lib,
+  ...
+}:
+{
   options.users.cjshearer.programs.ssh.enable = lib.mkEnableOption "ssh";
 
   config = lib.mkIf config.users.cjshearer.programs.ssh.enable {

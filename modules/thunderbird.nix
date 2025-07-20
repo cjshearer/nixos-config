@@ -1,4 +1,9 @@
-{ lib, options, config, ... }: {
+{
+  lib,
+  config,
+  ...
+}:
+{
   options.users.cjshearer.programs.thunderbird.enable = lib.mkEnableOption "thunderbird";
 
   config = lib.mkIf config.users.cjshearer.programs.thunderbird.enable {

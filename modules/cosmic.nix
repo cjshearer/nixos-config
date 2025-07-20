@@ -1,4 +1,9 @@
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 lib.mkIf config.services.desktopManager.cosmic.enable {
   services.displayManager.cosmic-greeter.enable = true;
 
@@ -25,7 +30,7 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
     #    cosmic.ron below. Remove cosmic.ron after you're done.
     #
     # To update settings: repeat steps 3-5.
-    # 
+    #
     # Troubleshooting:
     # - If home-manager fails to apply the settings, you may need to set a backup extension to allow
     #   home-manager to overwrite the existing files. I use .bak.

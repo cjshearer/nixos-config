@@ -1,4 +1,5 @@
-{ lib, config, ... }: {
+{ lib, config, ... }:
+{
   options.users.cjshearer.programs.atuin.enable = lib.mkEnableOption "atuin";
 
   config = lib.mkIf config.users.cjshearer.programs.atuin.enable {

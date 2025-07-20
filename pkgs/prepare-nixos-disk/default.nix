@@ -1,9 +1,11 @@
-{ writeShellScriptBin
-, util-linux
-, parted
-, dosfstools
-, e2fsprogs
-}: writeShellScriptBin "prepare-nixos-disk" ''
+{
+  writeShellScriptBin,
+  util-linux,
+  parted,
+  dosfstools,
+  e2fsprogs,
+}:
+writeShellScriptBin "prepare-nixos-disk" ''
   # Adapted from: https://nixos.wiki/wiki/NixOS_Installation_Guide#Partitioning 
   set -euo pipefail
 

@@ -1,7 +1,15 @@
-{ config, lib, modulesPath, ... }: {
+{
+  lib,
+  modulesPath,
+  ...
+}:
+{
   imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
 
-  boot.initrd.availableKernelModules = [ "xhci_pci" "virtio_scsi" ];
+  boot.initrd.availableKernelModules = [
+    "xhci_pci"
+    "virtio_scsi"
+  ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
@@ -14,7 +22,10 @@
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/DBB7-EB52";
     fsType = "vfat";
-    options = [ "fmask=0022" "dmask=0022" ];
+    options = [
+      "fmask=0022"
+      "dmask=0022"
+    ];
   };
 
   swapDevices = [ ];

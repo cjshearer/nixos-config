@@ -1,12 +1,20 @@
-{ config, pkgs, lib, options, ... }: {
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+{
   options.users.cjshearer.programs.vscode.enable = lib.mkEnableOption "vscode";
 
   config = lib.mkIf config.users.cjshearer.programs.vscode.enable {
     home-manager.users.cjshearer.programs.vscode = {
       enable = true;
-      package = (pkgs.vscodium.override {
-        commandLineArgs = "--password-store=\"gnome-libsecret\"";
-      });
+      package = (
+        pkgs.vscodium.override {
+          commandLineArgs = "--password-store=\"gnome-libsecret\"";
+        }
+      );
       profiles.default.extensions =
         (with pkgs.vscode-extensions; [
           bierner.markdown-mermaid
@@ -15,22 +23,27 @@
           golang.go
           jnoortheen.nix-ide
           # Failed to find package "@vscode/vsce-sign-linux-x64" on the file system
-          # rust-lang.rust-analyzer 
+          # rust-lang.rust-analyzer
           # TODO: add or wait for dnut.rewrap-revived to be added to vscode-extensions and replace:
           stkb.rewrap
           streetsidesoftware.code-spell-checker
           tamasfe.even-better-toml
           timonwong.shellcheck
           waderyan.gitblame
-        ]) ++ (with pkgs.vscode-marketplace; [
+        ])
+        ++ (with pkgs.vscode-marketplace; [
           biomejs.biome
           budparr.language-hugo-vscode
           joshbolduc.commitlint
           phil294.git-log--graph
           bradlc.vscode-tailwindcss
-        ]) ++ lib.optionals config.programs.direnv.enable (with pkgs.vscode-extensions; [
-          mkhl.direnv
-        ]);
+        ])
+        ++ lib.optionals config.programs.direnv.enable (
+          with pkgs.vscode-extensions;
+          [
+            mkhl.direnv
+          ]
+        );
 
       profiles.default.keybindings = [
         {

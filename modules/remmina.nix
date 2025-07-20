@@ -1,4 +1,10 @@
-{ pkgs, lib, config, ... }: {
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
+{
   options.users.cjshearer.services.remmina.enable = lib.mkEnableOption "remmina";
 
   config = lib.mkIf config.users.cjshearer.services.remmina.enable {

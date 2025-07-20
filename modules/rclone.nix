@@ -1,4 +1,9 @@
-{ lib, pkgs, config, home-manager, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 {
   options.users.cjshearer.programs.rclone.enable = lib.mkEnableOption "rclone";
 
@@ -6,8 +11,18 @@
     type = lib.types.attrsOf (
       lib.types.submoduleWith {
         modules = [
-          ({ config, lib, pkgs, ... }:
-            let cfg = config.programs.rclone; iniFormat = pkgs.formats.ini { }; in {
+          (
+            {
+              config,
+              lib,
+              pkgs,
+              ...
+            }:
+            let
+              cfg = config.programs.rclone;
+              iniFormat = pkgs.formats.ini { };
+            in
+            {
               # https://github.com/nix-community/home-manager/blob/master/modules/programs/rclone.nix
               options.programs.rclone = {
                 remotes = lib.mkOption {
@@ -36,16 +51,14 @@
                     # https://github.com/rclone/rclone/issues/8190
                     injectSecret =
                       remote:
-                      lib.mapAttrsToList
-                        (secret: secretFile: ''
-                          ${lib.getExe cfg.package} config update \
-                            ${remote.name} config_refresh_token=false \
-                            ${secret} "$(cat ${secretFile})" \
-                            --quiet --non-interactive > /dev/null
-                        '') remote.value.secrets or { };
+                      lib.mapAttrsToList (secret: secretFile: ''
+                        ${lib.getExe cfg.package} config update \
+                          ${remote.name} config_refresh_token=false \
+                          ${secret} "$(cat ${secretFile})" \
+                          --quiet --non-interactive > /dev/null
+                      '') remote.value.secrets or { };
 
-                    injectAllSecrets =
-                      lib.concatMap injectSecret (lib.mapAttrsToList lib.nameValuePair cfg.remotes);
+                    injectAllSecrets = lib.concatMap injectSecret (lib.mapAttrsToList lib.nameValuePair cfg.remotes);
                   in
                   lib.mkForce (
                     lib.hm.dag.entryAfter [ "writeBoundary" cfg.writeAfter ] ''
@@ -58,9 +71,9 @@
                       # "remoteName,persistItem" pairs
                       valuesToPersist=(${
                         lib.pipe cfg.remotes [
-                          (lib.mapAttrsToList (remoteName: remote:
-                              lib.map (persistItem: ''"${remoteName},${persistItem}"'') remote.persist
-                            ))
+                          (lib.mapAttrsToList (
+                            remoteName: remote: lib.map (persistItem: ''"${remoteName},${persistItem}"'') remote.persist
+                          ))
                           (lib.flatten)
                           (lib.concatStringsSep " ")
                         ]
@@ -81,7 +94,8 @@
                     ''
                   );
               };
-            })
+            }
+          )
         ];
       }
     );
@@ -97,7 +111,10 @@
         drive_type = "personal";
         type = "onedrive";
       };
-      persist = [ "drive_id" "token" ];
+      persist = [
+        "drive_id"
+        "token"
+      ];
       mounts."" = {
         enable = true;
         mountPoint = "/mnt/onedrive";
@@ -113,7 +130,10 @@
       };
     };
     home-manager.users.cjshearer.systemd.user.services."rclone-mount\:@onedrive-symlink" =
-      let home = config.home-manager.users.cjshearer.home.homeDirectory; in {
+      let
+        home = config.home-manager.users.cjshearer.home.homeDirectory;
+      in
+      {
         Unit = {
           # This unit must be started after rclone mount, as inotify would otherwise be watching
           # the inode that the directory was previously pointing to, rather than the new inode

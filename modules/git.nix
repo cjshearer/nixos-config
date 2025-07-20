@@ -1,4 +1,5 @@
-{ lib, config, ... }: {
+{ lib, config, ... }:
+{
   options.users.cjshearer.programs.git.enable = lib.mkEnableOption "git";
 
   config = lib.mkIf config.users.cjshearer.programs.git.enable {

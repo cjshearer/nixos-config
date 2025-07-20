@@ -1,4 +1,5 @@
-{ lib, ... }: {
+{ lib, ... }:
+{
   imports = lib.pipe ./. [
     (lib.fileset.fileFilter (file: file.name != "default.nix"))
     (lib.fileset.toList)
@@ -16,7 +17,10 @@
     options = "--delete-older-than 30d";
   };
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
   nix.settings.trusted-users = [ "cjshearer" ];
 
   nixpkgs.config.allowUnfree = true;
