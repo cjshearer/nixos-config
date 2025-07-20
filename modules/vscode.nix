@@ -139,7 +139,8 @@
         "javascript.inlayHints.propertyDeclarationTypes.enabled" = true;
         "javascript.referencesCodeLens.showOnAllFunctions" = true;
         "javascript.updateImportsOnFileMove.enabled" = "always";
-        "nix.formatterPath" = lib.getExe pkgs.nixpkgs-fmt;
+        "nix.enableLanguageServer" = true;
+        "nix.serverPath" = lib.getExe pkgs.nil;
         "typescript.updateImportsOnFileMove.enabled" = "always";
         "window.customMenuBarAltFocus" = false;
         "window.titleBarStyle" = "custom";
