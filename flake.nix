@@ -25,13 +25,7 @@
             ./overlays
             ./modules
             ./hosts/${hostname}.nix
-            home-manager.nixosModules.home-manager
-            {
-              networking.hostName = hostname;
-              home-manager.backupFileExtension = "bak";
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-            }
+            { networking.hostName = hostname; }
           ];
         };
       }))
