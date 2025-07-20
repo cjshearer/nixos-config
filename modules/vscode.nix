@@ -7,7 +7,7 @@
       package = (pkgs.vscodium.override {
         commandLineArgs = "--password-store=\"gnome-libsecret\"";
       });
-      extensions =
+      profiles.default.extensions =
         (with pkgs.vscode-extensions; [
           bierner.markdown-mermaid
           github.copilot
@@ -32,7 +32,7 @@
           mkhl.direnv
         ]);
 
-      keybindings = [
+      profiles.default.keybindings = [
         {
           key = "ctrl+f4";
           command = "workbench.action.closeActiveEditor";
@@ -93,7 +93,7 @@
         }
       ];
 
-      userSettings = {
+      profiles.default.userSettings = {
         "[markdown]" = {
           "rewrap.autoWrap.enabled" = false;
         };
