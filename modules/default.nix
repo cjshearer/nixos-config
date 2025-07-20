@@ -1,33 +1,7 @@
-{
-  imports = [
-    ./atuin.nix
-    ./blender.nix
-    ./citrix_workspace.nix
-    ./cosmic.nix
-    ./direnv.nix
-    ./discord.nix
-    ./freecad.nix
-    ./git.nix
-    ./google-chrome.nix
-    ./ideamaker.nix
-    ./kicad.nix
-    ./ledger-live-desktop.nix
-    ./libreoffice.nix
-    ./liquidctl.nix
-    ./logiops.nix
-    ./obsidian.nix
-    ./picard.nix
-    ./pipewire.nix
-    ./pixelflasher.nix
-    ./qbittorrent.nix
-    ./rclone.nix
-    ./remmina.nix
-    ./ssh.nix
-    ./steam.nix
-    ./tailscale.nix
-    ./thunderbird.nix
-    ./vscode.nix
-    ./ytmdesktop.nix
+{ lib, ... }: {
+  imports = lib.pipe ./. [
+    (lib.fileset.fileFilter (file: file.name != "default.nix"))
+    (lib.fileset.toList)
   ];
 
   boot.loader.efi.canTouchEfiVariables = true;
