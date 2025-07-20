@@ -12,5 +12,9 @@ in
     environment.systemPackages = [
       pkgs.citrix_workspace
     ];
+
+    nixpkgs.config.permittedInsecurePackages = [
+      "libxml2-2.13.8"
+    ];
   };
 }

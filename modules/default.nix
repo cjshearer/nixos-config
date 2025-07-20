@@ -20,9 +20,6 @@
   nix.settings.trusted-users = [ "cjshearer" ];
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = [
-    "libxml2-2.13.8"
-  ];
 
   system.etc.overlay.mutable = false;
 
