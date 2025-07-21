@@ -24,8 +24,6 @@
           jnoortheen.nix-ide
           # Failed to find package "@vscode/vsce-sign-linux-x64" on the file system
           # rust-lang.rust-analyzer
-          # TODO: add or wait for dnut.rewrap-revived to be added to vscode-extensions and replace:
-          stkb.rewrap
           streetsidesoftware.code-spell-checker
           tamasfe.even-better-toml
           timonwong.shellcheck
@@ -34,6 +32,7 @@
         ++ (with pkgs.vscode-marketplace; [
           biomejs.biome
           budparr.language-hugo-vscode
+          dnut.rewrap-revived
           joshbolduc.commitlint
           phil294.git-log--graph
           bradlc.vscode-tailwindcss
