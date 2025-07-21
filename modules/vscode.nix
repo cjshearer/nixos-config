@@ -22,8 +22,7 @@
           github.copilot-chat
           golang.go
           jnoortheen.nix-ide
-          # Failed to find package "@vscode/vsce-sign-linux-x64" on the file system
-          # rust-lang.rust-analyzer
+          rust-lang.rust-analyzer
           streetsidesoftware.code-spell-checker
           tamasfe.even-better-toml
           timonwong.shellcheck
@@ -31,11 +30,11 @@
         ])
         ++ (with pkgs.vscode-marketplace; [
           biomejs.biome
+          bradlc.vscode-tailwindcss
           budparr.language-hugo-vscode
           dnut.rewrap-revived
           joshbolduc.commitlint
           phil294.git-log--graph
-          bradlc.vscode-tailwindcss
         ])
         ++ lib.optionals config.programs.direnv.enable (
           with pkgs.vscode-extensions;
