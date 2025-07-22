@@ -151,6 +151,9 @@
         "javascript.referencesCodeLens.showOnAllFunctions" = true;
         "javascript.updateImportsOnFileMove.enabled" = "always";
         "nix.enableLanguageServer" = true;
+        "nix.hiddenLanguageServerErrors" = [
+          "textDocument/documentSymbol"
+        ];
         "nix.serverPath" = lib.getExe pkgs.nil;
         "typescript.updateImportsOnFileMove.enabled" = "always";
         "window.customMenuBarAltFocus" = false;
