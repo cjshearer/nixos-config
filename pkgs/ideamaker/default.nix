@@ -26,15 +26,15 @@
 }:
 let
   pname = "ideamaker";
-  version = "5.2.1.8560";
+  version = "5.2.2.8570";
   semver = lib.strings.concatStringsSep "." (lib.lists.init (builtins.splitVersion version));
   description = "Raise3D's 3D slicer software";
 in
 stdenv.mkDerivation {
   inherit pname version;
   src = fetchurl {
-    url = "https://downcdn.raise3d.com/ideamaker/beta/${semver}/ideaMaker_${version}-ubuntu_amd64.deb";
-    hash = "sha256-AUeHcCbXTJeIWRkdRs6bpdiA2i81OPY4npyivXscqjs=";
+    url = "https://downcdn.raise3d.com/ideamaker/release/${semver}/ideaMaker_${version}-ubuntu_amd64.deb";
+    hash = "sha256-kXcgVuuPTMWoOCrEztiedJrZrTbFx1xHyzzh4y2b0UA=";
   };
 
   nativeBuildInputs = [

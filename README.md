@@ -19,10 +19,11 @@ $ nix flake show
 │   ├───athamas: NixOS configuration
 │   ├───charon: NixOS configuration
 │   ├───clotho: NixOS configuration
+│   ├───cretheus: NixOS configuration
 │   └───sisyphus: NixOS configuration
 └───packages
     └───x86_64-linux
-        ├───ideamaker: package 'ideamaker-5.2.1.8560'
+        ├───ideamaker: package 'ideamaker-5.2.2.8570'
         └───prepare-nixos-disk: package 'prepare-nixos-disk'
 ```
 
@@ -51,6 +52,7 @@ sudo cp result/iso/*.iso /dev/sdX
 
 ## Upstream Contributions
 
+- [ideamaker: 5.1.4.8480 -> 5.2.2.8570](https://github.com/NixOS/nixpkgs/pull/388453)
 - [ideamaker: init at 4.3.3](https://github.com/NixOS/nixpkgs/pull/309130)
 - [pixelflasher: init at 7.9.2.4](https://github.com/NixOS/nixpkgs/pull/336191)
 - [ytmdesktop: init at 2.0.5](https://github.com/NixOS/nixpkgs/pull/317309)
