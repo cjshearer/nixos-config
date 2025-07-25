@@ -116,6 +116,7 @@
           "editor.insertSpaces" = true;
           "editor.tabSize" = 2;
         };
+        "biome.lsp.bin" = lib.getExe pkgs.biome;
         "cSpell.diagnosticLevel" = "Hint";
         "cSpell.diagnosticLevelFlaggedWords" = "Hint";
         "cSpell.textDecorationColor" = "royalblue";
