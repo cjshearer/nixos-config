@@ -33,6 +33,7 @@
   nixpkgs.hostPlatform = "x86_64-linux";
 
   users.cjshearer.programs.git.enable = true;
+  users.cjshearer.programs.kicad.enable = true;
   users.cjshearer.programs.rclone.enable = true;
   users.cjshearer.programs.ssh.enable = true;
   users.cjshearer.programs.vscode.enable = true;
@@ -43,7 +44,6 @@
   programs.discord.enable = true;
   programs.freecad.enable = true;
   programs.google-chrome.enable = true;
-  programs.kicad.enable = true;
   programs.ytmdesktop.enable = true;
 
   services.desktopManager.cosmic.enable = true;

@@ -37,6 +37,7 @@
 
   users.cjshearer.programs.atuin.enable = true;
   users.cjshearer.programs.git.enable = true;
+  users.cjshearer.programs.kicad.enable = true;
   users.cjshearer.programs.rclone.enable = true;
   users.cjshearer.programs.ssh.enable = true;
   users.cjshearer.programs.thunderbird.enable = true;
@@ -50,7 +51,6 @@
   programs.citrix_workspace.enable = true;
   programs.google-chrome.enable = true;
   programs.ideamaker.enable = true;
-  programs.kicad.enable = true;
   programs.ledger-live-desktop.enable = true;
   programs.libreoffice.enable = true;
   programs.obsidian.enable = true;
