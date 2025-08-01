@@ -32,6 +32,7 @@
 
   nixpkgs.hostPlatform = "x86_64-linux";
 
+  users.cjshearer.programs.atuin.enable = true;
   users.cjshearer.programs.git.enable = true;
   users.cjshearer.programs.kicad.enable = true;
   users.cjshearer.programs.rclone.enable = true;
