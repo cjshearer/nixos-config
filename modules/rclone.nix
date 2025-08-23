@@ -7,100 +7,6 @@
 {
   options.users.cjshearer.programs.rclone.enable = lib.mkEnableOption "rclone";
 
-  options.home-manager.users = lib.mkOption {
-    type = lib.types.attrsOf (
-      lib.types.submoduleWith {
-        modules = [
-          (
-            {
-              config,
-              lib,
-              pkgs,
-              ...
-            }:
-            let
-              cfg = config.programs.rclone;
-              iniFormat = pkgs.formats.ini { };
-            in
-            {
-              # https://github.com/nix-community/home-manager/blob/master/modules/programs/rclone.nix
-              options.programs.rclone = {
-                remotes = lib.mkOption {
-                  type = lib.types.attrsOf (
-                    lib.types.submodule {
-                      options.persist = lib.mkOption {
-                        type = lib.types.listOf lib.types.str;
-                        default = [ ];
-                        description = ''
-                          A list of keys that should be persisted from prior rclone configurations.
-                        '';
-                      };
-                    }
-                  );
-                };
-              };
-
-              config = lib.mkIf config.programs.rclone.enable {
-                home.activation.createRcloneConfig =
-                  let
-                    safeConfig = lib.pipe cfg.remotes [
-                      (lib.mapAttrs (_: v: v.config))
-                      (iniFormat.generate "rclone.conf@pre-secrets")
-                    ];
-
-                    # https://github.com/rclone/rclone/issues/8190
-                    injectSecret =
-                      remote:
-                      lib.mapAttrsToList (secret: secretFile: ''
-                        ${lib.getExe cfg.package} config update \
-                          ${remote.name} config_refresh_token=false \
-                          ${secret} "$(cat ${secretFile})" \
-                          --quiet --non-interactive > /dev/null
-                      '') remote.value.secrets or { };
-
-                    injectAllSecrets = lib.concatMap injectSecret (lib.mapAttrsToList lib.nameValuePair cfg.remotes);
-                  in
-                  lib.mkForce (
-                    lib.hm.dag.entryAfter [ "writeBoundary" cfg.writeAfter ] ''
-                      previousConfig=$(${pkgs.rclone}/bin/rclone config dump)
-
-                      run install $VERBOSE_ARG -D -m600 ${safeConfig} "${config.xdg.configHome}/rclone/rclone.conf"
-                      ${lib.concatLines injectAllSecrets}
-
-                      # convert remotes.<remoteName>.persist.[persistItem] to a list of
-                      # "remoteName,persistItem" pairs
-                      valuesToPersist=(${
-                        lib.pipe cfg.remotes [
-                          (lib.mapAttrsToList (
-                            remoteName: remote: lib.map (persistItem: ''"${remoteName},${persistItem}"'') remote.persist
-                          ))
-                          (lib.flatten)
-                          (lib.concatStringsSep " ")
-                        ]
-                      })
-
-                      for pair in "''${valuesToPersist[@]}"; do
-                        IFS=',' read -r remoteName persistItem <<< "$pair"
-
-                        ${pkgs.rclone}/bin/rclone config update \
-                          "$remoteName" \
-                          "$persistItem" \
-                          "$(
-                            ${pkgs.coreutils}/bin/echo "$previousConfig" |
-                            ${pkgs.jq}/bin/jq -r ."$remoteName"."$persistItem"' // ""'
-                          )" \
-                          --quiet --non-interactive > /dev/null
-                      done
-                    ''
-                  );
-              };
-            }
-          )
-        ];
-      }
-    );
-  };
-
   config = lib.mkIf config.users.cjshearer.programs.rclone.enable {
     systemd.tmpfiles.rules = [
       "d /mnt/onedrive 0755 cjshearer users -"
@@ -108,27 +14,38 @@
     home-manager.users.cjshearer.programs.rclone.enable = true;
     home-manager.users.cjshearer.programs.rclone.remotes.onedrive = {
       config = {
+        delta = true;
+        dir_cache_time = "52w";
         drive_type = "personal";
+        poll_interval = "30s";
         type = "onedrive";
+        vfs_cache_max_age = "2w";
+        vfs_cache_mode = "full";
+        vfs_refresh = true;
       };
-      persist = [
-        "drive_id"
-        "token"
-      ];
       mounts."" = {
         enable = true;
         mountPoint = "/mnt/onedrive";
-        options = {
-          dir-cache-time = "52w";
-          onedrive-delta = true;
-          onedrive-drive-type = "personal";
-          poll-interval = "30s";
-          vfs-cache-max-age = "2w";
-          vfs-cache-mode = "full";
-          vfs-refresh = true;
-        };
+      };
+      secrets = {
+        drive_id = ''
+          $(
+          tmp=$(mktemp)
+          ${pkgs.rclone}/bin/rclone config dump --config "$savedConfigPath" \
+            | ${pkgs.jq}/bin/jq -r '.onedrive.drive_id // empty' > "$tmp"
+          echo "$tmp"
+          )'';
+
+        token = ''
+          $(
+          tmp=$(mktemp)
+          ${pkgs.rclone}/bin/rclone config dump --config "$savedConfigPath" \
+            | ${pkgs.jq}/bin/jq -r '.onedrive.token // empty' > "$tmp"
+          echo "$tmp"
+          )'';
       };
     };
+
     home-manager.users.cjshearer.systemd.user.services."rclone-mount\:@onedrive-symlink" =
       let
         home = config.home-manager.users.cjshearer.home.homeDirectory;
