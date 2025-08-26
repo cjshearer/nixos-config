@@ -35,6 +35,8 @@
 
   networking.useDHCP = lib.mkDefault true;
 
+  home-manager.users.cjshearer.programs.devenv.enable = true;
+
   users.cjshearer.programs.atuin.enable = true;
   users.cjshearer.programs.git.enable = true;
   users.cjshearer.programs.kicad.enable = true;
