@@ -34,7 +34,7 @@ $ nix flake show
 sudo nixos-rebuild switch --flake .
 
 # build target configuration locally and push over ssh
-nixos-rebuild switch --flake . --target-host user@targetHost --use-remote-sudo
+nixos-rebuild switch --flake . --target-host user@targetHost --ask-sudo-password
 
 # provisioning a new host with a USB drive:
 sudo nix run .#prepare-nixos-disk
