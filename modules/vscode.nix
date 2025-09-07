@@ -15,6 +15,7 @@
           commandLineArgs = "--password-store=\"gnome-libsecret\"";
         }
       );
+
       profiles.default.extensions =
         (with pkgs.vscode-extensions; [
           bierner.markdown-mermaid
@@ -162,5 +163,7 @@
         "window.zoomLevel" = 0.5;
       };
     };
+
+    home-manager.users.cjshearer.services.gnome-keyring.enable = true;
   };
 }
