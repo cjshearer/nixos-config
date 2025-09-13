@@ -9,6 +9,7 @@
   config = lib.mkIf config.users.cjshearer.programs.ssh.enable {
     home-manager.users.cjshearer.programs.ssh = {
       enable = true;
+      enableDefaultConfig = false;
       matchBlocks."github.com" = {
         hostname = "ssh.github.com";
         port = 443;
