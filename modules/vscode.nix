@@ -42,6 +42,12 @@
           [
             mkhl.direnv
           ]
+        )
+        ++ lib.optionals config.programs.openscad.enable (
+          with pkgs.vscode-marketplace;
+          [
+            leathong.openscad-language-support
+          ]
         );
 
       profiles.default.keybindings = [

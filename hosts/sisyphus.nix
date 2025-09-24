@@ -47,15 +47,16 @@
   users.cjshearer.services.remmina.enable = true;
 
   programs.blender.enable = true;
+  programs.citrix_workspace.enable = true;
   programs.direnv.enable = true;
   programs.discord.enable = true;
   programs.freecad.enable = true;
-  programs.citrix_workspace.enable = true;
   programs.google-chrome.enable = true;
   programs.ideamaker.enable = true;
   programs.ledger-live-desktop.enable = true;
   programs.libreoffice.enable = true;
   programs.obsidian.enable = true;
+  programs.openscad.enable = true;
   programs.picard.enable = true;
   programs.pixelflasher.enable = true;
   programs.qbittorrent.enable = true;
