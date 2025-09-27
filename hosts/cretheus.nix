@@ -48,6 +48,7 @@
   programs.freecad.enable = true;
   programs.google-chrome.enable = true;
   programs.htop.enable = true;
+  programs.openscad.enable = true;
   programs.ytmdesktop.enable = true;
 
   services.desktopManager.cosmic.enable = true;
