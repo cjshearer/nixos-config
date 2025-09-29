@@ -17,38 +17,34 @@
       );
 
       profiles.default.extensions =
-        (with pkgs.vscode-extensions; [
-          bierner.markdown-mermaid
-          github.copilot
-          github.copilot-chat
-          golang.go
-          jnoortheen.nix-ide
-          rust-lang.rust-analyzer
-          streetsidesoftware.code-spell-checker
-          tamasfe.even-better-toml
-          timonwong.shellcheck
-          waderyan.gitblame
-        ])
-        ++ (with pkgs.vscode-marketplace; [
-          biomejs.biome
-          bradlc.vscode-tailwindcss
-          budparr.language-hugo-vscode
-          dnut.rewrap-revived
-          joshbolduc.commitlint
-          phil294.git-log--graph
-        ])
-        ++ lib.optionals config.programs.direnv.enable (
-          with pkgs.vscode-extensions;
-          [
-            mkhl.direnv
-          ]
-        )
-        ++ lib.optionals config.programs.openscad.enable (
-          with pkgs.vscode-marketplace;
-          [
-            leathong.openscad-language-support
-          ]
-        );
+        let
+          mkt = pkgs.vscode-marketplace;
+          vsx = pkgs.open-vsx;
+        in
+        [
+          mkt.github.copilot
+          vsx.bierner.markdown-mermaid
+          vsx.biomejs.biome
+          vsx.bradlc.vscode-tailwindcss
+          vsx.budparr.language-hugo-vscode
+          vsx.dnut.rewrap-revived
+          vsx.github.copilot-chat
+          vsx.golang.go
+          vsx.jnoortheen.nix-ide
+          vsx.joshbolduc.commitlint
+          vsx.phil294.git-log--graph
+          vsx.rust-lang.rust-analyzer
+          vsx.streetsidesoftware.code-spell-checker
+          vsx.tamasfe.even-better-toml
+          vsx.timonwong.shellcheck
+          vsx.waderyan.gitblame
+        ]
+        ++ lib.optionals config.programs.direnv.enable [
+          vsx.mkhl.direnv
+        ]
+        ++ lib.optionals config.programs.openscad.enable [
+          vsx.leathong.openscad-language-support
+        ];
 
       profiles.default.keybindings = [
         {
