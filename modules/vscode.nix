@@ -11,40 +11,39 @@
     home-manager.users.cjshearer.programs.vscode = {
       enable = true;
       package = (
-        pkgs.vscodium.override {
+        pkgs.vscode.override {
           commandLineArgs = "--password-store=\"gnome-libsecret\"";
         }
       );
 
-      profiles.default.extensions =
-        let
-          mkt = pkgs.vscode-marketplace;
-          vsx = pkgs.open-vsx;
-        in
+      profiles.default.enableUpdateCheck = false;
+      profiles.default.enableExtensionUpdateCheck = false;
+      profiles.default.extensions = pkgs.nix4vscode.forVscode (
         [
-          mkt.github.copilot
-          vsx.bierner.markdown-mermaid
-          vsx.biomejs.biome
-          vsx.bradlc.vscode-tailwindcss
-          vsx.budparr.language-hugo-vscode
-          vsx.dnut.rewrap-revived
-          vsx.github.copilot-chat
-          vsx.golang.go
-          vsx.jnoortheen.nix-ide
-          vsx.joshbolduc.commitlint
-          vsx.phil294.git-log--graph
-          vsx.rust-lang.rust-analyzer
-          vsx.streetsidesoftware.code-spell-checker
-          vsx.tamasfe.even-better-toml
-          vsx.timonwong.shellcheck
-          vsx.waderyan.gitblame
+          "github.copilot"
+          "bierner.markdown-mermaid"
+          "biomejs.biome"
+          "bradlc.vscode-tailwindcss"
+          "budparr.language-hugo-vscode"
+          "dnut.rewrap-revived"
+          "github.copilot-chat"
+          "golang.go"
+          "jnoortheen.nix-ide"
+          "joshbolduc.commitlint"
+          "phil294.git-log--graph"
+          "rust-lang.rust-analyzer"
+          "streetsidesoftware.code-spell-checker"
+          "tamasfe.even-better-toml"
+          "timonwong.shellcheck"
+          "waderyan.gitblame"
         ]
         ++ lib.optionals config.programs.direnv.enable [
-          vsx.mkhl.direnv
+          "mkhl.direnv"
         ]
         ++ lib.optionals config.programs.openscad.enable [
-          vsx.leathong.openscad-language-support
-        ];
+          "leathong.openscad-language-support"
+        ]
+      );
 
       profiles.default.keybindings = [
         {

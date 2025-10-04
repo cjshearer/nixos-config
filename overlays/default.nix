@@ -1,7 +1,7 @@
-{ pkgs, nix-vscode-extensions, ... }:
+{ pkgs, nix4vscode, ... }:
 {
   nixpkgs.overlays = [
     (final: _prev: import ../pkgs { inherit pkgs; })
-    nix-vscode-extensions.overlays.default
+    nix4vscode.overlays.default
   ];
 }
