@@ -158,6 +158,7 @@
           "textDocument/documentSymbol"
         ];
         "nix.serverPath" = lib.getExe pkgs.nil;
+        "telemetry.telemetryLevel" = "off";
         "typescript.updateImportsOnFileMove.enabled" = "always";
         "window.customMenuBarAltFocus" = false;
         "window.titleBarStyle" = "custom";
