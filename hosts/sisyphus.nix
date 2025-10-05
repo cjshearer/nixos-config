@@ -32,7 +32,7 @@
   hardware.bluetooth.enable = true;
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   hardware.keyboard.zsa.enable = true;
-  hardware.seeed-xiao-ble.enable = true;
+  hardware.seeeduino_xiao_ble.enable = true;
 
   networking.useDHCP = lib.mkDefault true;
 
