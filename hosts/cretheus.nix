@@ -34,7 +34,6 @@
 
   hardware.seeeduino_xiao_ble.enable = true;
 
-
   home-manager.users.cjshearer.programs.entr.enable = true;
 
   users.cjshearer.programs.atuin.enable = true;
