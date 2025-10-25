@@ -49,7 +49,7 @@
   users.cjshearer.services.remmina.enable = true;
 
   programs.blender.enable = true;
-  programs.citrix_workspace.enable = true;
+  # programs.citrix_workspace.enable = true;
   programs.direnv.enable = true;
   programs.discord.enable = true;
   programs.freecad.enable = true;
