@@ -37,6 +37,7 @@
   services.tailscale.enable = true;
 
   users.cjshearer.programs.git.enable = true;
+  users.cjshearer.programs.ssh.enable = true;
 
   time.timeZone = "America/New_York";
 
