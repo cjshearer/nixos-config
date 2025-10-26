@@ -33,7 +33,10 @@
   networking.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = "aarch64-linux";
+
   services.tailscale.enable = true;
+
+  users.cjshearer.programs.git.enable = true;
 
   time.timeZone = "America/New_York";
 
