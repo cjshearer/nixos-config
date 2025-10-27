@@ -34,6 +34,7 @@
 
   nixpkgs.hostPlatform = "aarch64-linux";
 
+  services.immich.enable = true;
   services.tailscale.enable = true;
 
   users.cjshearer.programs.git.enable = true;
