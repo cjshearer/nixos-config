@@ -7,6 +7,8 @@
 # https://github.com/sarveshrulz/nixos_config/blob/main/system/raspberrypi/users/sarvesh/home.nix
 lib.mkIf config.services.immich.enable {
   services.immich.host = "127.0.0.1";
+  services.immich.mediaLocation = "/mnt/onedrive/Pictures/immich";
+  services.tailscale.enable = true;
   systemd.services.tailscaled-serve-immich = {
     after = [ "tailscaled.service" ];
     wants = [ "tailscaled.service" ];
@@ -18,5 +20,5 @@ lib.mkIf config.services.immich.enable {
       RemainAfterExit = true;
     };
   };
-  services.tailscale.enable = true;
+  users.cjshearer.services.rclone.onedrive.enable = true;
 }
