@@ -4,15 +4,15 @@
   ...
 }:
 lib.mkIf config.services.tailscale.enable {
-  services.tailscale.extraSetFlags =
-    [
-      "--ssh"
-    ]
-    ++ builtins.attrNames (
-      lib.filterAttrs (flag: hostnames: builtins.elem config.networking.hostName hostnames) {
-        "--advertise-exit-node" = [ "charon" ];
-      }
-    );
+  services.tailscale.extraSetFlags = [
+    "--accept-routes"
+    "--ssh"
+  ]
+  ++ builtins.attrNames (
+    lib.filterAttrs (flag: hostnames: builtins.elem config.networking.hostName hostnames) {
+      "--advertise-exit-node" = [ "charon" ];
+    }
+  );
 
   services.tailscale.useRoutingFeatures =
     {
