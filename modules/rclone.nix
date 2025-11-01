@@ -21,7 +21,6 @@
         type = "onedrive";
         vfs_cache_max_age = "2w";
         vfs_cache_mode = "full";
-        vfs_refresh = true;
       };
       mounts."" = {
         enable = true;
