@@ -5,9 +5,16 @@
 }:
 # https://github.com/simonwjackson/mountainous/blob/main/modules/nixos/services/photos/default.nix
 # https://github.com/sarveshrulz/nixos_config/blob/main/system/raspberrypi/users/sarvesh/home.nix
+# https://github.com/simisimis/s/blob/4b39dccbc5bc850572e7eab40aa9b6dcd20efe65/hosts/kouti/proxy.nix#L348-L360
+# state can be removed with:
+# sudo rm -rf /var/lib/{immich,postgresql,redis-immich} /var/cache/immich/
 lib.mkIf config.services.immich.enable {
+  services.immich.database.name = "cjshearer";
+  services.immich.database.user = "cjshearer";
+  services.immich.group = "users";
   services.immich.host = "127.0.0.1";
-  services.immich.mediaLocation = "/mnt/onedrive/Pictures/immich";
+  services.immich.mediaLocation = "/mnt/onedrive/app/immich";
+  services.immich.user = "cjshearer";
   services.tailscale.enable = true;
   systemd.services.tailscaled-serve-immich = {
     after = [ "tailscaled.service" ];
