@@ -41,7 +41,8 @@
 
   users.cjshearer.programs.atuin.enable = true;
   users.cjshearer.programs.git.enable = true;
-  users.cjshearer.programs.rclone.enable = true;
+  users.cjshearer.programs.rclone.remotes.onedrive.enable = true;
+  users.cjshearer.programs.rclone.remotes.onedrive.symlink.enable = true;
   users.cjshearer.programs.ssh.enable = true;
   users.cjshearer.programs.thunderbird.enable = true;
   users.cjshearer.programs.vscode.enable = true;

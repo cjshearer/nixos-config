@@ -40,7 +40,8 @@
   users.cjshearer.programs.git.enable = true;
   users.cjshearer.programs.helix.enable = true;
   users.cjshearer.programs.kicad.enable = true;
-  users.cjshearer.programs.rclone.enable = true;
+  users.cjshearer.programs.rclone.remotes.onedrive.enable = true;
+  users.cjshearer.programs.rclone.remotes.onedrive.symlink.enable = true;
   users.cjshearer.programs.ssh.enable = true;
   users.cjshearer.programs.vscode.enable = true;
   users.cjshearer.services.remmina.enable = true;
