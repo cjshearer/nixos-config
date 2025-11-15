@@ -80,7 +80,7 @@
 
   time.timeZone = "America/New_York";
 
-  nixpkgs.config.rocmSupport = true;
+  # nixpkgs.config.rocmSupport = true;
   nixpkgs.hostPlatform = "x86_64-linux";
 
   # This value determines the NixOS release from which the default
