@@ -41,6 +41,8 @@
         ]
       );
 
-      packages.x86_64-linux = import ./pkgs nixpkgs.legacyPackages.x86_64-linux;
+      packages = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
+        system: import ./pkgs nixpkgs.legacyPackages.${system}
+      );
     };
 }
