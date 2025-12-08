@@ -18,7 +18,7 @@
 
       profiles.default.enableUpdateCheck = false;
       profiles.default.enableExtensionUpdateCheck = false;
-      profiles.default.extensions = pkgs.nix4vscode.forVscode (
+      profiles.default.extensions = pkgs.nix4vscode.forVscodeVersion pkgs.vscode.version (
         [
           "github.copilot"
           "bierner.markdown-mermaid"
