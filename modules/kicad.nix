@@ -22,7 +22,7 @@ let
       };
 
       config = lib.mkIf cfg.enable {
-        home.packages = [ pkgs.kicad-unstable ];
+        home.packages = [ pkgs.kicad ];
       };
     }
   );
