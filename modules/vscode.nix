@@ -20,7 +20,6 @@
       profiles.default.enableExtensionUpdateCheck = false;
       profiles.default.extensions = pkgs.nix4vscode.forVscodeVersion pkgs.vscode.version (
         [
-          "github.copilot"
           "bierner.markdown-mermaid"
           "biomejs.biome"
           "bradlc.vscode-tailwindcss"
