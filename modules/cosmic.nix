@@ -64,6 +64,20 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
 
     home.file.".config/cosmic/com.system76.CosmicEdit/v1/tab_width".text = "2";
 
+    home.file.".config/cosmic/com.system76.CosmicFiles/v1/favorites".text = ''
+      [
+        Home,
+        Downloads,
+        Path("/home/cjshearer/repos"),
+        Path("/mnt/onedrive"),
+        Path("/mnt/onedrive/Documents"),
+        Path("/mnt/onedrive/Documents/my-notes"),
+        Path("/mnt/onedrive/Music"),
+        Path("/mnt/onedrive/Pictures"),
+        Path("/mnt/onedrive/Videos"),
+      ]
+    '';
+
     home.file.".config/cosmic/com.system76.CosmicIdle/v1/screen_off_time".text = "Some(300000)";
     home.file.".config/cosmic/com.system76.CosmicIdle/v1/suspend_on_ac_time".text =
       if config.networking.hostName == "sisyphus" then "None" else "Some(1800000)";
