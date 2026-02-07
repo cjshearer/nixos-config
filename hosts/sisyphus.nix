@@ -1,4 +1,5 @@
 {
+  pkgs,
   config,
   lib,
   modulesPath,
@@ -64,12 +65,33 @@
   programs.obsidian.enable = true;
   programs.openscad.enable = true;
   programs.picard.enable = true;
-  programs.pixelflasher.enable = true;
+  # programs.pixelflasher.enable = true;
   programs.qbittorrent.enable = true;
   programs.steam.enable = true;
   programs.ytmdesktop.enable = true;
   programs.zoom-us.enable = true;
 
+  systemd.services.duo-desktop = {
+    enable = true;
+    description = "Duo Desktop";
+
+    wantedBy = [ "multi-user.target" ];
+
+    serviceConfig = {
+      ExecStart = "${pkgs.duo}/bin/duo-desktop";
+      Type = "simple";
+      Restart = "on-failure";
+      CapabilityBoundingSet = "CAP_DAC_OVERRIDE CAP_NET_ADMIN CAP_NET_RAW CAP_SYS_ADMIN CAP_SYS_PTRACE";
+      NoNewPrivileges = "yes";
+      ProtectKernelModules = "yes";
+      ProtectKernelTunables = "yes";
+      RestrictAddressFamilies = "AF_UNIX AF_LOCAL AF_INET AF_NETLINK AF_INET6";
+      RestrictRealtime = "yes";
+      ProtectControlGroups = "yes";
+      RestrictSUIDSGID = "yes";
+      LockPersonality = "yes";
+    };
+  };
   services.desktopManager.cosmic.enable = true;
   services.liquidctl.enable = true;
   services.logiops.enable = true;
