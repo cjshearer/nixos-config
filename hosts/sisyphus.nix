@@ -48,7 +48,6 @@
   users.cjshearer.programs.vscode.enable = true;
 
   users.cjshearer.services.rclone.onedrive.enable = true;
-  users.cjshearer.services.rclone.onedrive.symlink.enable = true;
   users.cjshearer.services.remmina.enable = true;
 
   programs.blender.enable = true;
@@ -64,7 +63,7 @@
   programs.obsidian.enable = true;
   programs.openscad.enable = true;
   programs.picard.enable = true;
-  programs.pixelflasher.enable = true;
+  # programs.pixelflasher.enable = true;
   programs.qbittorrent.enable = true;
   programs.steam.enable = true;
   programs.ytmdesktop.enable = true;

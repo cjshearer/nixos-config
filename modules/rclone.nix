@@ -15,8 +15,9 @@
 #   months to not need to workaround stale caches
 # - f5ba42c: split OneDrive remote and symlink into separate options, since with immich I want to
 #   run this on a server where I don't need symlinks in the home directory
-# - ???????: moved mount back to a system unit, run as my user, so that immich and other systemd
+# - 7d5d7dd: moved mount back to a system unit, run as my user, so that immich and other systemd
 #   units can depend on it, but while keeping rclone config management in home-manager.
+# - #######: removed inotify-driven symlink service that mirrored OneDrive into $HOME due to fragility, stale references, and systemd lifecycle issues. Replaced it with explicit XDG user directory mappings pointing directly at the rclone-mounted OneDrive path. This restores clear boundaries between local state and cloud-backed data while simplifying mount behavior and failure modes.
 {
   lib,
   pkgs,
@@ -33,12 +34,6 @@ in
       type = lib.types.str;
       default = "/mnt/onedrive";
       description = "The mount point for the OneDrive remote.";
-    };
-    symlink.enable = lib.mkEnableOption "symlink onedrive root folders to home directory";
-    symlink.to = lib.mkOption {
-      type = lib.types.str;
-      default = config.home-manager.users.cjshearer.home.homeDirectory;
-      description = "The directory to symlink OneDrive root folders into.";
     };
   };
 
@@ -91,39 +86,9 @@ in
           )'';
       };
     };
-
-    systemd.services."rclone-mount\:@onedrive-symlink" = lib.mkIf cfg.symlink.enable {
-      # This unit must be started after rclone mount, as inotify would otherwise be watching
-      # the inode that the directory was previously pointing to, rather than the new inode
-      # pointing to the root of the mounted file system.
-      description = "Symlink OneDrive Folders to Home Directory";
-      partOf = [ "rclone-mount\:@onedrive.service" ];
-      after = [ "rclone-mount\:@onedrive.service" ];
-      requires = [ "rclone-mount\:@onedrive.service" ];
-      wantedBy = [ "default.target" ];
-
-      serviceConfig = {
-        Type = "simple";
-        User = "cjshearer";
-        Group = "users";
-        ExecStart = pkgs.writeShellScript "rclone-mount\:@onedrive-symlink" ''
-          ${pkgs.coreutils}/bin/ln -sf ${cfg.mountPoint}/* ${cfg.symlink.to}
-          ${pkgs.inotify-tools}/bin/inotifywait \
-            -m \
-            -e create,delete,moved_to,moved_from \
-            ${cfg.mountPoint} | \
-            while read path action file; do
-              if [ $action = "CREATE" ] || [ $action = "MOVED_TO" ]; then
-                ln -sf "${cfg.mountPoint}/$file" ${cfg.symlink.to}
-              else
-                rm "${cfg.symlink.to}/$file"
-            fi
-          done
-        '';
-        ExecStop = "${pkgs.findutils}/bin/find ${cfg.symlink.to} -maxdepth 1 -xtype l -delete";
-        RestartSec = 10;
-        Restart = "on-failure";
-      };
-    };
+    home-manager.users.cjshearer.xdg.userDirs.documents = "${cfg.mountPoint}/Documents";
+    home-manager.users.cjshearer.xdg.userDirs.music = "${cfg.mountPoint}/Music";
+    home-manager.users.cjshearer.xdg.userDirs.pictures = "${cfg.mountPoint}/Pictures";
+    home-manager.users.cjshearer.xdg.userDirs.videos = "${cfg.mountPoint}/Videos";
   };
 }
