@@ -37,6 +37,7 @@ in
     };
   };
 
+  # requires on config file from home-manager existing, which is yet another user unit :/
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [
       "d ${cfg.mountPoint} 0755 cjshearer users -"

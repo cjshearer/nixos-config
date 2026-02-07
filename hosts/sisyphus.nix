@@ -38,6 +38,10 @@
 
   home-manager.users.cjshearer.programs.devenv.enable = true;
   home-manager.users.cjshearer.programs.entr.enable = true;
+  # home-manager.users.cjshearer.systemd.user.services.vscode-server.enable = true;
+  # systemd.user.services.auto-fix-vscode-server.wantedBy = [ "default.target" ];
+  # services.vscode-server.enable = true;
+  systemd.user.services.auto-fix-vscode-server.enable = true;
 
   users.cjshearer.programs.atuin.enable = true;
   users.cjshearer.programs.git.enable = true;

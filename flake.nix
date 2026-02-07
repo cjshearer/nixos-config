@@ -11,6 +11,9 @@
 
     nix4vscode.url = "github:nix-community/nix4vscode";
     nix4vscode.inputs.nixpkgs.follows = "nixpkgs";
+
+    nixos-vscode-server.url = "github:nix-community/nixos-vscode-server";
+    nixos-vscode-server.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -18,6 +21,7 @@
       self,
       nixpkgs,
       home-manager,
+      nixos-vscode-server,
       ...
     }@inputs:
     {
@@ -34,6 +38,7 @@
                 ./modules
                 ./hosts/${hostname}.nix
                 { networking.hostName = hostname; }
+                nixos-vscode-server.homeModules.default
               ];
             };
           }))
