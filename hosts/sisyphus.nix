@@ -48,7 +48,6 @@
   users.cjshearer.programs.vscode.enable = true;
 
   users.cjshearer.services.rclone.onedrive.enable = true;
-  users.cjshearer.services.remmina.enable = true;
 
   programs.blender.enable = true;
   # programs.citrix_workspace.enable = true;

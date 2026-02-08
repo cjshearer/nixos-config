@@ -46,7 +46,6 @@
   users.cjshearer.programs.vscode.enable = true;
 
   users.cjshearer.services.rclone.onedrive.enable = true;
-  users.cjshearer.services.remmina.enable = true;
 
   programs.direnv.enable = true;
   programs.discord.enable = true;
