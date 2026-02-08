@@ -213,15 +213,10 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
         ): Disable,
       }
     '';
-    home.file.".config/cosmic/com.system76.CosmicSettings.Wallpaper/v1/custom-colors".text = ''
-      [
-        Single((0.0, 0.0, 0.0)),
-      ]
-    '';
 
     home.file.".config/cosmic/com.system76.CosmicTheme.Dark/v1/active_hint".text = "1";
     home.file.".config/cosmic/com.system76.CosmicTheme.Dark/v1/gaps".text = "(0, 3)";
-      };
+  };
 
   qt.enable = true;
   qt.style = "adwaita-dark";
