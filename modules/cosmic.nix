@@ -90,7 +90,7 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
         handle_size: 4,
       ))
     '';
-    home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/border_radius".text = "8";
+    home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/border_radius".text = "160";
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/exclusive_zone".text = "false";
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/expand_to_edges".text = "false";
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/plugins_wings".text = ''
