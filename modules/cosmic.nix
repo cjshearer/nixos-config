@@ -90,14 +90,9 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
         handle_size: 4,
       ))
     '';
-    home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/autohover_delay_ms".text = ''
-      Some(500)
-    '';
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/border_radius".text = "8";
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/exclusive_zone".text = "false";
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/expand_to_edges".text = "false";
-    home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/margin".text = "4";
-    home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/plugins_center".text = "Some([])";
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/plugins_wings".text = ''
       Some(([
         "com.system76.CosmicAppletTime",
@@ -112,7 +107,6 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
         "com.system76.CosmicAppletPower",
       ]))
     '';
-    home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/spacing".text = "0";
     home.file.".config/cosmic/com.system76.CosmicPanel/v1/entries".text = ''[ "Panel" ]'';
 
     home.file.".config/cosmic/com.system76.CosmicPortal/v1/screenshot".text = ''
@@ -224,25 +218,7 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
 
     home.file.".config/cosmic/com.system76.CosmicTheme.Dark/v1/active_hint".text = "1";
     home.file.".config/cosmic/com.system76.CosmicTheme.Dark/v1/gaps".text = "(0, 3)";
-    home.file.".config/cosmic/com.system76.CosmicTheme.Dark/v1/spacing".text = ''
-      (
-        space_none: 0,
-        space_xxxs: 4,
-        space_xxs: 4,
-        space_xs: 8,
-        space_s: 8,
-        space_m: 16,
-        space_l: 24,
-        space_xl: 32,
-        space_xxl: 48,
-        space_xxxl: 64,
-      )
-    '';
-
-    home.file.".config/cosmic/com.system76.CosmicTk/v1/header_size".text = "Compact";
-    home.file.".config/cosmic/com.system76.CosmicTk/v1/interface_density".text = "Compact";
-
-  };
+      };
 
   qt.enable = true;
   qt.style = "adwaita-dark";
