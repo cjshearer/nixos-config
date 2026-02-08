@@ -107,6 +107,9 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
         "com.system76.CosmicAppletPower",
       ]))
     '';
+    home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/size".text = "S";
+
+    # I don't use the dock, which is normally in this array:
     home.file.".config/cosmic/com.system76.CosmicPanel/v1/entries".text = ''[ "Panel" ]'';
 
     home.file.".config/cosmic/com.system76.CosmicPortal/v1/screenshot".text = ''
