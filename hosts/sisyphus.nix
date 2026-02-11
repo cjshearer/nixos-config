@@ -7,6 +7,7 @@
 {
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
+  boot.extraModulePackages = [ ];
   boot.initrd.availableKernelModules = [
     "xhci_pci"
     "ahci"
@@ -16,7 +17,7 @@
   ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
-  boot.extraModulePackages = [ ];
+  boot.loader.systemd-boot.enable = true;
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/6c060c58-52b2-4a2d-854c-5f5288ea1351";
@@ -34,6 +35,7 @@
   hardware.keyboard.zsa.enable = true;
   hardware.seeeduino_xiao_ble.enable = true;
 
+  networking.networkmanager.enable = true;
   networking.useDHCP = lib.mkDefault true;
 
   home-manager.users.cjshearer.programs.devenv.enable = true;

@@ -5,6 +5,7 @@
     nixos-hardware.nixosModules.framework-amd-ai-300-series
   ];
 
+  boot.extraModulePackages = [ ];
   boot.initrd.availableKernelModules = [
     "nvme"
     "xhci_pci"
@@ -14,7 +15,7 @@
   ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-amd" ];
-  boot.extraModulePackages = [ ];
+  boot.loader.systemd-boot.enable = true;
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/fa387430-ca2c-4ea4-9f8e-8155ef0b3c68";
@@ -29,6 +30,11 @@
       "dmask=0077"
     ];
   };
+
+  networking.networkmanager.enable = true;
+  # TODO: investigate whether a lack of 
+  # networking.useDHCP = lib.mkDefault true;
+  # is causing intermittent failures
 
   nixpkgs.hostPlatform = "x86_64-linux";
 

@@ -7,6 +7,7 @@
 {
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
+  boot.extraModulePackages = [ ];
   boot.initrd.availableKernelModules = [
     "xhci_pci"
     "nvme"
@@ -17,7 +18,7 @@
   ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
-  boot.extraModulePackages = [ ];
+  boot.loader.systemd-boot.enable = true;
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/914a31f1-92a4-461b-ad89-b81e6519e277";
@@ -35,6 +36,7 @@
 
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
+  networking.networkmanager.enable = true;
   networking.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = "x86_64-linux";

@@ -2,15 +2,18 @@
   description = "Cody Shearer's NixOS Configuration";
 
   inputs = {
-    nixos-hardware.url = "github:NixOS/nixos-hardware";
-
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-
+    
     nix4vscode.url = "github:nix-community/nix4vscode";
     nix4vscode.inputs.nixpkgs.follows = "nixpkgs";
+
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
+
+    nixos-wsl.url = "github:nix-community/NixOS-WSL";
+    nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
+
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
   outputs =
