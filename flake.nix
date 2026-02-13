@@ -18,6 +18,7 @@
       self,
       nixpkgs,
       home-manager,
+      nix4vscode,
       ...
     }@inputs:
     {
@@ -30,10 +31,15 @@
             value = nixpkgs.lib.nixosSystem {
               specialArgs = inputs;
               modules = [
-                ./overlays
                 ./modules
                 ./hosts/${hostname}.nix
-                { networking.hostName = hostname; }
+                {
+                  networking.hostName = hostname;
+                  nixpkgs.overlays = [
+                    nix4vscode.overlays.default
+                    self.overlays.packages
+                  ];
+                }
               ];
             };
           }))
@@ -41,8 +47,14 @@
         ]
       );
 
+      overlays.packages =
+        final: _prev:
+        builtins.mapAttrs (
+          name: _: (final.pkgs.callPackage (./pkgs/by-name + "/${name}/default.nix") { })
+        ) (builtins.readDir ./pkgs/by-name);
+
       packages = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
-        system: import ./pkgs nixpkgs.legacyPackages.${system}
+        system: self.overlays.packages nixpkgs.legacyPackages.${system} { }
       );
     };
 }
