@@ -2,9 +2,13 @@
   config,
   pkgs,
   lib,
+  nix4vscode,
+  vscode-server,
   ...
 }:
 {
+  imports = [ vscode-server.nixosModules.default ];
+
   options.users.cjshearer.programs.vscode.enable = lib.mkEnableOption "vscode";
 
   config = lib.mkIf config.users.cjshearer.programs.vscode.enable {
@@ -166,5 +170,9 @@
     };
 
     home-manager.users.cjshearer.services.gnome-keyring.enable = true;
+
+    nixpkgs.overlays = [ nix4vscode.overlays.default ];
+
+    services.vscode-server.enable = true;
   };
 }

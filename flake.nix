@@ -14,6 +14,9 @@
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    vscode-server.url = "github:nix-community/nixos-vscode-server";
+    vscode-server.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -21,7 +24,6 @@
       self,
       nixpkgs,
       home-manager,
-      nix4vscode,
       ...
     }@inputs:
     {
@@ -38,10 +40,7 @@
                 ./hosts/${hostname}.nix
                 {
                   networking.hostName = hostname;
-                  nixpkgs.overlays = [
-                    nix4vscode.overlays.default
-                    self.overlays.packages
-                  ];
+                  nixpkgs.overlays = [ self.overlays.packages ];
                 }
               ];
             };
