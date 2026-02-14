@@ -14,10 +14,17 @@ in
   config = mkIf cfg.enable {
     services.udev.packages = [ pkgs.logitech-udev-rules ];
 
-    # we restart logiops when a Logitech device connects to avoid timing issues that prevent the
-    # mouse from working on reboot
+    # We restart logiops when a Logitech device connects to avoid timing issues that prevent the
+    # mouse from working on reboot:
+    # https://github.com/PixlOne/logiops/issues/522
     services.udev.extraRules = ''
-      ACTION=="add", SUBSYSTEM=="input", ATTRS{id/vendor}=="046d", RUN{program}="${pkgs.systemd}/bin/systemctl --machine=cjshearer@.host --user restart logiops.service"
+      # Logitech via USB receiver
+      ACTION=="add|change", SUBSYSTEM=="hidraw", SUBSYSTEMS=="usb", ATTRS{idVendor}=="046d", \
+        RUN+="${pkgs.systemd}/bin/systemctl restart --no-block logiops.service"
+
+      # Logitech via Bluetooth (BlueZ UHID path 0005:046D:...)
+      ACTION=="add|change", SUBSYSTEM=="hidraw", KERNELS=="0005:046D:*", \
+        RUN+="${pkgs.systemd}/bin/systemctl restart --no-block logiops.service"
     '';
 
     home-manager.users.cjshearer.systemd.user.services.logiops = {
