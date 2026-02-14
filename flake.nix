@@ -50,7 +50,7 @@
       overlays.packages =
         final: _prev:
         builtins.mapAttrs (
-          name: _: (final.pkgs.callPackage (./pkgs/by-name + "/${name}/default.nix") { })
+          name: _: (final.pkgs.callPackage (./pkgs/by-name + "/${name}/package.nix") { })
         ) (builtins.readDir ./pkgs/by-name);
 
       packages = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
