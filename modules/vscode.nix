@@ -15,14 +15,7 @@
         pkgs.biome
       ];
 
-      programs.vscode = {
-        enable = true;
-        package = (
-          pkgs.vscode.override {
-            commandLineArgs = "--password-store=\"gnome-libsecret\"";
-          }
-        );
-      };
+      programs.vscode.enable = true;
 
       services.gnome-keyring.enable = true;
       services.vscode-server.enable = true;
