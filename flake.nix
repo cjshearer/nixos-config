@@ -8,9 +8,6 @@
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-
-    nix4vscode.url = "github:nix-community/nix4vscode";
-    nix4vscode.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -18,7 +15,6 @@
       self,
       nixpkgs,
       home-manager,
-      nix4vscode,
       ...
     }@inputs:
     let
@@ -39,10 +35,7 @@
                 ./hosts/${hostname}.nix
                 {
                   networking.hostName = hostname;
-                  nixpkgs.overlays = [
-                    nix4vscode.overlays.default
-                    self.overlays.packages
-                  ];
+                  nixpkgs.overlays = [ self.overlays.packages ];
                 }
               ];
             };
