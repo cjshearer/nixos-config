@@ -37,7 +37,12 @@
               modules = [
                 ./modules
                 ./hosts/${hostname}.nix
+                home-manager.nixosModules.home-manager
                 {
+                  home-manager.backupFileExtension = "bak";
+                  home-manager.sharedModules = [ vscode-server.homeModules.default ];
+                  home-manager.useGlobalPkgs = true;
+                  home-manager.useUserPackages = true;
                   networking.hostName = hostname;
                   nixpkgs.overlays = [ self.overlays.packages ];
                 }

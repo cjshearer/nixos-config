@@ -2,7 +2,6 @@
   config,
   pkgs,
   lib,
-  vscode-server,
   ...
 }:
 {
@@ -11,8 +10,6 @@
 
   config = lib.mkIf config.users.cjshearer.programs.vscode.enable {
     home-manager.users.cjshearer = {
-      imports = [ vscode-server.homeModules.default ];
-
       home.packages = [
         pkgs.nil
         pkgs.biome
