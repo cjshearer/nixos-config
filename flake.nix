@@ -21,6 +21,10 @@
       nix4vscode,
       ...
     }@inputs:
+    let
+      byNamePackages = builtins.readDir ./pkgs/by-name;
+      pythonModules = builtins.readDir ./pkgs/python-modules;
+    in
     {
       nixosConfigurations = (
         nixpkgs.lib.pipe ./hosts [
@@ -48,13 +52,31 @@
       );
 
       overlays.packages =
-        final: _prev:
+        final: prev:
         builtins.mapAttrs (
           name: _: (final.pkgs.callPackage (./pkgs/by-name + "/${name}/package.nix") { })
-        ) (builtins.readDir ./pkgs/by-name);
+        ) byNamePackages
+        // {
+          pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+            (
+              python-final: python-prev:
+              builtins.mapAttrs (
+                name: _: (python-final.callPackage (./pkgs/python-modules + "/${name}") { })
+              ) pythonModules
+            )
+          ];
+        };
 
       packages = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
-        system: self.overlays.packages nixpkgs.legacyPackages.${system} { }
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ self.overlays.packages ];
+          };
+        in
+        builtins.mapAttrs (name: _: pkgs.${name}) byNamePackages
+        // builtins.mapAttrs (name: _: pkgs.python3Packages.${name}) pythonModules
       );
     };
 }
