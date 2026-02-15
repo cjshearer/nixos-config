@@ -12,7 +12,9 @@ in
   options.programs.pixelflasher.enable = mkEnableOption "pixelflasher";
 
   config = mkIf cfg.enable {
-    environment.systemPackages = with pkgs; [ pixelflasher ];
-    programs.adb.enable = true;
+    environment.systemPackages = with pkgs; [
+      android-tools
+      pixelflasher
+    ];
   };
 }

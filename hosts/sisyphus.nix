@@ -61,7 +61,7 @@
   programs.obsidian.enable = true;
   programs.openscad.enable = true;
   programs.picard.enable = true;
-  # programs.pixelflasher.enable = true;
+  programs.pixelflasher.enable = true;
   programs.qbittorrent.enable = true;
   programs.steam.enable = true;
   programs.ytmdesktop.enable = true;
