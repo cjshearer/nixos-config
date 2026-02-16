@@ -24,8 +24,10 @@
       ...
     }@inputs:
     let
-      byNamePackages = builtins.readDir ./pkgs/by-name;
-      pythonModules = builtins.readDir ./pkgs/python-modules;
+      byNamePackages =
+        if builtins.pathExists ./pkgs/by-name then builtins.readDir ./pkgs/by-name else { };
+      pythonModules =
+        if builtins.pathExists ./pkgs/python-modules then builtins.readDir ./pkgs/python-modules else { };
     in
     {
       nixosConfigurations = (

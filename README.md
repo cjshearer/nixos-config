@@ -14,6 +14,7 @@ $ tree -v --dirsfirst -L 1
 
 $ nix flake show | grep -v omitted
 .
+├───legacyPackages
 ├───nixosConfigurations
 │   ├───athamas: NixOS configuration
 │   ├───charon: NixOS configuration
@@ -33,18 +34,9 @@ $ nix flake show | grep -v omitted
     ├───x86_64-darwin
     ├───x86_64-freebsd
     └───x86_64-linux
-        ├───cadquery: package 'python3.13-cadquery-2.6.1'
-        ├───cadquery-ocp: package 'python3.13-cadquery-ocp-7.8.1.2'
-        ├───cq-editor: package 'cq-editor-0.6.2'
         ├───google-photos-takeout-helper: package 'google-photos-takeout-helper-5.0.5'
         ├───ideamaker: package 'ideamaker-5.2.2.8570'
-        ├───prepare-nixos-disk: package 'prepare-nixos-disk'
-        ├───trame: package 'python3.13-trame-3.12.0'
-        ├───trame-client: package 'python3.13-trame-client-3.11.2'
-        ├───trame-common: package 'python3.13-trame-common-1.1.1'
-        ├───trame-server: package 'python3.13-trame-server-3.10.0'
-        ├───trame-vtk: package 'python3.13-trame-vtk-2.11.1'
-        └───trame-vuetify: package 'python3.13-trame-vuetify-3.2.1'
+        └───prepare-nixos-disk: package 'prepare-nixos-disk'
 ```
 
 ## Common Commands
