@@ -9,18 +9,19 @@
 }:
 buildPythonPackage (finalAttrs: {
   pname = "ocpsvg";
-  version = "0.6.0";
-  src = fetchPypi {
-    inherit (finalAttrs) pname version;
-    hash = "sha256-8I2kNHzJDs01ZTlem9pXRtRquKr9aiaBuwOpwyG1QDk=";
-  };
+  version = "0.5.0";
   pyproject = true;
 
-  build-system = [
-    setuptools-scm
-  ];
+  src = fetchPypi {
+    inherit (finalAttrs) pname version;
+    hash = "sha256-XNjb7Iv1kNNzqCquvqskGDgYWqsE7ihZ8zudeVa7+6Y=";
+  };
+
+  build-system = [ setuptools-scm ];
 
   nativeCheckInputs = [ pytestCheckHook ];
+
+  pythonRemoveDeps = [ "cadquery-ocp" ];
 
   dependencies = [
     cadquery-ocp
