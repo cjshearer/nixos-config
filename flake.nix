@@ -71,14 +71,16 @@
 
       packages = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
         system:
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [ self.overlays.packages ];
-          };
-        in
-        builtins.mapAttrs (name: _: pkgs.${name}) byNamePackages
-        // builtins.mapAttrs (name: _: pkgs.python3Packages.${name}) pythonModules
+        builtins.mapAttrs (name: _: self.legacyPackages.${system}.${name}) byNamePackages
+        // builtins.mapAttrs (name: _: self.legacyPackages.${system}.python3Packages.${name}) pythonModules
+      );
+
+      legacyPackages = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
+        system:
+        import nixpkgs {
+          inherit system;
+          overlays = [ self.overlays.packages ];
+        }
       );
     };
 }
