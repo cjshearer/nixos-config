@@ -10,12 +10,7 @@
     home-manager.users.cjshearer.programs.ssh = {
       enable = true;
       enableDefaultConfig = false;
-      matchBlocks."github.com" = {
-        hostname = "ssh.github.com";
-        port = 443;
-        user = "git";
-        identityFile = [ "~/.ssh/${config.networking.hostName}" ];
-      };
+      matchBlocks."*".identityFile = [ "~/.ssh/${config.networking.hostName}" ];
     };
   };
 }
