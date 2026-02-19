@@ -1,18 +1,18 @@
 {
-  lib,
   modulesPath,
   ...
 }:
 {
   imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
 
+  boot.extraModulePackages = [ ];
   boot.initrd.availableKernelModules = [
     "xhci_pci"
     "virtio_scsi"
   ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
-  boot.extraModulePackages = [ ];
+  boot.loader.systemd-boot.enable = true;
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/8a67d44b-5f63-4bed-bd32-7cc652db6452";
@@ -29,6 +29,8 @@
   };
 
   swapDevices = [ ];
+
+  networking.networkmanager.enable = true;
 
   nixpkgs.hostPlatform = "aarch64-linux";
 

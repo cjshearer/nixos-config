@@ -6,9 +6,7 @@
   ];
 
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.systemd-boot.enable = true;
 
-  networking.networkmanager.enable = true;
   networking.stevenblack.enable = true;
 
   nix.gc = {
