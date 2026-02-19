@@ -30,8 +30,6 @@
 
   swapDevices = [ ];
 
-  networking.useDHCP = lib.mkDefault true;
-
   nixpkgs.hostPlatform = "aarch64-linux";
 
   services.immich.enable = true;

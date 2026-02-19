@@ -34,8 +34,6 @@
   hardware.keyboard.zsa.enable = true;
   hardware.seeeduino_xiao_ble.enable = true;
 
-  networking.useDHCP = lib.mkDefault true;
-
   home-manager.users.cjshearer.programs.devenv.enable = true;
   home-manager.users.cjshearer.programs.entr.enable = true;
 
