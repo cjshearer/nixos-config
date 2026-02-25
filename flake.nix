@@ -24,6 +24,7 @@
       ...
     }@inputs:
     let
+      # TODO: refactor with lib.fileset
       byNamePackages =
         if builtins.pathExists ./pkgs/by-name then builtins.readDir ./pkgs/by-name else { };
       pythonModules =
@@ -39,23 +40,61 @@
             value = nixpkgs.lib.nixosSystem {
               specialArgs = inputs;
               modules = [
-                ./modules
                 ./hosts/${hostname}.nix
-                home-manager.nixosModules.home-manager
-                {
-                  home-manager.backupFileExtension = "bak";
-                  home-manager.sharedModules = [ vscode-server.homeModules.default ];
-                  home-manager.useGlobalPkgs = true;
-                  home-manager.useUserPackages = true;
-                  networking.hostName = hostname;
-                  nixpkgs.overlays = [ self.overlays.packages ];
-                }
+                { networking.hostName = hostname; }
+                self.nixosModules.default
               ];
             };
           }))
           builtins.listToAttrs
         ]
       );
+
+      nixosModules.default = {
+        imports = [ home-manager.nixosModules.home-manager ] ++ nixpkgs.lib.fileset.toList ./modules;
+
+        boot.loader.efi.canTouchEfiVariables = true;
+        home-manager.backupFileExtension = "bak";
+        home-manager.sharedModules = [ vscode-server.homeModules.default ];
+        home-manager.useGlobalPkgs = true;
+
+        home-manager.useUserPackages = true;
+        networking.stevenblack.enable = true;
+
+        nix.gc = {
+          automatic = true;
+          dates = "weekly";
+          options = "--delete-older-than 30d";
+        };
+
+        nix.settings.experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
+        nix.settings.trusted-users = [ "cjshearer" ];
+
+        nixpkgs.config.allowUnfree = true;
+
+        nixpkgs.overlays = [ self.overlays.packages ];
+
+        system.autoUpgrade.allowReboot = true;
+        system.autoUpgrade.enable = true;
+        system.autoUpgrade.flake = "github:cjshearer/nixos-config";
+        system.autoUpgrade.rebootWindow = {
+          lower = "01:00";
+          upper = "05:00";
+        };
+        system.autoUpgrade.upgrade = false;
+
+        system.etc.overlay.mutable = false;
+
+        users.users.cjshearer.extraGroups = [
+          "networkmanager"
+          "wheel"
+        ];
+        users.users.cjshearer.isNormalUser = true;
+        users.users.cjshearer.uid = 1000;
+      };
 
       overlays.packages =
         final: prev:
