@@ -20,9 +20,10 @@
     // (lib.mkIf config.users.cjshearer.services.vscode-server.enable {
       home-manager.users.cjshearer = {
         home.packages = [
-          pkgs.nil
           pkgs.biome
-        ];
+          pkgs.nil
+        ]
+        ++ lib.optional config.users.cjshearer.programs.go.enable pkgs.gopls;
         services.vscode-server.enable = true;
       };
     });
