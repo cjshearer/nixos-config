@@ -8,6 +8,8 @@
 
   users.cjshearer.services.vscode-server.enable = true;
 
+  virtualisation.podman.enable = true;
+
   wsl.enable = true;
 
   # This value determines the NixOS release from which the default
