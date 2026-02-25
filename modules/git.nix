@@ -15,7 +15,7 @@
         push.autoSetupRemote = true;
         rebase.autoStash = true;
         rere.enabled = true;
-        url."git@github.com:".insteadOf = "https://github.com/";
+        url."ssh://git@github.com/".insteadOf = "https://github.com/";
         user.email = "cjshearer@live.com";
         user.name = "cjshearer";
       };
