@@ -77,7 +77,7 @@
 
         system.autoUpgrade.allowReboot = true;
         system.autoUpgrade.enable = true;
-        system.autoUpgrade.flake = "github:cjshearer/nixos-config";
+        system.autoUpgrade.flake = nixpkgs.lib.mkDefault "github:cjshearer/nixos-config";
         system.autoUpgrade.rebootWindow = {
           lower = "01:00";
           upper = "05:00";
