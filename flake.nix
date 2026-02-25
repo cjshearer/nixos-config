@@ -31,24 +31,22 @@
         if builtins.pathExists ./pkgs/python-modules then builtins.readDir ./pkgs/python-modules else { };
     in
     {
-      nixosConfigurations = (
-        nixpkgs.lib.pipe ./hosts [
-          nixpkgs.lib.fileset.toList
-          (map (path: nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf path)))
-          (map (hostname: {
-            name = hostname;
-            value = nixpkgs.lib.nixosSystem {
+      nixosConfigurations =
+        nixpkgs.lib.genAttrs
+          (map (x: nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf x)) (
+            nixpkgs.lib.fileset.toList ./hosts
+          ))
+          (
+            hostname:
+            nixpkgs.lib.nixosSystem {
               specialArgs = inputs;
               modules = [
                 ./hosts/${hostname}.nix
                 { networking.hostName = hostname; }
                 self.nixosModules.default
               ];
-            };
-          }))
-          builtins.listToAttrs
-        ]
-      );
+            }
+          );
 
       nixosModules.default = {
         imports = [ home-manager.nixosModules.home-manager ] ++ nixpkgs.lib.fileset.toList ./modules;
