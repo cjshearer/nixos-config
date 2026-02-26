@@ -52,11 +52,15 @@
         imports = [ home-manager.nixosModules.home-manager ] ++ nixpkgs.lib.fileset.toList ./modules;
 
         boot.loader.efi.canTouchEfiVariables = true;
+
         home-manager.backupFileExtension = "bak";
         home-manager.sharedModules = [ vscode-server.homeModules.default ];
         home-manager.useGlobalPkgs = true;
-
         home-manager.useUserPackages = true;
+
+        home-manager.users.cjshearer.programs.bash.bashrcExtra = ''
+          source ~/.bash_aliases
+        '';
         networking.stevenblack.enable = true;
 
         nix.gc = {
