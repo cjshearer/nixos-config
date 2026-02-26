@@ -8,7 +8,7 @@
 
   users.cjshearer.services.vscode-server.enable = true;
 
-  virtualisation.podman.enable = true;
+  virtualisation.docker.enable = true;
 
   wsl.enable = true;
 
