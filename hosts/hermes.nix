@@ -1,6 +1,8 @@
 {
   nixpkgs.hostPlatform = "x86_64-linux";
 
+  programs.htop.enable = true;
+
   users.cjshearer.programs.atuin.enable = true;
   users.cjshearer.programs.git.enable = true;
   users.cjshearer.programs.go.enable = true;
