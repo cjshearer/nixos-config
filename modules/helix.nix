@@ -11,6 +11,8 @@
     home-manager.users.cjshearer.programs.helix = {
       enable = true;
     };
+    home-manager.users.cjshearer.home.sessionVariables.EDITOR = "hx";
+    home-manager.users.cjshearer.home.sessionVariables.VISUAL = "hx";
     home-manager.users.cjshearer.home.packages = [
       pkgs.ruff
       pkgs.python3Packages.python-lsp-server
