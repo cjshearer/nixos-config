@@ -8,6 +8,9 @@
   imports = [ nixos-wsl.nixosModules.default ];
 
   config = lib.mkIf config.wsl.enable {
+    # Windows Terminal supports true color
+    environment.sessionVariables.COLORTERM = "truecolor";
+
     wsl.defaultUser = "cjshearer";
     wsl.interop.register = true;
     wsl.ssh-agent.enable = true;
