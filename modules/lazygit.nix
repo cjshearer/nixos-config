@@ -10,6 +10,8 @@
     home-manager.users.cjshearer.programs.lazygit = {
       enable = true;
       enableBashIntegration = true;
+      settings.gui.showIcons = true;
+      settings.gui.nerdFontsVersion = 3;
     };
   };
 }
