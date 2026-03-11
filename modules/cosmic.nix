@@ -62,6 +62,9 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
       )
     '';
 
+    home.file.".config/cosmic/com.system76.CosmicEdit/v1/font_name".text = ''
+      "JetBrainsMono Nerd Font Mono"
+    '';
     home.file.".config/cosmic/com.system76.CosmicEdit/v1/tab_width".text = "2";
 
     home.file.".config/cosmic/com.system76.CosmicFiles/v1/favorites".text = ''
@@ -216,6 +219,21 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
 
     home.file.".config/cosmic/com.system76.CosmicTheme.Dark/v1/active_hint".text = "1";
     home.file.".config/cosmic/com.system76.CosmicTheme.Dark/v1/gaps".text = "(0, 3)";
+
+    home.file.".config/cosmic/com.system76.CosmicTerm/v1/font_name".text = ''
+      "JetBrainsMono Nerd Font Mono"
+    '';
+
+    home.file.".config/cosmic/com.system76.CosmicTk/v1/monospace_font".text = ''
+      (
+        family: "JetBrainsMono Nerd Font Mono",
+        weight: Normal,
+        stretch: Normal,
+        style: Normal,
+      )
+    '';
+
+    home.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
   };
 
   qt.enable = true;
