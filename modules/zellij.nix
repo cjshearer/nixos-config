@@ -13,7 +13,6 @@
       enableBashIntegration = true;
       settings = {
         pane_frames = true;
-        simplified_ui = true;
         keys.locked = {
           "A-left".MoveFocusOrTab = "Left";
           "A-right".MoveFocusOrTab = "Right";
