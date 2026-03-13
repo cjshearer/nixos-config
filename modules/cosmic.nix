@@ -233,7 +233,10 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
       )
     '';
 
-    home.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
+    home.packages = [
+      pkgs.nerd-fonts.jetbrains-mono
+      pkgs.wl-clipboard
+    ];
   };
 
   qt.enable = true;
