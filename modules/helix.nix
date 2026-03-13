@@ -12,6 +12,8 @@
       enable = true;
       languages = {
         language-server.nil.command = "${pkgs.nil}/bin/nil";
+        language-server.pylsp.command = "${pkgs.python3Packages.python-lsp-server}/bin/pylsp";
+        language-server.ruff.command = "${pkgs.ruff}/bin/ruff";
         language = [
           {
             name = "markdown";
@@ -27,9 +29,5 @@
     };
     home-manager.users.cjshearer.home.sessionVariables.EDITOR = "hx";
     home-manager.users.cjshearer.home.sessionVariables.VISUAL = "hx";
-    home-manager.users.cjshearer.home.packages = [
-      pkgs.ruff
-      pkgs.python3Packages.python-lsp-server
-    ];
   };
 }
