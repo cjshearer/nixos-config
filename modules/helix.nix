@@ -11,10 +11,15 @@
     home-manager.users.cjshearer.programs.helix = {
       enable = true;
       languages = {
+        language-server.nil.command = "${pkgs.nil}/bin/nil";
         language = [
           {
             name = "markdown";
             soft-wrap.enable = true;
+          }
+          {
+            name = "nix";
+            auto-format = true;
           }
         ];
       };
@@ -25,6 +30,6 @@
     home-manager.users.cjshearer.home.packages = [
       pkgs.ruff
       pkgs.python3Packages.python-lsp-server
-   ];
+    ];
   };
 }
