@@ -25,7 +25,10 @@
           }
         ];
       };
-      settings.editor.rulers = [ 100 ];
+      settings.editor = {
+        rulers = [ 100 ];
+        text-width = 100;
+      };
     };
     home-manager.users.cjshearer.home.sessionVariables.EDITOR = "hx";
     home-manager.users.cjshearer.home.sessionVariables.VISUAL = "hx";
