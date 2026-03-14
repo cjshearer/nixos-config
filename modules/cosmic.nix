@@ -234,7 +234,11 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
     '';
 
     home.packages = [
+      # Cosmic's default monospace font, Noto Sans Mono, doesn't have some common characters like ◯
+      # (e.g. used in lazygit for git commit log), so I changed the font to one that also supports
+      # other symbols used by other programs I use, like zellij.
       pkgs.nerd-fonts.jetbrains-mono
+      # Helix, and probably other programs, need this to interact with the system clipboard.
       pkgs.wl-clipboard
     ];
   };
