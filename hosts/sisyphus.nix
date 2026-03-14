@@ -39,6 +39,7 @@
 
   home-manager.users.cjshearer.programs.devenv.enable = true;
   home-manager.users.cjshearer.programs.entr.enable = true;
+  home-manager.users.cjshearer.programs.github-copilot-cli.enable = true;
 
   users.cjshearer.programs.atuin.enable = true;
   users.cjshearer.programs.git.enable = true;
