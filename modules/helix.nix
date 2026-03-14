@@ -11,12 +11,16 @@
     home-manager.users.cjshearer.programs.helix = {
       enable = true;
       languages = {
+        language-server.codebook.args = [ "serve" ];
+        language-server.codebook.command = "${pkgs.codebook}/bin/codebook-lsp";
         language-server.nil.command = "${pkgs.nil}/bin/nil";
         language-server.pylsp.command = "${pkgs.python3Packages.python-lsp-server}/bin/pylsp";
         language-server.ruff.command = "${pkgs.ruff}/bin/ruff";
+
         language = [
           {
             name = "markdown";
+            language-servers = [ "codebook" ];
             soft-wrap.enable = true;
           }
           {
