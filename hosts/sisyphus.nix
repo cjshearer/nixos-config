@@ -37,11 +37,11 @@
 
   networking.networkmanager.enable = true;
 
+  home-manager.users.cjshearer.programs.atuin.enable = true;
   home-manager.users.cjshearer.programs.devenv.enable = true;
   home-manager.users.cjshearer.programs.entr.enable = true;
   home-manager.users.cjshearer.programs.github-copilot-cli.enable = true;
 
-  users.cjshearer.programs.atuin.enable = true;
   users.cjshearer.programs.git.enable = true;
   users.cjshearer.programs.helix.enable = true;
   users.cjshearer.programs.kicad.enable = true;
