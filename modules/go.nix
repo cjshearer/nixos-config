@@ -5,6 +5,7 @@
   config = lib.mkIf config.users.cjshearer.programs.go.enable {
     home-manager.users.cjshearer.programs.go = {
       enable = true;
+      env.CGO_ENABLED = "0";
     };
   };
 }
