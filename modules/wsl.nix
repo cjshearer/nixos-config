@@ -35,6 +35,8 @@
     ];
 
     wsl.defaultUser = "cjshearer";
+    # Including windows paths makes tab completion slow
+    wsl.interop.includePath = false;
     wsl.interop.register = true;
     wsl.ssh-agent.enable = true;
 
