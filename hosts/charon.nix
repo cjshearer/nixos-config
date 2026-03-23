@@ -37,8 +37,13 @@
   services.immich.enable = true;
   services.tailscale.enable = true;
 
+  home-manager.users.cjshearer.programs.atuin.enable = true;
+
   users.cjshearer.programs.git.enable = true;
+  users.cjshearer.programs.helix.enable = true;
+  users.cjshearer.programs.lazygit.enable = true;
   users.cjshearer.programs.ssh.enable = true;
+  users.cjshearer.programs.zellij.enable = true;
 
   time.timeZone = "America/New_York";
 
