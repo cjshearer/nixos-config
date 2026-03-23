@@ -5,13 +5,13 @@
 }:
 buildDartApplication rec {
   pname = "google-photos-takeout-helper";
-  version = "5.0.5";
+  version = "5.1.0";
 
   src = fetchFromGitHub {
     owner = "Xentraxx";
     repo = "GooglePhotosTakeoutHelper";
     rev = "v${version}";
-    hash = "sha256-jYbgqGmIPXBr5O47r2KpMwyZ3Z3UQ9zH9WfgowmvMGk=";
+    hash = "sha256-JjZsQfD3u7gHWTOD/1KV+3Aq2fak/cNs2OwRYm0AON0=";
   };
 
   dartEntryPoints = {
