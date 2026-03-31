@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  pkgs,
   ...
 }:
 {
@@ -10,7 +11,6 @@
     home-manager.users.cjshearer.programs.zellij = {
       attachExistingSession = true;
       enable = true;
-      enableBashIntegration = true;
       settings = {
         pane_frames = false;
         keys.locked = {
@@ -21,5 +21,10 @@
         };
       };
     };
+    home-manager.users.cjshearer.programs.bash.initExtra = ''
+      if [ "$TERM_PROGRAM" != "vscode" ]; then
+        eval "$(${lib.getExe pkgs.zellij} setup --generate-auto-start bash)"
+      fi
+    '';
   };
 }
