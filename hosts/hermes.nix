@@ -2,6 +2,7 @@
   nixpkgs.hostPlatform = "x86_64-linux";
 
   home-manager.users.cjshearer.programs.atuin.enable = true;
+  home-manager.users.cjshearer.programs.awscli2.enable = true;
   home-manager.users.cjshearer.programs.entr.enable = true;
   home-manager.users.cjshearer.programs.github-copilot-cli.enable = true;
   home-manager.users.cjshearer.programs.kubectl.enable = true;
