@@ -11,6 +11,7 @@
 
   programs.htop.enable = true;
 
+  users.cjshearer.programs.gh.enable = true;
   users.cjshearer.programs.git.enable = true;
   users.cjshearer.programs.go.enable = true;
   users.cjshearer.programs.helix.enable = true;
