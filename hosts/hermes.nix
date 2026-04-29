@@ -3,6 +3,7 @@
 
   home-manager.users.cjshearer.programs.atuin.enable = true;
   home-manager.users.cjshearer.programs.awscli2.enable = true;
+  home-manager.users.cjshearer.programs.dotnet-sdk.enable = true;
   home-manager.users.cjshearer.programs.entr.enable = true;
   home-manager.users.cjshearer.programs.github-copilot-cli.enable = true;
   home-manager.users.cjshearer.programs.k9s.enable = true;
