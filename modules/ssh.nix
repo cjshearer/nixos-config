@@ -10,7 +10,7 @@
     home-manager.users.cjshearer.programs.ssh = {
       enable = true;
       enableDefaultConfig = false;
-      matchBlocks."*".identityFile = [ "~/.ssh/${config.networking.hostName}" ];
+      settings."*".IdentityFile = [ "~/.ssh/${config.networking.hostName}" ];
     };
   };
 }

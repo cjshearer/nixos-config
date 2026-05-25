@@ -149,7 +149,7 @@ in
             drive_id = ''
               $(
               tmp=$(mktemp)
-              ${pkgs.rclone}/bin/rclone config dump --config "$savedConfigPath" \
+              ${pkgs.rclone}/bin/rclone config dump --config "$configPath" \
                 | ${pkgs.jq}/bin/jq -r '.onedrive.drive_id // empty' > "$tmp"
               echo "$tmp"
               )'';
@@ -157,7 +157,7 @@ in
             token = ''
               $(
               tmp=$(mktemp)
-              ${pkgs.rclone}/bin/rclone config dump --config "$savedConfigPath" \
+              ${pkgs.rclone}/bin/rclone config dump --config "$configPath" \
                 | ${pkgs.jq}/bin/jq -r '.onedrive.token // empty' > "$tmp"
               echo "$tmp"
               )'';

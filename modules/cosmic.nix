@@ -14,6 +14,8 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
       iconTheme.package = pkgs.adwaita-icon-theme;
       theme.name = "Adwaita-dark";
       theme.package = pkgs.gnome-themes-extra;
+      gtk4.theme.name = "Adwaita-dark";
+      gtk4.theme.package = pkgs.gnome-themes-extra;
     };
 
     # Initial setup:
