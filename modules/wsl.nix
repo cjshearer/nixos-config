@@ -12,27 +12,8 @@
     # Windows Terminal supports true color
     environment.sessionVariables.COLORTERM = "truecolor";
 
-    # awaiting https://github.com/nix-community/NixOS-WSL/pull/970
-    environment.systemPackages = [
-      (
-        let
-          wl-copy = pkgs.writeShellScriptBin "wl-copy" ''
-            printf '%s' "$(cat)" | ${pkgs.dos2unix}/bin/unix2dos | /mnt/c/windows/system32/clip.exe
-          '';
-
-          wl-paste = pkgs.writeShellScriptBin "wl-paste" ''
-            /mnt/c/windows/system32/windowspowershell/v1.0/powershell.exe -command Get-Clipboard | ${pkgs.dos2unix}/bin/dos2unix
-          '';
-        in
-        pkgs.symlinkJoin {
-          name = "wl-clipboard-wsl";
-          paths = [
-            wl-copy
-            wl-paste
-          ];
-        }
-      )
-    ];
+    # The standard clipboard now works between Windows and WSL. Used by zellij and voxtype
+    environment.systemPackages = [ pkgs.wl-clipboard ];
 
     wsl.defaultUser = "cjshearer";
     # Including windows paths makes tab completion slow
@@ -46,18 +27,6 @@
     # .wslconfig
     # [wsl2]
     # networkingMode=Mirrored
-
-    # FancyWM/settings.json
-    # {
-    #   "ActivationHotkey": "None_None",
-    #   "ProcessIgnoreList": [
-    #     "Taskmgr"
-    #   ],
-    #   "ShowFocus": true,
-    #   "ShowStartupWindow": false,
-    #   "SoundOnFailure": false,
-    #   "WindowPadding": 0
-    # }
 
     # fancy-wm.ahk
     # #Requires AutoHotkey v2.0.2
