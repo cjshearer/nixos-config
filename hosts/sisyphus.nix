@@ -63,7 +63,6 @@
   programs.ledger-live-desktop.enable = true;
   programs.libreoffice.enable = true;
   programs.obsidian.enable = true;
-  programs.openscad.enable = true;
   programs.pixelflasher.enable = true;
   programs.qbittorrent.enable = true;
   programs.steam.enable = true;
