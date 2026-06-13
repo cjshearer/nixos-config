@@ -4,6 +4,9 @@
   ...
 }:
 lib.mkIf config.services.pipewire.enable {
+  services.pipewire.alsa.enable = true;
+  services.pipewire.alsa.support32Bit = true;
+  services.pipewire.pulse.enable = true;
   services.pipewire.wireplumber.extraConfig = {
     # From: https://wiki.archlinux.org/title/Bluetooth_headset#Disable_PipeWire_HSP/HFP_profile
     #
@@ -71,4 +74,5 @@ lib.mkIf config.services.pipewire.enable {
       }
     ];
   };
+  security.rtkit.enable = true;
 }
