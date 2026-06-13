@@ -52,6 +52,7 @@
   users.cjshearer.programs.zellij.enable = true;
 
   users.cjshearer.services.rclone.onedrive.enable = true;
+  users.cjshearer.services.voxtype.enable = true;
 
   programs.blender.enable = true;
   programs.direnv.enable = true;
