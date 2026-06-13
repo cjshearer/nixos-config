@@ -23,6 +23,7 @@
       }:$PATH";
       settings = {
         output.mode = "paste";
+        output.paste_keys = "ctrl+shift+v";
         output.restore_clipboard = true;
         output.shift_enter_newlines = true;
         vad.enable = true;
