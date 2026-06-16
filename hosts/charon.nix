@@ -45,6 +45,8 @@
   users.cjshearer.programs.ssh.enable = true;
   users.cjshearer.programs.zellij.enable = true;
 
+  users.cjshearer.services.vscode-server.enable = true;
+
   time.timeZone = "America/New_York";
 
   # This value determines the NixOS release from which the default
