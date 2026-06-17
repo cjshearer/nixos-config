@@ -20,6 +20,7 @@
   home-manager.users.cjshearer.programs.zellij.enable = true;
 
   home-manager.users.cjshearer.services.vscode-server.enable = true;
+  home-manager.users.cjshearer.services.voxtype.enable = true;
 
   programs.htop.enable = true;
 
