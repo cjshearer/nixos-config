@@ -8,6 +8,24 @@
 {
   imports = [ nixos-wsl.nixosModules.default ];
 
+  options.windows.files = lib.mkOption {
+    type =
+      with lib.types;
+      attrsOf (submodule {
+        options = {
+          source = lib.mkOption {
+            type = path;
+            description = "Source path in the Nix store to copy to Windows.";
+          };
+          destination = lib.mkOption {
+            type = str;
+            description = "Destination path relative to the Windows user profile.";
+          };
+        };
+      });
+    default = { };
+  };
+
   config = lib.mkIf config.wsl.enable {
     # Windows Terminal supports true color
     environment.sessionVariables.COLORTERM = "truecolor";
@@ -21,33 +39,32 @@
     wsl.interop.register = true;
     wsl.ssh-agent.enable = true;
 
-    # TODO: use this to sync dotfiles to Windows:
-    # https://github.com/swebra/dotfiles/blob/master/home-manager/windows/sync-windows-dotfiles.nix
+    windows.files.wslconfig = {
+      source = pkgs.writeText ".wslconfig" ''
+        [wsl2]
+        networkingMode=Mirrored
+      '';
+      destination = ".wslconfig";
+    };
 
-    # .wslconfig
-    # [wsl2]
-    # networkingMode=Mirrored
-
-    # fancy-wm.ahk
-    # #Requires AutoHotkey v2.0.2
-    # #SingleInstance Force
-    # FancyWM(action) {
-    #     RunWait(format("fancywm.exe --action {}", action), , "Hide")
-    # }
-
-    # ; Disables Windows key search box, but allows combinations
-    # ~LWin::Send("{Blind}{vkE8}")
-    # ~RWin::Send("{Blind}{vkE8}")
-
-    # #q::Run("wt.exe")
-
-    # #Left::FancyWM("MoveFocusLeft")
-    # #Right::FancyWM("MoveFocusRight")
-    # #Up::FancyWM("MoveFocusUp")
-    # #Down::FancyWM("MoveFocusDown")
-    # +#Left::FancyWM("SwapLeft")
-    # +#Right::FancyWM("SwapRight")
-    # +#Up::FancyWM("SwapUp")
-    # +#Down::FancyWM("SwapDown")
+    system.activationScripts.syncWindowsFiles =
+      let
+        powershell = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe";
+        files = lib.attrValues config.windows.files;
+        formatCmd = fileCfg: ''
+          ${lib.getExe pkgs.rsync} \
+            -a --mkpath --copy-links --chmod=Da=rwx,Fa=r --checksum \
+            ${lib.escapeShellArg (toString fileCfg.source)} "$windowsHome/${fileCfg.destination}"
+        '';
+      in
+      ''
+        windowsUser=$(${powershell} '$env:UserName' 2>/dev/null | tr -d $'\r\n')
+        if [[ -z $windowsUser || ! -d /mnt/c/Users/$windowsUser ]]; then
+          echo 'syncWindowsFiles: could not determine Windows user; skipping.'
+        else
+          windowsHome="/mnt/c/Users/$windowsUser"
+          ${lib.strings.concatMapStrings formatCmd files}
+        fi
+      '';
   };
 }
