@@ -46,7 +46,12 @@
   users.cjshearer.programs.ssh.enable = true;
   users.cjshearer.programs.vscode.enable = true;
 
-  users.cjshearer.services.rclone.onedrive.enable = true;
+  users.cjshearer.services.rclone.operations.onedrive = {
+    src = "onedrive:";
+    dst = "/mnt/onedrive";
+    enable = true;
+    operation = "mount";
+  };
 
   programs.blender.enable = true;
   programs.direnv.enable = true;

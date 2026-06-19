@@ -22,8 +22,10 @@
 #   directory mappings pointing directly at the rclone-mounted OneDrive path. This restores clear
 #   boundaries between local state and cloud-backed data while simplifying mount behavior and
 #   failure modes.
-# - #######: added reusable rclone bisync jobs for OneDrive subdirectories so services can run
+# - 46ee857 added reusable rclone bisync jobs for OneDrive subdirectories so services can run
 #   against local disk while still mirroring cloud-backed data on a schedule.
+# - ########: refactored OneDrive transfers into a direct src.dst operation model, folded mount into
+#   operations, added copy support, and made enablement explicit per pair.
 {
   lib,
   pkgs,
@@ -31,161 +33,191 @@
   ...
 }:
 let
-  cfg = config.users.cjshearer.services.rclone.onedrive;
-  mkSyncUnitName = name: "rclone-onedrive-sync-${name}";
-  mkSyncWorkDir = name: "/var/lib/rclone-onedrive-sync/${name}";
+  cfg = config.users.cjshearer.services.rclone.operations;
+
+  isRemotePath = path: builtins.match "^[^/][^:]*:.*" path != null;
+  mkWorkDir = name: "/var/lib/rclone-bisync/${name}";
+
+  flattenOperations = lib.mapAttrsToList (name: opCfg: {
+    inherit name;
+    cfg = opCfg;
+  }) cfg;
+  enabledOperations = lib.filter (op: op.cfg.enable) flattenOperations;
+
+  mkExecStart =
+    op:
+    let
+      src = lib.escapeShellArg op.cfg.src;
+      dst = lib.escapeShellArg op.cfg.dst;
+      workdir = lib.escapeShellArg (mkWorkDir op.name);
+    in
+    pkgs.writeShellScript "rclone-bisync-${op.name}" (
+      ''
+        set -euo pipefail
+        ${lib.getExe pkgs.rclone} mkdir ${src}
+        ${lib.getExe pkgs.rclone} mkdir ${dst}
+      ''
+      + (
+        if op.cfg.operation == "mount" then
+          "exec ${lib.getExe pkgs.rclone} mount --vfs-cache-mode full ${src} ${dst}"
+        else if op.cfg.operation == "copy" then
+          "exec ${lib.getExe pkgs.rclone} copy --update ${src} ${dst}"
+        else
+          ''
+            ${lib.getExe pkgs.rclone} mkdir ${workdir}
+
+            resync_args=()
+            check_sync_args=("--check-sync=false")
+
+            # To ensure we download from the remote if the local copy is empty, we check if a previous
+            # resync has been performed by looking for a .lst file in the workdir.
+            if ! ${lib.getExe pkgs.findutils} ${workdir} -maxdepth 1 -name '*.lst' -print -quit | grep -q .; then
+              resync_args+=(--resync --resync-mode newer)
+              check_sync_args=()
+            fi
+
+            exec ${lib.getExe pkgs.rclone} bisync \
+              --recover \
+              --resilient \
+              --workdir ${workdir} \
+              "''${check_sync_args[@]}" \
+              "''${resync_args[@]}" \
+              ${src} \
+              ${dst}
+          ''
+      )
+    );
+
+  mkService =
+    op:
+    let
+      name = op.cfg.unitName;
+      needsNetwork = isRemotePath op.cfg.src || isRemotePath op.cfg.dst;
+    in
+    lib.nameValuePair name {
+      after = lib.optional needsNetwork "network-online.target";
+      wants = lib.optional needsNetwork "network-online.target";
+      wantedBy = lib.optional (op.cfg.operation == "mount") "multi-user.target";
+      serviceConfig = {
+        User = "cjshearer";
+        Group = "users";
+      }
+      // lib.optionalAttrs (op.cfg.operation == "mount") {
+        Environment = [
+          "PATH=/run/wrappers/bin/:$PATH"
+        ];
+        Type = "notify";
+        Restart = "on-failure";
+        ExecStart = mkExecStart op;
+        ExecStop = "/run/wrappers/bin/fusermount -uz ${lib.escapeShellArg op.cfg.dst}";
+      }
+      // lib.optionalAttrs (op.cfg.operation != "mount") {
+        Type = "oneshot";
+        TimeoutStartSec = "infinity";
+        ExecStart = mkExecStart op;
+      };
+    };
+
+  mkTimer =
+    op:
+    lib.nameValuePair op.cfg.unitName {
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnBootSec = "1m";
+        OnUnitInactiveSec = op.cfg.interval;
+      };
+    };
+
 in
 {
-  options.users.cjshearer.services.rclone.onedrive = {
-    enable = lib.mkEnableOption "rclone onedrive remote";
-    mount.enable = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Whether to mount the OneDrive remote locally.";
-    };
-    mountPoint = lib.mkOption {
-      type = lib.types.str;
-      default = "/mnt/onedrive";
-      description = "The mount point for the OneDrive remote.";
-    };
-    syncs = lib.mkOption {
-      type = lib.types.attrsOf (
-        lib.types.submodule {
+  options.users.cjshearer.services.rclone.operations = lib.mkOption {
+    default = { };
+
+    type = lib.types.attrsOf (
+      lib.types.submodule (
+        { name, config, ... }: {
           options = {
+            src = lib.mkOption {
+              type = lib.types.str;
+              description = "Source path (local or remote).";
+            };
+            dst = lib.mkOption {
+              type = lib.types.str;
+              description = "Destination path (local or remote).";
+            };
+            enable = lib.mkEnableOption "rclone operation";
+            operation = lib.mkOption {
+              type = lib.types.enum [
+                "mount"
+                "copy"
+                "bisync"
+              ];
+              default = "bisync";
+            };
             interval = lib.mkOption {
               type = lib.types.str;
               default = "1m";
-              description = "How often to rerun the sync after the previous run finishes.";
             };
-            localPath = lib.mkOption {
+            unitName = lib.mkOption {
               type = lib.types.str;
-              description = "The local directory to keep synchronized with OneDrive.";
-            };
-            remotePath = lib.mkOption {
-              type = lib.types.str;
-              description = "The path within the OneDrive remote to synchronize.";
+              description = "Systemd unit base name for this operation.";
             };
           };
+          config.unitName = lib.mkDefault "rclone-${name}-${config.operation}";
         }
-      );
-      default = { };
-      description = "Named OneDrive subdirectories to keep synchronized with local directories.";
-    };
+      )
+    );
   };
 
-  config = lib.mkIf cfg.enable (
-    lib.mkMerge [
-      {
-        systemd.tmpfiles.rules = lib.concatLists (
-          lib.mapAttrsToList (name: syncCfg: [
-            "d ${syncCfg.localPath} 0755 cjshearer users -"
-            "d ${mkSyncWorkDir name} 0755 cjshearer users -"
-          ]) cfg.syncs
-        );
-        systemd.services = lib.mapAttrs' (
-          name: syncCfg:
-          let
-            workDir = mkSyncWorkDir name;
-          in
-          lib.nameValuePair (mkSyncUnitName name) {
-            after = [ "network-online.target" ];
-            wants = [ "network-online.target" ];
-            serviceConfig = {
-              Group = "users";
-              TimeoutStartSec = "infinity";
-              Type = "oneshot";
-              User = "cjshearer";
-            };
-            script = ''
-              set -euo pipefail
+  config = lib.mkIf (enabledOperations != [ ]) {
 
-              local_path=${lib.escapeShellArg syncCfg.localPath}
-              remote_path=${lib.escapeShellArg "onedrive:${syncCfg.remotePath}"}
-              work_dir=${lib.escapeShellArg workDir}
-              resync_args=()
+    systemd.services = lib.listToAttrs (map mkService enabledOperations);
+    systemd.timers = lib.listToAttrs (
+      map mkTimer (lib.filter (op: op.cfg.operation != "mount") enabledOperations)
+    );
 
-              ${pkgs.coreutils}/bin/mkdir -p "$local_path" "$work_dir"
-              ${pkgs.rclone}/bin/rclone mkdir "$remote_path"
-
-              if [ -z "$(${pkgs.findutils}/bin/find "$work_dir" -maxdepth 1 -name '*.lst' -print -quit)" ]; then
-                resync_args+=(--resync --resync-mode newer)
-              fi
-
-              exec ${pkgs.rclone}/bin/rclone bisync \
-                --create-empty-src-dirs \
-                --recover \
-                --resilient \
-                --workdir "$work_dir" \
-                "''${resync_args[@]}" \
-                "$local_path" \
-                "$remote_path"
-            '';
-          }
-        ) cfg.syncs;
-        systemd.timers = lib.mapAttrs' (
-          name: syncCfg:
-          lib.nameValuePair (mkSyncUnitName name) {
-            wantedBy = [ "timers.target" ];
-            timerConfig = {
-              OnBootSec = "1m";
-              OnUnitInactiveSec = syncCfg.interval;
-            };
-          }
-        ) cfg.syncs;
-        home-manager.users.cjshearer.programs.rclone.enable = true;
-        home-manager.users.cjshearer.programs.rclone.remotes.onedrive = {
-          config = {
-            delta = true;
-            dir_cache_time = "52w";
-            drive_type = "personal";
-            poll_interval = "30s";
-            type = "onedrive";
-            vfs_cache_max_age = "2w";
-            vfs_cache_mode = "full";
-          };
-          # this is a hack to persist rclone secrets that are not managed by home-manager:
-          # https://github.com/nix-community/home-manager/pull/7688#issuecomment-3217292389
-          secrets = {
-            drive_id = ''
-              $(
-              tmp=$(mktemp)
-              ${pkgs.rclone}/bin/rclone config dump --config "$configPath" \
-                | ${pkgs.jq}/bin/jq -r '.onedrive.drive_id // empty' > "$tmp"
-              echo "$tmp"
-              )'';
-
-            token = ''
-              $(
-              tmp=$(mktemp)
-              ${pkgs.rclone}/bin/rclone config dump --config "$configPath" \
-                | ${pkgs.jq}/bin/jq -r '.onedrive.token // empty' > "$tmp"
-              echo "$tmp"
-              )'';
-          };
+    # This assumes all operations use onedrive. If that changes, so should this configuration.
+    home-manager.users.cjshearer.programs.rclone = {
+      enable = true;
+      remotes.onedrive = {
+        config = {
+          delta = true;
+          dir_cache_time = "52w";
+          drive_type = "personal";
+          poll_interval = "30s";
+          type = "onedrive";
+          vfs_cache_max_age = "2w";
+          vfs_cache_mode = "full";
         };
-      }
-      (lib.mkIf cfg.mount.enable {
-        systemd.tmpfiles.rules = [ "d ${cfg.mountPoint} 0755 cjshearer users -" ];
-        systemd.services."rclone-mount\:@onedrive" = {
-          after = [ "network-online.target" ];
-          requires = [ "network-online.target" ];
-          serviceConfig = {
-            # required for fusermount setuid wrapper
-            Environment = [ "PATH=/run/wrappers/bin/:$PATH" ];
-            ExecStart = "${pkgs.rclone}/bin/rclone mount --vfs-cache-mode full onedrive: ${cfg.mountPoint}";
-            ExecStop = "/run/wrappers/bin/fusermount -uz ${cfg.mountPoint}";
-            Group = "users";
-            Restart = "on-failure";
-            Type = "notify";
-            User = "cjshearer";
-          };
-          wantedBy = [ "default.target" ];
+
+        # this is a hack to persist rclone secrets that are not managed by home-manager:
+        # https://github.com/nix-community/home-manager/pull/7688#issuecomment-3217292389
+        secrets = {
+          drive_id = ''
+            $(
+            tmp=$(mktemp)
+            ${lib.getExe pkgs.rclone} config dump --config "$configPath" \
+              | ${lib.getExe pkgs.jq} -r '.onedrive.drive_id // empty' > "$tmp"
+            echo "$tmp"
+            )'';
+
+          token = ''
+            $(
+            tmp=$(mktemp)
+            ${lib.getExe pkgs.rclone} config dump --config "$configPath" \
+              | ${lib.getExe pkgs.jq} -r '.onedrive.token // empty' > "$tmp"
+            echo "$tmp"
+            )'';
         };
-        home-manager.users.cjshearer.xdg.userDirs.documents = "${cfg.mountPoint}/Documents";
-        home-manager.users.cjshearer.xdg.userDirs.music = "${cfg.mountPoint}/Music";
-        home-manager.users.cjshearer.xdg.userDirs.pictures = "${cfg.mountPoint}/Pictures";
-        home-manager.users.cjshearer.xdg.userDirs.videos = "${cfg.mountPoint}/Videos";
-      })
-    ]
-  );
+      };
+    };
+
+    # This assumes the operation is a mount, but in practice that will always be the case.
+    home-manager.users.cjshearer.xdg.userDirs = {
+      documents = "/mnt/onedrive/Documents";
+      music = "/mnt/onedrive/Music";
+      pictures = "/mnt/onedrive/Pictures";
+      videos = "/mnt/onedrive/Videos";
+    };
+  };
 }

@@ -5,7 +5,7 @@
 }:
 let
   immichLocalPath = "/var/lib/immich";
-  immichRemotePath = "app/immich";
+  immichRcloneUnit = config.users.cjshearer.services.rclone.operations.immich.unitName;
 in
 # https://github.com/simonwjackson/mountainous/blob/main/modules/nixos/services/photos/default.nix
 # https://github.com/sarveshrulz/nixos_config/blob/main/system/raspberrypi/users/sarvesh/home.nix
@@ -22,10 +22,10 @@ lib.mkIf config.services.immich.enable {
 
   services.tailscale.enable = true;
 
-  systemd.services.immich-server.after = [ "rclone-onedrive-sync-immich.service" ];
-  systemd.services.immich-server.requires = [ "rclone-onedrive-sync-immich.service" ];
+  systemd.services.immich-server.after = [ "${immichRcloneUnit}.service" ];
+  systemd.services.immich-server.requires = [ "${immichRcloneUnit}.service" ];
   systemd.services.immich-server.wants = [
-    "rclone-onedrive-sync-immich.timer"
+    "${immichRcloneUnit}.timer"
     "tailscaled-serve-immich.service"
   ];
 
@@ -40,8 +40,10 @@ lib.mkIf config.services.immich.enable {
     };
   };
 
-  users.cjshearer.services.rclone.onedrive.enable = true;
-  users.cjshearer.services.rclone.onedrive.mount.enable = lib.mkDefault false;
-  users.cjshearer.services.rclone.onedrive.syncs.immich.localPath = lib.mkDefault immichLocalPath;
-  users.cjshearer.services.rclone.onedrive.syncs.immich.remotePath = lib.mkDefault immichRemotePath;
+  users.cjshearer.services.rclone.operations.immich = {
+    src = "/var/lib/immich";
+    dst = "onedrive:/app/immich";
+    enable = true;
+    operation = "bisync";
+  };
 }
