@@ -17,7 +17,7 @@ lib.mkIf config.services.immich.enable {
   services.immich.database.user = "cjshearer";
   services.immich.group = "users";
   services.immich.host = "127.0.0.1";
-  services.immich.mediaLocation = lib.mkDefault immichLocalPath;
+  services.immich.mediaLocation = immichLocalPath;
   services.immich.user = "cjshearer";
 
   services.tailscale.enable = true;
@@ -41,7 +41,7 @@ lib.mkIf config.services.immich.enable {
   };
 
   users.cjshearer.services.rclone.operations.immich = {
-    src = "/var/lib/immich";
+    src = immichLocalPath;
     dst = "onedrive:/app/immich";
     enable = true;
     operation = "bisync";
