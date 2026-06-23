@@ -3,24 +3,32 @@
   config,
   ...
 }:
+let
+  isServer = builtins.elem config.networking.hostName [ "charon" ];
+in
 lib.mkIf config.services.tailscale.enable {
   services.tailscale.extraSetFlags = [
     "--accept-routes"
     "--ssh"
   ]
-  ++ builtins.attrNames (
-    lib.filterAttrs (flag: hostnames: builtins.elem config.networking.hostName hostnames) {
-      "--advertise-exit-node" = [ "charon" ];
-    }
-  );
+  ++ lib.optionals isServer [
+    "--advertise-connector"
+    "--advertise-exit-node"
+  ];
 
-  services.tailscale.useRoutingFeatures =
-    {
-      charon = "server";
-    }
-    .${config.networking.hostName} or "client";
+  services.tailscale.extraUpFlags = lib.optionals isServer [
+    "--advertise-tags=tag:server"
+  ];
 
-  # Workaround for "Failed to start Network Manager Wait Online." Toggle this on while switching
-  # configurations if you see this failure
-  # systemd.services.NetworkManager-wait-online.enable = lib.mkForce false;
+  services.tailscale.useRoutingFeatures = if isServer then "server" else "client";
+
+  # https://tailscale.com/docs/reference/best-practices/performance#linux-optimizations-for-subnet-routers-and-exit-nodes
+  systemd.network.links."50-tailscale" = lib.mkIf isServer {
+    matchConfig.Type = "ether";
+
+    linkConfig = {
+      GenericReceiveOffloadList = false; # rx-gro-list off
+      GenericReceiveOffloadUDPForwarding = true; # rx-udp-gro-forwarding on
+    };
+  };
 }
