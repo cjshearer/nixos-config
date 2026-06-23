@@ -35,6 +35,7 @@
   nixpkgs.hostPlatform = "aarch64-linux";
 
   services.immich.enable = true;
+  services.qbittorrent.enable = true;
   services.tailscale.enable = true;
 
   home-manager.users.cjshearer.programs.atuin.enable = true;
