@@ -16,6 +16,7 @@
   users.cjshearer.programs.git.enable = true;
   users.cjshearer.programs.go.enable = true;
   users.cjshearer.programs.helix.enable = true;
+  users.cjshearer.programs.jujutsu.enable = true;
   users.cjshearer.programs.lazygit.enable = true;
   users.cjshearer.programs.ssh.enable = true;
   users.cjshearer.programs.zellij.enable = true;
