@@ -44,6 +44,7 @@
 
   users.cjshearer.programs.git.enable = true;
   users.cjshearer.programs.helix.enable = true;
+  users.cjshearer.programs.jujutsu.enable = true;
   users.cjshearer.programs.kicad.enable = true;
   users.cjshearer.programs.lazygit.enable = true;
   users.cjshearer.programs.ssh.enable = true;
