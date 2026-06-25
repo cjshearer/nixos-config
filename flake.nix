@@ -2,6 +2,9 @@
   description = "Cody Shearer's NixOS Configuration";
 
   inputs = {
+    flake-utils.inputs.systems.follows = "systems";
+    flake-utils.url = "github:numtide/flake-utils";
+
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
 
@@ -16,6 +19,11 @@
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    robotnix.inputs.androidPkgs.inputs.flake-utils.follows = "flake-utils";
+    robotnix.inputs.androidPkgs.inputs.nixpkgs.follows = "nixpkgs";
+    robotnix.inputs.nixpkgs.follows = "nixpkgs";
+    robotnix.url = "github:nix-community/robotnix";
+
     systems.url = "github:nix-systems/default-linux";
     
     vscode-server.url = "github:nix-community/nixos-vscode-server";
@@ -26,13 +34,18 @@
       self,
       systems,
       nixpkgs,
+      robotnix,
       ...
     }@inputs:
     let
       eachSystem = nixpkgs.lib.genAttrs (import systems);
+      robotnixHosts = [ "salmoneus" ];
+      nixosHosts = builtins.filter (
+        host: !(builtins.elem (nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf host)) robotnixHosts)
+      ) (nixpkgs.lib.fileset.toList ./hosts);
     in
     {
-      nixosConfigurations = nixpkgs.lib.genAttrs' (nixpkgs.lib.fileset.toList ./hosts) (host: rec {
+      nixosConfigurations = nixpkgs.lib.genAttrs' nixosHosts (host: rec {
         name = nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf host);
         value = nixpkgs.lib.nixosSystem {
           specialArgs = inputs;
@@ -43,6 +56,10 @@
           ];
         };
       });
+
+      robotnixConfigurations = nixpkgs.lib.genAttrs robotnixHosts (
+        hostname: robotnix.lib.robotnixSystem ./hosts/${hostname}.nix
+      );
 
       nixosModules.default.imports = nixpkgs.lib.fileset.toList ./modules;
 
