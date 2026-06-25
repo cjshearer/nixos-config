@@ -16,6 +16,10 @@
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    robotnix.inputs.androidPkgs.inputs.nixpkgs.follows = "nixpkgs";
+    robotnix.inputs.nixpkgs.follows = "nixpkgs";
+    robotnix.url = "github:nix-community/robotnix";
+
     vscode-server.inputs.nixpkgs.follows = "nixpkgs";
     vscode-server.url = "github:nix-community/nixos-vscode-server";
   };
@@ -24,6 +28,7 @@
     {
       self,
       nixpkgs,
+      robotnix,
       ...
     }@inputs:
     let
@@ -40,23 +45,29 @@
       byNamePackages = packageDirs "package.nix" ./pkgs/by-name;
       pythonModules = packageDirs "default.nix" ./pkgs/python-modules;
     in
+    let
+      hosts = map (x: nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf x)) (
+        nixpkgs.lib.fileset.toList ./hosts
+      );
+      robotnixHosts = [ "salmoneus" ];
+      nixosHosts = builtins.filter (n: !(builtins.elem n robotnixHosts)) hosts;
+    in
     {
-      nixosConfigurations =
-        nixpkgs.lib.genAttrs
-          (map (x: nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf x)) (
-            nixpkgs.lib.fileset.toList ./hosts
-          ))
-          (
-            hostname:
-            nixpkgs.lib.nixosSystem {
-              specialArgs = inputs;
-              modules = [
-                ./hosts/${hostname}.nix
-                { networking.hostName = hostname; }
-                self.nixosModules.default
-              ];
-            }
-          );
+      nixosConfigurations = nixpkgs.lib.genAttrs nixosHosts (
+        hostname:
+        nixpkgs.lib.nixosSystem {
+          specialArgs = inputs;
+          modules = [
+            ./hosts/${hostname}.nix
+            { networking.hostName = hostname; }
+            self.nixosModules.default
+          ];
+        }
+      );
+
+      robotnixConfigurations = nixpkgs.lib.genAttrs robotnixHosts (
+        hostname: robotnix.lib.robotnixSystem ./hosts/${hostname}.nix
+      );
 
       nixosModules.default.imports = nixpkgs.lib.fileset.toList ./modules;
 
