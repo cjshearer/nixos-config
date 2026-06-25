@@ -2,6 +2,9 @@
   description = "Cody Shearer's NixOS Configuration";
 
   inputs = {
+    flake-utils.inputs.systems.follows = "systems";
+    flake-utils.url = "github:numtide/flake-utils";
+
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
 
@@ -16,6 +19,11 @@
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    robotnix.inputs.androidPkgs.inputs.flake-utils.follows = "flake-utils";
+    robotnix.inputs.androidPkgs.inputs.nixpkgs.follows = "nixpkgs";
+    robotnix.inputs.nixpkgs.follows = "nixpkgs";
+    robotnix.url = "github:nix-community/robotnix";
+
     vscode-server.url = "github:nix-community/nixos-vscode-server";
 
     systems.url = "github:nix-systems/default-linux";
@@ -26,6 +34,7 @@
       self,
       systems,
       nixpkgs,
+      robotnix,
       ...
     }@inputs:
     let
@@ -43,23 +52,29 @@
       pythonModules = packageDirs "default.nix" ./pkgs/python-modules;
       eachSystem = nixpkgs.lib.genAttrs (import systems);
     in
+    let
+      hosts = map (x: nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf x)) (
+        nixpkgs.lib.fileset.toList ./hosts
+      );
+      robotnixHosts = [ "salmoneus" ];
+      nixosHosts = builtins.filter (n: !(builtins.elem n robotnixHosts)) hosts;
+    in
     {
-      nixosConfigurations =
-        nixpkgs.lib.genAttrs
-          (map (x: nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf x)) (
-            nixpkgs.lib.fileset.toList ./hosts
-          ))
-          (
-            hostname:
-            nixpkgs.lib.nixosSystem {
-              specialArgs = inputs;
-              modules = [
-                ./hosts/${hostname}.nix
-                { networking.hostName = hostname; }
-                self.nixosModules.default
-              ];
-            }
-          );
+      nixosConfigurations = nixpkgs.lib.genAttrs nixosHosts (
+        hostname:
+        nixpkgs.lib.nixosSystem {
+          specialArgs = inputs;
+          modules = [
+            ./hosts/${hostname}.nix
+            { networking.hostName = hostname; }
+            self.nixosModules.default
+          ];
+        }
+      );
+
+      robotnixConfigurations = nixpkgs.lib.genAttrs robotnixHosts (
+        hostname: robotnix.lib.robotnixSystem ./hosts/${hostname}.nix
+      );
 
       nixosModules.default.imports = nixpkgs.lib.fileset.toList ./modules;
 
