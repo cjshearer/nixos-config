@@ -5,6 +5,9 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
 
+    ncro.inputs.nixpkgs.follows = "nixpkgs";
+    ncro.url = "github:feel-co/ncro";
+
     nixos-hardware.inputs.nixpkgs.follows = "nixpkgs";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
@@ -20,8 +23,9 @@
   outputs =
     {
       self,
-      nixpkgs,
       home-manager,
+      ncro,
+      nixpkgs,
       vscode-server,
       ...
     }@inputs:
@@ -51,7 +55,11 @@
           );
 
       nixosModules.default = {
-        imports = [ home-manager.nixosModules.home-manager ] ++ nixpkgs.lib.fileset.toList ./modules;
+        imports = [
+          home-manager.nixosModules.home-manager
+          ncro.nixosModules.default
+        ]
+        ++ nixpkgs.lib.fileset.toList ./modules;
 
         boot.loader.efi.canTouchEfiVariables = true;
 

@@ -54,6 +54,26 @@
         "type": "github"
       }
     },
+    "ncro": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782302203,
+        "narHash": "sha256-ftzqz/MsXiCsbX2Mwh73e4x4jzI0/h2uwDHPT3kmVl0=",
+        "owner": "feel-co",
+        "repo": "ncro",
+        "rev": "13153c506ae2e5ea0d072f1d0af0d923aefdf2e8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "feel-co",
+        "repo": "ncro",
+        "type": "github"
+      }
+    },
     "nixos-hardware": {
       "inputs": {
         "nixpkgs": [
@@ -114,6 +134,7 @@
     "root": {
       "inputs": {
         "home-manager": "home-manager",
+        "ncro": "ncro",
         "nixos-hardware": "nixos-hardware",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs",
