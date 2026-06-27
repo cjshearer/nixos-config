@@ -53,6 +53,7 @@
     enable = true;
     operation = "mount";
   };
+  users.cjshearer.services.vscode-server.enable = true;
 
   programs.blender.enable = true;
   programs.direnv.enable = true;
