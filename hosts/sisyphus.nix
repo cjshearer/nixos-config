@@ -41,6 +41,7 @@
   home-manager.users.cjshearer.programs.devenv.enable = true;
   home-manager.users.cjshearer.programs.entr.enable = true;
   home-manager.users.cjshearer.programs.github-copilot-cli.enable = true;
+  home-manager.users.cjshearer.programs.orca-slicer.enable = true;
 
   users.cjshearer.programs.git.enable = true;
   users.cjshearer.programs.helix.enable = true;
