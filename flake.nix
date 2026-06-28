@@ -6,7 +6,7 @@
     home-manager.url = "github:nix-community/home-manager";
 
     ncro.inputs.nixpkgs.follows = "nixpkgs";
-    ncro.url = "github:feel-co/ncro";
+    ncro.url = "github:manic-systems/ncro";
 
     nixos-hardware.inputs.nixpkgs.follows = "nixpkgs";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
