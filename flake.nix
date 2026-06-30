@@ -30,11 +30,18 @@
       ...
     }@inputs:
     let
-      # TODO: refactor with lib.fileset
-      byNamePackages =
-        if builtins.pathExists ./pkgs/by-name then builtins.readDir ./pkgs/by-name else { };
-      pythonModules =
-        if builtins.pathExists ./pkgs/python-modules then builtins.readDir ./pkgs/python-modules else { };
+      # List package directories (those containing the given entry file) under a root, mirroring
+      # how ./hosts and ./modules are enumerated with lib.fileset.
+      packageDirs =
+        entryFile: root:
+        nixpkgs.lib.optionals (builtins.pathExists root) (
+          map (file: baseNameOf (dirOf file)) (
+            nixpkgs.lib.fileset.toList (nixpkgs.lib.fileset.fileFilter (file: file.name == entryFile) root)
+          )
+        );
+
+      byNamePackages = packageDirs "package.nix" ./pkgs/by-name;
+      pythonModules = packageDirs "default.nix" ./pkgs/python-modules;
     in
     {
       nixosConfigurations =
@@ -107,24 +114,24 @@
 
       overlays.packages =
         final: prev:
-        builtins.mapAttrs (
-          name: _: (final.pkgs.callPackage (./pkgs/by-name + "/${name}/package.nix") { })
-        ) byNamePackages
+        nixpkgs.lib.genAttrs byNamePackages (
+          name: final.pkgs.callPackage (./pkgs/by-name + "/${name}/package.nix") { }
+        )
         // {
           pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
             (
               python-final: python-prev:
-              builtins.mapAttrs (
-                name: _: (python-final.callPackage (./pkgs/python-modules + "/${name}") { })
-              ) pythonModules
+              nixpkgs.lib.genAttrs pythonModules (
+                name: python-final.callPackage (./pkgs/python-modules + "/${name}") { }
+              )
             )
           ];
         };
 
       packages = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
         system:
-        builtins.mapAttrs (name: _: self.legacyPackages.${system}.${name}) byNamePackages
-        // builtins.mapAttrs (name: _: self.legacyPackages.${system}.python3Packages.${name}) pythonModules
+        nixpkgs.lib.genAttrs byNamePackages (name: self.legacyPackages.${system}.${name})
+        // nixpkgs.lib.genAttrs pythonModules (name: self.legacyPackages.${system}.python3Packages.${name})
       );
 
       legacyPackages = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
