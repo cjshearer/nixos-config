@@ -45,6 +45,7 @@
   home-manager.users.cjshearer.programs.helix.enable = true;
   home-manager.users.cjshearer.programs.jujutsu.enable = true;
   home-manager.users.cjshearer.programs.kicad.enable = true;
+  home-manager.users.cjshearer.programs.lazygit.enable = true;
   home-manager.users.cjshearer.programs.ssh.enable = true;
   home-manager.users.cjshearer.programs.vscode.enable = true;
 
