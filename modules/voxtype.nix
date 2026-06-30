@@ -47,6 +47,8 @@
                   # awaiting https://github.com/nix-community/home-manager/pull/9484
                   environment.PATH = "${voxtypeRuntimePath}:$PATH";
                   settings = {
+                    audio.feedback.enabled = true;
+                    meeting.enabled = true;
                     output.mode = lib.mkDefault "paste";
                     output.paste_keys = "ctrl+shift+v";
                     output.restore_clipboard = true;
