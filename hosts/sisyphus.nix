@@ -7,7 +7,6 @@
 {
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
-  boot.extraModulePackages = [ ];
   boot.initrd.availableKernelModules = [
     "xhci_pci"
     "ahci"
@@ -15,7 +14,6 @@
     "usb_storage"
     "sd_mod"
   ];
-  boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.loader.systemd-boot.enable = true;
 
@@ -81,8 +79,6 @@
   services.logiops.enable = true;
   services.pipewire.enable = true;
   services.tailscale.enable = true;
-
-  swapDevices = [ ];
 
   time.timeZone = "America/New_York";
 

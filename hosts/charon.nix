@@ -5,13 +5,10 @@
 {
   imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
 
-  boot.extraModulePackages = [ ];
   boot.initrd.availableKernelModules = [
     "xhci_pci"
     "virtio_scsi"
   ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ ];
   boot.loader.systemd-boot.enable = true;
 
   fileSystems."/" = {
@@ -27,8 +24,6 @@
       "dmask=0022"
     ];
   };
-
-  swapDevices = [ ];
 
   networking.networkmanager.enable = true;
 

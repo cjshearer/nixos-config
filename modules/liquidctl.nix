@@ -13,7 +13,6 @@ in
 
   config = mkIf cfg.enable {
     systemd.services.liquidctl = {
-      enable = true;
       description = "AIO startup service";
       serviceConfig = {
         Type = "oneshot";
