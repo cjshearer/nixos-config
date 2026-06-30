@@ -38,18 +38,18 @@
   home-manager.users.cjshearer.programs.atuin.enable = true;
   home-manager.users.cjshearer.programs.devenv.enable = true;
   home-manager.users.cjshearer.programs.entr.enable = true;
-  home-manager.users.cjshearer.programs.github-copilot-cli.enable = true;
-  home-manager.users.cjshearer.programs.orca-slicer.enable = true;
-
   home-manager.users.cjshearer.programs.git.enable = true;
+  home-manager.users.cjshearer.programs.github-copilot-cli.enable = true;
   home-manager.users.cjshearer.programs.helix.enable = true;
   home-manager.users.cjshearer.programs.jujutsu.enable = true;
   home-manager.users.cjshearer.programs.kicad.enable = true;
   home-manager.users.cjshearer.programs.lazygit.enable = true;
+  home-manager.users.cjshearer.programs.orca-slicer.enable = true;
   home-manager.users.cjshearer.programs.ssh.enable = true;
   home-manager.users.cjshearer.programs.thunderbird.enable = true;
   home-manager.users.cjshearer.programs.vscode.enable = true;
   home-manager.users.cjshearer.programs.zellij.enable = true;
+  home-manager.users.cjshearer.services.voxtype.enable = true;
 
   users.cjshearer.services.rclone.operations.onedrive = {
     src = "onedrive:";
@@ -57,7 +57,6 @@
     enable = true;
     operation = "mount";
   };
-  home-manager.users.cjshearer.services.voxtype.enable = true;
 
   programs.blender.enable = true;
   programs.direnv.enable = true;

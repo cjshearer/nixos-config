@@ -3,27 +3,26 @@
 
   home-manager.users.cjshearer.programs.atuin.enable = true;
   home-manager.users.cjshearer.programs.awscli.enable = true;
+  home-manager.users.cjshearer.programs.docker.enable = true;
   home-manager.users.cjshearer.programs.dotnet-sdk.enable = true;
   home-manager.users.cjshearer.programs.entr.enable = true;
-  home-manager.users.cjshearer.programs.github-copilot-cli.enable = true;
-  home-manager.users.cjshearer.programs.k9s.enable = true;
-  home-manager.users.cjshearer.programs.kubectl.enable = true;
-  home-manager.users.cjshearer.programs.ripgrep.enable = true;
-
-  programs.htop.enable = true;
-
   home-manager.users.cjshearer.programs.gh.enable = true;
   home-manager.users.cjshearer.programs.git.enable = true;
+  home-manager.users.cjshearer.programs.github-copilot-cli.enable = true;
   home-manager.users.cjshearer.programs.go.enable = true;
   home-manager.users.cjshearer.programs.helix.enable = true;
   home-manager.users.cjshearer.programs.jujutsu.enable = true;
+  home-manager.users.cjshearer.programs.k9s.enable = true;
+  home-manager.users.cjshearer.programs.kubectl.enable = true;
   home-manager.users.cjshearer.programs.lazygit.enable = true;
+  home-manager.users.cjshearer.programs.ripgrep.enable = true;
   home-manager.users.cjshearer.programs.ssh.enable = true;
   home-manager.users.cjshearer.programs.zellij.enable = true;
 
   home-manager.users.cjshearer.services.vscode-server.enable = true;
 
-  home-manager.users.cjshearer.programs.docker.enable = true;
+  programs.htop.enable = true;
+
   virtualisation.docker.enable = true;
 
   wsl.enable = true;

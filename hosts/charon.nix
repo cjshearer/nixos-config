@@ -34,7 +34,6 @@
   services.tailscale.enable = true;
 
   home-manager.users.cjshearer.programs.atuin.enable = true;
-
   home-manager.users.cjshearer.programs.git.enable = true;
   home-manager.users.cjshearer.programs.jujutsu.enable = true;
   home-manager.users.cjshearer.programs.helix.enable = true;
