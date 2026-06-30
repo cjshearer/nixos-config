@@ -1,16 +1,16 @@
 {
-  config,
-  lib,
-  ...
-}:
-{
-  options.users.cjshearer.programs.ssh.enable = lib.mkEnableOption "ssh";
-
-  config = lib.mkIf config.users.cjshearer.programs.ssh.enable {
-    home-manager.users.cjshearer.programs.ssh = {
-      enable = true;
-      enableDefaultConfig = false;
-      settings."*".IdentityFile = [ "~/.ssh/${config.networking.hostName}" ];
-    };
-  };
+  home-manager.sharedModules = [
+    (
+      {
+        lib,
+        config,
+        osConfig,
+        ...
+      }:
+      lib.mkIf config.programs.ssh.enable {
+        programs.ssh.enableDefaultConfig = false;
+        programs.ssh.settings."*".IdentityFile = [ "~/.ssh/${osConfig.networking.hostName}" ];
+      }
+    )
+  ];
 }

@@ -12,16 +12,16 @@
 
   programs.htop.enable = true;
 
-  users.cjshearer.programs.gh.enable = true;
-  users.cjshearer.programs.git.enable = true;
-  users.cjshearer.programs.go.enable = true;
-  users.cjshearer.programs.helix.enable = true;
-  users.cjshearer.programs.jujutsu.enable = true;
-  users.cjshearer.programs.lazygit.enable = true;
-  users.cjshearer.programs.ssh.enable = true;
-  users.cjshearer.programs.zellij.enable = true;
+  home-manager.users.cjshearer.programs.gh.enable = true;
+  home-manager.users.cjshearer.programs.git.enable = true;
+  home-manager.users.cjshearer.programs.go.enable = true;
+  home-manager.users.cjshearer.programs.helix.enable = true;
+  home-manager.users.cjshearer.programs.jujutsu.enable = true;
+  home-manager.users.cjshearer.programs.lazygit.enable = true;
+  home-manager.users.cjshearer.programs.ssh.enable = true;
+  home-manager.users.cjshearer.programs.zellij.enable = true;
 
-  users.cjshearer.services.vscode-server.enable = true;
+  home-manager.users.cjshearer.services.vscode-server.enable = true;
 
   virtualisation.docker.enable = true;
 

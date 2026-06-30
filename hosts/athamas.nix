@@ -41,10 +41,10 @@
   nixpkgs.hostPlatform = "x86_64-linux";
 
   home-manager.users.cjshearer.programs.atuin.enable = true;
-  users.cjshearer.programs.git.enable = true;
-  users.cjshearer.programs.ssh.enable = true;
-  users.cjshearer.programs.thunderbird.enable = true;
-  users.cjshearer.programs.vscode.enable = true;
+  home-manager.users.cjshearer.programs.git.enable = true;
+  home-manager.users.cjshearer.programs.ssh.enable = true;
+  home-manager.users.cjshearer.programs.thunderbird.enable = true;
+  home-manager.users.cjshearer.programs.vscode.enable = true;
 
   users.cjshearer.services.rclone.operations.onedrive = {
     src = "onedrive:";
