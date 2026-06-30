@@ -44,12 +44,22 @@ let
   }) cfg;
   enabledOperations = lib.filter (op: op.cfg.enable) flattenOperations;
 
+  mkExcludeArgs =
+    op:
+    let
+      inherit (op.cfg) operation exclude;
+    in
+    lib.optionalString ((operation == "copy" || operation == "bisync") && exclude != [ ]) (
+      lib.concatMapStringsSep " " (pattern: "--exclude ${lib.escapeShellArg pattern}") exclude
+    );
+
   mkExecStart =
     op:
     let
       src = lib.escapeShellArg op.cfg.src;
       dst = lib.escapeShellArg op.cfg.dst;
       workdir = lib.escapeShellArg (mkWorkDir op.name);
+      excludeArgs = mkExcludeArgs op;
     in
     pkgs.writeShellScript "rclone-bisync-${op.name}" (
       ''
@@ -61,7 +71,7 @@ let
         if op.cfg.operation == "mount" then
           "exec ${lib.getExe pkgs.rclone} mount --vfs-cache-mode full ${src} ${dst}"
         else if op.cfg.operation == "copy" then
-          "exec ${lib.getExe pkgs.rclone} copy --update ${src} ${dst}"
+          "exec ${lib.getExe pkgs.rclone} copy --update ${excludeArgs} ${src} ${dst}"
         else
           ''
             ${lib.getExe pkgs.rclone} mkdir ${workdir}
@@ -80,6 +90,7 @@ let
               --recover \
               --resilient \
               --workdir ${workdir} \
+              ${excludeArgs} \
               "''${check_sync_args[@]}" \
               "''${resync_args[@]}" \
               ${src} \
@@ -157,6 +168,17 @@ in
             interval = lib.mkOption {
               type = lib.types.str;
               default = "1m";
+            };
+            exclude = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = ''
+                Exclude paths matching these glob patterns (passed as `--exclude` flags).
+                Only applies to "copy" and "bisync" operations; ignored for "mount".
+                To exclude a directory and all its contents, use a pattern like `dir/**`
+                or `/dir/**`. To exclude only the directory entry itself (not its children),
+                append a `/` separator, e.g. `dir/`.
+              '';
             };
             unitName = lib.mkOption {
               type = lib.types.str;
