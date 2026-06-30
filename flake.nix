@@ -68,11 +68,6 @@
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
 
-        home-manager.users.cjshearer.programs.bash.bashrcExtra = ''
-          if [ -f ~/.bash_aliases ]; then
-            source ~/.bash_aliases
-          fi
-        '';
         networking.stevenblack.enable = true;
 
         nix.gc = {
