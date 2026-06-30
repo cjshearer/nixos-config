@@ -31,6 +31,8 @@
                   package = lib.mkDefault pkgs.voxtype-vulkan;
                   loadModels = [ "base.en" ];
                   settings = {
+                    audio.feedback.enabled = true;
+                    meeting.enabled = true;
                     output.mode = lib.mkDefault "paste";
                     output.paste_keys = "ctrl+shift+v";
                     output.restore_clipboard = true;
