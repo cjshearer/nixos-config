@@ -1,5 +1,10 @@
 {
+  vscode-server,
+  ...
+}:
+{
   home-manager.sharedModules = [
+    vscode-server.homeModules.default
     (
       {
         lib,

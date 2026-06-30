@@ -1,0 +1,6 @@
+{
+  ...
+}:
+{
+  networking.stevenblack.enable = true;
+}

@@ -1,10 +1,13 @@
 {
   config,
   lib,
+  ncro,
   self,
   ...
 }:
 {
+  imports = [ ncro.nixosModules.default ];
+
   # We expose the local Nix store as an HTTP binary cache so other hosts can pull from us.
   services.nix-serve.enable = true;
 
