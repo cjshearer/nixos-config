@@ -23,6 +23,7 @@
 
   home-manager.users.cjshearer.services.vscode-server.enable = true;
 
+  home-manager.users.cjshearer.programs.docker.enable = true;
   virtualisation.docker.enable = true;
 
   wsl.enable = true;
