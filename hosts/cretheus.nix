@@ -48,6 +48,7 @@
   home-manager.users.cjshearer.programs.lazygit.enable = true;
   home-manager.users.cjshearer.programs.ssh.enable = true;
   home-manager.users.cjshearer.programs.vscode.enable = true;
+  home-manager.users.cjshearer.programs.zellij.enable = true;
 
   users.cjshearer.services.rclone.operations.onedrive = {
     src = "onedrive:";
