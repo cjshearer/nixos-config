@@ -36,7 +36,7 @@ let
   cfg = config.users.cjshearer.services.rclone.operations;
 
   isRemotePath = path: builtins.match "^[^/][^:]*:.*" path != null;
-  mkWorkDir = name: "/var/lib/rclone-bisync/${name}";
+  mkWorkDir = name: "/home/cjshearer/.local/share/rclone-bisync/${name}";
 
   flattenOperations = lib.mapAttrsToList (name: opCfg: {
     inherit name;
