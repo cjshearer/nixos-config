@@ -11,15 +11,6 @@
         services.voxtype = {
           package = lib.mkDefault pkgs.voxtype-vulkan;
           loadModels = [ "base.en" ];
-          # awaiting https://github.com/nix-community/home-manager/pull/9484
-          environment.PATH = "${
-            lib.makeBinPath [
-              pkgs.coreutils
-              pkgs.which
-              pkgs.wl-clipboard
-              pkgs.wtype
-            ]
-          }:$PATH";
           settings = {
             output.mode = "paste";
             output.paste_keys = "ctrl+shift+v";
