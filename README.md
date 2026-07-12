@@ -20,21 +20,15 @@ $ nix flake show | grep -v omitted
 │   ├───charon: NixOS configuration
 │   ├───clotho: NixOS configuration
 │   ├───cretheus: NixOS configuration
+│   ├───hermes: NixOS configuration
 │   └───sisyphus: NixOS configuration
+├───nixosModules
+│   └───default: NixOS module
 ├───overlays
 │   └───packages: Nixpkgs overlay
 └───packages
-    ├───aarch64-darwin
     ├───aarch64-linux
-    ├───armv6l-linux
-    ├───armv7l-linux
-    ├───i686-linux
-    ├───powerpc64le-linux
-    ├───riscv64-linux
-    ├───x86_64-darwin
-    ├───x86_64-freebsd
     └───x86_64-linux
-        ├───google-photos-takeout-helper: package 'google-photos-takeout-helper-5.0.5'
         ├───ideamaker: package 'ideamaker-5.2.2.8570'
         └───prepare-nixos-disk: package 'prepare-nixos-disk'
 ```

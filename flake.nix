@@ -18,11 +18,20 @@
 
     vscode-server.inputs.nixpkgs.follows = "nixpkgs";
     vscode-server.url = "github:nix-community/nixos-vscode-server";
+
+    # Override flake-utils defaultSystems to linux-only so that flake inputs depending on
+    # flake-utils (like vscode-server) don't try to evaluate for darwin systems that nixpkgs 26.11
+    # no longer supports.
+    systems.url = "github:nix-systems/default-linux";
+    flake-utils.url = "github:numtide/flake-utils";
+    flake-utils.inputs.systems.follows = "systems";
+    vscode-server.inputs.flake-utils.follows = "flake-utils";
   };
 
   outputs =
     {
       self,
+      systems,
       nixpkgs,
       ...
     }@inputs:
@@ -39,6 +48,7 @@
 
       byNamePackages = packageDirs "package.nix" ./pkgs/by-name;
       pythonModules = packageDirs "default.nix" ./pkgs/python-modules;
+      eachSystem = nixpkgs.lib.genAttrs (import systems);
     in
     {
       nixosConfigurations =
@@ -63,7 +73,7 @@
       overlays.packages =
         final: prev:
         nixpkgs.lib.genAttrs byNamePackages (
-          name: final.pkgs.callPackage (./pkgs/by-name + "/${name}/package.nix") { }
+          name: final.callPackage (./pkgs/by-name + "/${name}/package.nix") { }
         )
         // {
           pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
@@ -74,15 +84,21 @@
               )
             )
           ];
+        }
+        # awaiting https://github.com/NixOS/nixpkgs/pull/540826
+        // {
+          gdalMinimal = prev.gdalMinimal.overrideAttrs (old: {
+            disabledTests = old.disabledTests ++ [ "test_zarr_read_simple_sharding" ];
+          });
         };
 
-      packages = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
+      packages = eachSystem (
         system:
         nixpkgs.lib.genAttrs byNamePackages (name: self.legacyPackages.${system}.${name})
         // nixpkgs.lib.genAttrs pythonModules (name: self.legacyPackages.${system}.python3Packages.${name})
       );
 
-      legacyPackages = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
+      legacyPackages = eachSystem (
         system:
         import nixpkgs {
           inherit system;

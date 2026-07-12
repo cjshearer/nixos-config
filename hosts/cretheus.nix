@@ -62,7 +62,6 @@
   programs.blender.enable = true;
   programs.direnv.enable = true;
   programs.discord.enable = true;
-  programs.freecad.enable = true;
   programs.google-chrome.enable = true;
   programs.htop.enable = true;
   programs.ytmdesktop.enable = true;
