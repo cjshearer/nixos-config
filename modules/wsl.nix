@@ -27,6 +27,18 @@
   };
 
   config = lib.mkIf config.wsl.enable {
+    # WSL's stock kernel defaults to 100Hz; 1000Hz improves wakeup latency for audio workloads.
+    boot.kernelPatches = [
+      {
+        name = "wsl-config-hz-1000";
+        patch = null;
+        structuredExtraConfig = with lib.kernel; {
+          HZ_1000 = yes;
+          HZ = freeform "1000";
+        };
+      }
+    ];
+
     # Windows Terminal supports true color
     environment.sessionVariables.COLORTERM = "truecolor";
 
@@ -43,6 +55,7 @@
       source = pkgs.writeText ".wslconfig" ''
         [wsl2]
         networkingMode=Mirrored
+        kernel=C:\\Users\\__WINDOWS_USER__\\wsl-kernels\\nixos-bzImage
       '';
       destination = ".wslconfig";
     };
@@ -81,6 +94,11 @@
       destination = "AppData/Local/Microsoft/Windows Terminal/Fragments/WarmBurnout/warm-burnout.json";
     };
 
+    windows.files.wslKernel = {
+      source = config.boot.kernelPackages.kernel + "/bzImage";
+      destination = "wsl-kernels/nixos-bzImage";
+    };
+
     system.activationScripts.syncWindowsFiles =
       let
         powershell = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe";
@@ -98,6 +116,7 @@
         else
           windowsHome="/mnt/c/Users/$windowsUser"
           ${lib.strings.concatMapStrings formatCmd files}
+          ${lib.getExe pkgs.gnused} -i "s|__WINDOWS_USER__|$windowsUser|g" "$windowsHome/.wslconfig"
         fi
       '';
   };
