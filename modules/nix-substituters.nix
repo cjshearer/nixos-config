@@ -8,8 +8,8 @@
 {
   imports = [ ncro.nixosModules.default ];
 
-  # We expose the local Nix store as an HTTP binary cache so other hosts can pull from us.
-  services.nix-serve.enable = true;
+  # We expose the local Nix store as an HTTP binary cache so other tailscale hosts can pull from us.
+  services.nix-serve.enable = config.services.tailscale.enable;
 
   # Because Nix requests packages from substituters sequentially, it can take up to
   # `M * connection-timeout` seconds to begin downloading packages using the built-in substituters
