@@ -23,7 +23,8 @@
               pkgs.biome
               pkgs.nil
             ]
-            ++ lib.optional config.programs.go.enable pkgs.gopls;
+            ++ lib.optional config.programs.go.enable pkgs.gopls
+            ++ lib.optional config.programs.dotnet-sdk.enable pkgs.roslyn-ls;
           })
         ];
       }
