@@ -22,6 +22,7 @@
             home.packages = [
               pkgs.biome
               pkgs.nil
+              pkgs.ruff
             ]
             ++ lib.optional config.programs.go.enable pkgs.gopls
             ++ lib.optional config.programs.dotnet-sdk.enable pkgs.roslyn-ls;
