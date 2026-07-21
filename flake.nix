@@ -16,16 +16,9 @@
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    vscode-server.inputs.nixpkgs.follows = "nixpkgs";
     vscode-server.url = "github:nix-community/nixos-vscode-server";
 
-    # Override flake-utils defaultSystems to linux-only so that flake inputs depending on
-    # flake-utils (like vscode-server) don't try to evaluate for darwin systems that nixpkgs 26.11
-    # no longer supports.
     systems.url = "github:nix-systems/default-linux";
-    flake-utils.url = "github:numtide/flake-utils";
-    flake-utils.inputs.systems.follows = "systems";
-    vscode-server.inputs.flake-utils.follows = "flake-utils";
   };
 
   outputs =
