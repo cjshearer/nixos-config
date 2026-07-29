@@ -44,6 +44,7 @@
   home-manager.users.cjshearer.programs.kicad.enable = true;
   home-manager.users.cjshearer.programs.lazygit.enable = true;
   home-manager.users.cjshearer.programs.opencode.enable = true;
+  home-manager.users.cjshearer.programs.opencode.web.enable = true;
   home-manager.users.cjshearer.programs.orca-slicer.enable = true;
   home-manager.users.cjshearer.programs.ssh.enable = true;
   home-manager.users.cjshearer.programs.thunderbird.enable = true;
