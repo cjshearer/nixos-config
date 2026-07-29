@@ -39,11 +39,11 @@
   home-manager.users.cjshearer.programs.devenv.enable = true;
   home-manager.users.cjshearer.programs.entr.enable = true;
   home-manager.users.cjshearer.programs.git.enable = true;
-  home-manager.users.cjshearer.programs.github-copilot-cli.enable = true;
   home-manager.users.cjshearer.programs.helix.enable = true;
   home-manager.users.cjshearer.programs.jujutsu.enable = true;
   home-manager.users.cjshearer.programs.kicad.enable = true;
   home-manager.users.cjshearer.programs.lazygit.enable = true;
+  home-manager.users.cjshearer.programs.opencode.enable = true;
   home-manager.users.cjshearer.programs.orca-slicer.enable = true;
   home-manager.users.cjshearer.programs.ssh.enable = true;
   home-manager.users.cjshearer.programs.thunderbird.enable = true;
