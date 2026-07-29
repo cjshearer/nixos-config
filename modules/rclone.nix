@@ -22,10 +22,13 @@
 #   directory mappings pointing directly at the rclone-mounted OneDrive path. This restores clear
 #   boundaries between local state and cloud-backed data while simplifying mount behavior and
 #   failure modes.
-# - 46ee857 added reusable rclone bisync jobs for OneDrive subdirectories so services can run
+# - 46ee857: added reusable rclone bisync jobs for OneDrive subdirectories so services can run
 #   against local disk while still mirroring cloud-backed data on a schedule.
-# - ########: refactored OneDrive transfers into a direct src.dst operation model, folded mount into
+# - 9b189b3: refactored OneDrive transfers into a direct src.dst operation model, folded mount into
 #   operations, added copy support, and made enablement explicit per pair.
+# - #######: fixed bisync first-run failure: mkWorkDir now includes a hash of src/dst so stale
+#   listing files from previous configurations can't poison the *.lst check; --recover is no longer
+#   passed during the initial --resync since it requires pre-existing listing files.
 {
   lib,
   pkgs,
@@ -36,7 +39,12 @@ let
   cfg = config.users.cjshearer.services.rclone.operations;
 
   isRemotePath = path: builtins.match "^[^/][^:]*:.*" path != null;
-  mkWorkDir = name: "/home/cjshearer/.local/share/rclone-bisync/${name}";
+  mkWorkDir =
+    name: src: dst:
+    let
+      hash = builtins.substring 0 8 (builtins.hashString "sha256" "${src}||${dst}");
+    in
+    "/home/cjshearer/.local/share/rclone-bisync/${name}-${hash}";
 
   flattenOperations = lib.mapAttrsToList (name: opCfg: {
     inherit name;
@@ -58,7 +66,7 @@ let
     let
       src = lib.escapeShellArg op.cfg.src;
       dst = lib.escapeShellArg op.cfg.dst;
-      workdir = lib.escapeShellArg (mkWorkDir op.name);
+      workdir = lib.escapeShellArg (mkWorkDir op.name op.cfg.src op.cfg.dst);
       excludeArgs = mkExcludeArgs op;
     in
     pkgs.writeShellScript "rclone-bisync-${op.name}" (
@@ -77,17 +85,19 @@ let
             ${lib.getExe pkgs.rclone} mkdir ${workdir}
 
             resync_args=()
+            recover_args=("--recover")
             check_sync_args=("--check-sync=false")
 
-            # To ensure we download from the remote if the local copy is empty, we check if a previous
-            # resync has been performed by looking for a .lst file in the workdir.
+            # To ensure we download from the remote if the local copy is empty, we check if a
+            # previous resync has been performed by looking for a .lst file in the workdir.
             if ! ${lib.getExe pkgs.findutils} ${workdir} -maxdepth 1 -name '*.lst' -print -quit | grep -q .; then
               resync_args+=(--resync --resync-mode newer)
+              recover_args=()
               check_sync_args=()
             fi
 
             exec ${lib.getExe pkgs.rclone} bisync \
-              --recover \
+              "''${recover_args[@]}" \
               --resilient \
               --workdir ${workdir} \
               ${excludeArgs} \
