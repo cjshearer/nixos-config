@@ -1,8 +1,4 @@
 {
-  self,
-  ...
-}:
-{
   nix.gc = {
     automatic = true;
     dates = "weekly";
@@ -16,6 +12,4 @@
   nix.settings.trusted-users = [ "cjshearer" ];
 
   nixpkgs.config.allowUnfree = true;
-
-  nixpkgs.overlays = [ self.overlays.packages ];
 }
