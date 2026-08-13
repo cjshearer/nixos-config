@@ -88,12 +88,14 @@ lib.mkIf config.services.desktopManager.cosmic.enable {
       if config.networking.hostName == "sisyphus" then "None" else "Some(1800000)";
 
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/anchor_gap".text = "true";
-    home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/autohide".text = ''
-      Some((
+    home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/autohide".text = "OnOverlap";
+    home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/autohide_behavior".text = ''
+      (
         wait_time: 200,
         transition_time: 50,
         handle_size: 4,
-      ))
+        unhide_delay: 200,
+      )
     '';
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/border_radius".text = "160";
     home.file.".config/cosmic/com.system76.CosmicPanel.Panel/v1/exclusive_zone".text = "false";
