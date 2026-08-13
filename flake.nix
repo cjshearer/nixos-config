@@ -16,9 +16,9 @@
 
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    vscode-server.url = "github:nix-community/nixos-vscode-server";
-
     systems.url = "github:nix-systems/default-linux";
+    
+    vscode-server.url = "github:nix-community/nixos-vscode-server";
   };
 
   outputs =
