@@ -32,22 +32,17 @@
       eachSystem = nixpkgs.lib.genAttrs (import systems);
     in
     {
-      nixosConfigurations =
-        nixpkgs.lib.genAttrs
-          (map (x: nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf x)) (
-            nixpkgs.lib.fileset.toList ./hosts
-          ))
-          (
-            hostname:
-            nixpkgs.lib.nixosSystem {
-              specialArgs = inputs;
-              modules = [
-                ./hosts/${hostname}.nix
-                { networking.hostName = hostname; }
-                self.nixosModules.default
-              ];
-            }
-          );
+      nixosConfigurations = nixpkgs.lib.genAttrs' (nixpkgs.lib.fileset.toList ./hosts) (host: rec {
+        name = nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf host);
+        value = nixpkgs.lib.nixosSystem {
+          specialArgs = inputs;
+          modules = [
+            host
+            { networking.hostName = name; }
+            self.nixosModules.default
+          ];
+        };
+      });
 
       nixosModules.default.imports = nixpkgs.lib.fileset.toList ./modules;
 
