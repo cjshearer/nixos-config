@@ -24,12 +24,9 @@ $ nix flake show | grep -v omitted
 │   └───sisyphus: NixOS configuration
 ├───nixosModules
 │   └───default: NixOS module
-├───overlays
-│   └───packages: Nixpkgs overlay
 └───packages
     ├───aarch64-linux
     └───x86_64-linux
-        ├───ideamaker: package 'ideamaker-5.2.2.8570'
         └───prepare-nixos-disk: package 'prepare-nixos-disk'
 ```
 
