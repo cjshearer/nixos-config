@@ -58,5 +58,7 @@
           directory = ./pkgs;
         }
       );
+
+      legacyPackages = eachSystem (system: import nixpkgs { inherit system; });
     };
 }
