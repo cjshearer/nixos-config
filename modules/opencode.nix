@@ -1,4 +1,5 @@
 { lib, config, ... }: {
+{ lib, config, pkgs, ... }: {
   home-manager.sharedModules = [
     (
       {
@@ -11,6 +12,14 @@
         systemd.user.services.opencode-web.Unit.Wants = lib.mkIf (
           config.programs.opencode.web.enable && osConfig.services.tailscale.enable
         ) [ "tailscaled-serve-opencode.service" ];
+
+        programs.opencode.package = pkgs.opencode.overrideAttrs ({
+          postPatch = (pkgs.opencode.postPatch or "") + ''
+            # fix for bun 1.4.x
+            substituteInPlace packages/opencode/script/build.ts \
+              --replace-fail 'splitting: true,' 'splitting: false,'
+          '';
+        });
       }
     )
   ];
