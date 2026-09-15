@@ -1,4 +1,3 @@
-{ lib, config, ... }: {
 { lib, config, pkgs, ... }: {
   home-manager.sharedModules = [
     (
@@ -20,6 +19,23 @@
               --replace-fail 'splitting: true,' 'splitting: false,'
           '';
         });
+
+        programs.opencode.settings = {
+          provider = {
+            openrouter = {
+              models = {
+                "~deepseek/deepseek-flash-latest" = {
+                  options = {
+                    provider = {
+                      order = [ "DeepSeek" ];
+                      allow_fallbacks = false;
+                    };
+                  };
+                };
+              };
+            };
+          };
+        };
       }
     )
   ];
