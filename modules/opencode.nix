@@ -35,6 +35,12 @@
               };
             };
           };
+        } // lib.optionalAttrs (osConfig.networking.hostName == "hermes") {
+          model = "github-copilot/gpt-5.6-terra";
+          agent = {
+            general.model = "github-copilot/gpt-5.6-luna";
+            explore.model = "github-copilot/gpt-5.6-luna";
+          };
         };
       }
     )
