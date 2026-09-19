@@ -43,9 +43,12 @@
 # - a76d50b: expire bisync lock files after 10m. An interrupted run left a lock that never expired,
 #   so the job failed forever until it was deleted by hand. rclone renews the lock while a run is
 #   active, so this only reclaims locks owned by dead processes.
-# - #######: run bisync jobs every 15m with jitter instead of every minute. The frequent cadence
+# - b808cf3: run bisync jobs every 15m with jitter instead of every minute. The frequent cadence
 #   hammered OneDrive alongside the mount and contributed to throttling. The 10m lock expiry stays
 #   below the interval so a stranded lock is always reclaimed by the next run.
+# - #######: let the mount service recover from a wedged mount on its own. Restart unconditionally,
+#   bound the stop with a timeout and hand rclone SIGINT so it unmounts, instead of requiring a
+#   manual lazy unmount and restart.
 {
   lib,
   pkgs,
@@ -163,7 +166,10 @@ let
           "PATH=/run/wrappers/bin/:$PATH"
         ];
         Type = "notify";
-        Restart = "on-failure";
+        Restart = "always";
+        RestartSec = "5s";
+        TimeoutStopSec = "15s";
+        KillSignal = "SIGINT";
         ExecStart = mkExecStart op;
         ExecStop = "/run/wrappers/bin/fusermount -uz ${lib.escapeShellArg op.cfg.dst}";
       }
