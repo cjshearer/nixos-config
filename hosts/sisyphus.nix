@@ -58,6 +58,7 @@
   users.cjshearer.services.rclone.operations.onedrive = {
     src = "onedrive:";
     dst = "/mnt/onedrive";
+    exclude = [ "/Personal Vault/**" ];
     enable = true;
     operation = "mount";
   };

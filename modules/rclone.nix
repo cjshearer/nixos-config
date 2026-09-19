@@ -29,8 +29,10 @@
 # - 68fcddf: fixed bisync first-run failure: mkWorkDir now includes a hash of src/dst so stale
 #   listing files from previous configurations can't poison the *.lst check; --recover is no longer
 #   passed during the initial --resync since it requires pre-existing listing files.
-# - #######: emit exclude patterns for mount operations as well, since root OneDrive mounts need to
+# - 6b6ef6e: emit exclude patterns for mount operations as well, since root OneDrive mounts need to
 #   filter known-bad paths such as the Personal Vault.
+# - #######: exclude OneDrive's Personal Vault from the root mounts. It cannot be listed through the
+#   API and produces repeated invalidResourceId errors (rclone#8736).
 {
   lib,
   pkgs,
