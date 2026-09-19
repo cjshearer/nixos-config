@@ -40,9 +40,12 @@
 # - 20df0f4: rate-limit and time-bound every rclone operation. OneDrive throttles the concurrent
 #   mount and bisync jobs, and FUSE requests block for the full retry window, which froze the
 #   filesystem.
-# - #######: expire bisync lock files after 10m. An interrupted run left a lock that never expired,
+# - a76d50b: expire bisync lock files after 10m. An interrupted run left a lock that never expired,
 #   so the job failed forever until it was deleted by hand. rclone renews the lock while a run is
 #   active, so this only reclaims locks owned by dead processes.
+# - #######: run bisync jobs every 15m with jitter instead of every minute. The frequent cadence
+#   hammered OneDrive alongside the mount and contributed to throttling. The 10m lock expiry stays
+#   below the interval so a stranded lock is always reclaimed by the next run.
 {
   lib,
   pkgs,
@@ -178,6 +181,8 @@ let
       timerConfig = {
         OnBootSec = "1m";
         OnUnitInactiveSec = op.cfg.interval;
+        RandomizedDelaySec = "1m";
+        AccuracySec = "1m";
       };
     };
 
@@ -209,7 +214,7 @@ in
             };
             interval = lib.mkOption {
               type = lib.types.str;
-              default = "1m";
+              default = "15m";
             };
             exclude = lib.mkOption {
               type = lib.types.listOf lib.types.str;
