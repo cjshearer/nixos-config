@@ -31,8 +31,12 @@
 #   passed during the initial --resync since it requires pre-existing listing files.
 # - 6b6ef6e: emit exclude patterns for mount operations as well, since root OneDrive mounts need to
 #   filter known-bad paths such as the Personal Vault.
-# - #######: exclude OneDrive's Personal Vault from the root mounts. It cannot be listed through the
+# - 9cbd8ac: exclude OneDrive's Personal Vault from the root mounts. It cannot be listed through the
 #   API and produces repeated invalidResourceId errors (rclone#8736).
+# - #######: pass the vfs and dir-cache flags on the mount command line, where they are actually
+#   honored. They were set in the [onedrive] remote config, but they are global flags rather than
+#   backend options, so rclone silently ignored them. Also cap the vfs cache by size and minimum
+#   free space so it cannot fill the root filesystem.
 {
   lib,
   pkgs,
@@ -81,7 +85,7 @@ let
       ''
       + (
         if op.cfg.operation == "mount" then
-          "exec ${lib.getExe pkgs.rclone} mount --vfs-cache-mode full ${excludeArgs} ${src} ${dst}"
+          "exec ${lib.getExe pkgs.rclone} mount --vfs-cache-mode full --dir-cache-time 24h --poll-interval 30s --vfs-cache-max-age 2w --vfs-cache-max-size 50G --vfs-cache-min-free-space 20G ${excludeArgs} ${src} ${dst}"
         else if op.cfg.operation == "copy" then
           "exec ${lib.getExe pkgs.rclone} copy --update ${excludeArgs} ${src} ${dst}"
         else
@@ -218,12 +222,8 @@ in
       remotes.onedrive = {
         config = {
           delta = true;
-          dir_cache_time = "52w";
           drive_type = "personal";
-          poll_interval = "30s";
           type = "onedrive";
-          vfs_cache_max_age = "2w";
-          vfs_cache_mode = "full";
         };
 
         # this is a hack to persist rclone secrets that are not managed by home-manager:
