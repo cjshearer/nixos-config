@@ -26,9 +26,11 @@
 #   against local disk while still mirroring cloud-backed data on a schedule.
 # - 9b189b3: refactored OneDrive transfers into a direct src.dst operation model, folded mount into
 #   operations, added copy support, and made enablement explicit per pair.
-# - #######: fixed bisync first-run failure: mkWorkDir now includes a hash of src/dst so stale
+# - 68fcddf: fixed bisync first-run failure: mkWorkDir now includes a hash of src/dst so stale
 #   listing files from previous configurations can't poison the *.lst check; --recover is no longer
 #   passed during the initial --resync since it requires pre-existing listing files.
+# - #######: emit exclude patterns for mount operations as well, since root OneDrive mounts need to
+#   filter known-bad paths such as the Personal Vault.
 {
   lib,
   pkgs,
@@ -55,9 +57,9 @@ let
   mkExcludeArgs =
     op:
     let
-      inherit (op.cfg) operation exclude;
+      inherit (op.cfg) exclude;
     in
-    lib.optionalString ((operation == "copy" || operation == "bisync") && exclude != [ ]) (
+    lib.optionalString (exclude != [ ]) (
       lib.concatMapStringsSep " " (pattern: "--exclude ${lib.escapeShellArg pattern}") exclude
     );
 
@@ -77,7 +79,7 @@ let
       ''
       + (
         if op.cfg.operation == "mount" then
-          "exec ${lib.getExe pkgs.rclone} mount --vfs-cache-mode full ${src} ${dst}"
+          "exec ${lib.getExe pkgs.rclone} mount --vfs-cache-mode full ${excludeArgs} ${src} ${dst}"
         else if op.cfg.operation == "copy" then
           "exec ${lib.getExe pkgs.rclone} copy --update ${excludeArgs} ${src} ${dst}"
         else
@@ -184,7 +186,7 @@ in
               default = [ ];
               description = ''
                 Exclude paths matching these glob patterns (passed as `--exclude` flags).
-                Only applies to "copy" and "bisync" operations; ignored for "mount".
+                Applies to "mount", "copy", and "bisync" operations.
                 To exclude a directory and all its contents, use a pattern like `dir/**`
                 or `/dir/**`. To exclude only the directory entry itself (not its children),
                 append a `/` separator, e.g. `dir/`.
