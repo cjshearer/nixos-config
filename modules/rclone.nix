@@ -33,10 +33,13 @@
 #   filter known-bad paths such as the Personal Vault.
 # - 9cbd8ac: exclude OneDrive's Personal Vault from the root mounts. It cannot be listed through the
 #   API and produces repeated invalidResourceId errors (rclone#8736).
-# - #######: pass the vfs and dir-cache flags on the mount command line, where they are actually
+# - a0fc96e: pass the vfs and dir-cache flags on the mount command line, where they are actually
 #   honored. They were set in the [onedrive] remote config, but they are global flags rather than
 #   backend options, so rclone silently ignored them. Also cap the vfs cache by size and minimum
 #   free space so it cannot fill the root filesystem.
+# - #######: rate-limit and time-bound every rclone operation. OneDrive throttles the concurrent
+#   mount and bisync jobs, and FUSE requests block for the full retry window, which froze the
+#   filesystem.
 {
   lib,
   pkgs,
@@ -60,6 +63,22 @@ let
   }) cfg;
   enabledOperations = lib.filter (op: op.cfg.enable) flattenOperations;
 
+  # OneDrive throttles aggressively when several rclone processes hit it at once, and the mount's
+  # FUSE requests block while rclone retries. Cap the request rate and fail stalled operations
+  # sooner so a slow backend cannot wedge the mount.
+  rcloneGlobalArgs = lib.escapeShellArgs [
+    "--tpslimit"
+    "10"
+    "--tpslimit-burst"
+    "1"
+    "--timeout"
+    "30s"
+    "--contimeout"
+    "10s"
+    "--retries"
+    "3"
+  ];
+
   mkExcludeArgs =
     op:
     let
@@ -80,17 +99,17 @@ let
     pkgs.writeShellScript "rclone-bisync-${op.name}" (
       ''
         set -euo pipefail
-        ${lib.getExe pkgs.rclone} mkdir ${src}
-        ${lib.getExe pkgs.rclone} mkdir ${dst}
+        ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${src}
+        ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${dst}
       ''
       + (
         if op.cfg.operation == "mount" then
-          "exec ${lib.getExe pkgs.rclone} mount --vfs-cache-mode full --dir-cache-time 24h --poll-interval 30s --vfs-cache-max-age 2w --vfs-cache-max-size 50G --vfs-cache-min-free-space 20G ${excludeArgs} ${src} ${dst}"
+          "exec ${lib.getExe pkgs.rclone} mount ${rcloneGlobalArgs} --vfs-cache-mode full --dir-cache-time 24h --poll-interval 30s --vfs-cache-max-age 2w --vfs-cache-max-size 50G --vfs-cache-min-free-space 20G ${excludeArgs} ${src} ${dst}"
         else if op.cfg.operation == "copy" then
-          "exec ${lib.getExe pkgs.rclone} copy --update ${excludeArgs} ${src} ${dst}"
+          "exec ${lib.getExe pkgs.rclone} copy ${rcloneGlobalArgs} --update ${excludeArgs} ${src} ${dst}"
         else
           ''
-            ${lib.getExe pkgs.rclone} mkdir ${workdir}
+            ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${workdir}
 
             resync_args=()
             recover_args=("--recover")
@@ -105,6 +124,7 @@ let
             fi
 
             exec ${lib.getExe pkgs.rclone} bisync \
+              ${rcloneGlobalArgs} \
               "''${recover_args[@]}" \
               --resilient \
               --workdir ${workdir} \
