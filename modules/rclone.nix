@@ -37,9 +37,12 @@
 #   honored. They were set in the [onedrive] remote config, but they are global flags rather than
 #   backend options, so rclone silently ignored them. Also cap the vfs cache by size and minimum
 #   free space so it cannot fill the root filesystem.
-# - #######: rate-limit and time-bound every rclone operation. OneDrive throttles the concurrent
+# - 20df0f4: rate-limit and time-bound every rclone operation. OneDrive throttles the concurrent
 #   mount and bisync jobs, and FUSE requests block for the full retry window, which froze the
 #   filesystem.
+# - #######: expire bisync lock files after 10m. An interrupted run left a lock that never expired,
+#   so the job failed forever until it was deleted by hand. rclone renews the lock while a run is
+#   active, so this only reclaims locks owned by dead processes.
 {
   lib,
   pkgs,
@@ -127,6 +130,7 @@ let
               ${rcloneGlobalArgs} \
               "''${recover_args[@]}" \
               --resilient \
+              --max-lock 10m \
               --workdir ${workdir} \
               ${excludeArgs} \
               "''${check_sync_args[@]}" \
