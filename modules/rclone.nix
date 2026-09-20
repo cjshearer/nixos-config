@@ -46,9 +46,13 @@
 # - b808cf3: run bisync jobs every 15m with jitter instead of every minute. The frequent cadence
 #   hammered OneDrive alongside the mount and contributed to throttling. The 10m lock expiry stays
 #   below the interval so a stranded lock is always reclaimed by the next run.
-# - #######: let the mount service recover from a wedged mount on its own. Restart unconditionally,
+# - 6c90267: let the mount service recover from a wedged mount on its own. Restart unconditionally,
 #   bound the stop with a timeout and hand rclone SIGINT so it unmounts, instead of requiring a
 #   manual lazy unmount and restart.
+# - #######: force rclone onto IPv4 and bound request retries. This host's IPv6 addresses go
+#   deprecated while v6 connects to the internet fail, so rclone's IPv6 sockets black-hole and
+#   stall every request until timeout. Binding to 0.0.0.0 sidesteps that, and shorter
+#   --timeout/--low-level-retries keep one stalled request from holding the VFS lock for minutes.
 {
   lib,
   pkgs,
@@ -72,18 +76,24 @@ let
   }) cfg;
   enabledOperations = lib.filter (op: op.cfg.enable) flattenOperations;
 
-  # OneDrive throttles aggressively when several rclone processes hit it at once, and the mount's
-  # FUSE requests block while rclone retries. Cap the request rate and fail stalled operations
-  # sooner so a slow backend cannot wedge the mount.
+  # IPv6 on this host is unreliable (global addresses go deprecated while v6 connects to the
+  # internet fail), so rclone's default IPv6 sockets black-hole and every request on them stalls
+  # until timeout. Bind to 0.0.0.0 to force IPv4. Also cap the request rate and fail stalled
+  # operations sooner: OneDrive throttles concurrent rclone processes, and a single stalled request
+  # holds the VFS lock and blocks all other lookups/reads while it retries.
   rcloneGlobalArgs = lib.escapeShellArgs [
+    "--bind"
+    "0.0.0.0"
     "--tpslimit"
     "10"
     "--tpslimit-burst"
     "1"
     "--timeout"
-    "30s"
+    "15s"
     "--contimeout"
     "10s"
+    "--low-level-retries"
+    "2"
     "--retries"
     "3"
   ];
