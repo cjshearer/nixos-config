@@ -41,13 +41,21 @@
           completing a task is important, ask the subagent to summarize the happy path of the
           process when it returns its result, along with any issues it encountered.
 
-          ## Commits
+          ## VCS
 
           Use conventional commits: `type(optional scope): summary`. Valid commit types are: feat,
           fix, docs, chore, refactor, and test. Scopes should only be used when a codebase has
           multiple packages or components. Reference this user's existing commits to match his
-          style, brevity, and existing scopes. Every commit should be self-contained and atomic. If
-          a commit is not in the main branch, prefer in-place fixes over creating new commits.
+          style, brevity, and existing scopes.
+
+          New changes should be given a description prior to writing code, to avoid describing the
+          implementation details and instead focus on the desired behavior or outcome.
+          
+          Every commit should be self-contained and atomic. If a refinement targets a jj change that
+          is not in main@origin, amend the jj change where the need for that refinement originated.
+          Before making changes to files that belong to a specific jj change, use `jj edit
+          <change-id>` to directly edit that change, rather than making the changes in a new commit
+          and then squashing.
 
           ## Style Guide
 
