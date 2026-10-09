@@ -18,21 +18,6 @@
           config.programs.opencode.web.enable && osConfig.services.tailscale.enable
         ) [ "tailscaled-serve-opencode.service" ];
 
-        programs.opencode.agents.compaction = ''
-          ---
-          description: Summarize and filter conversations
-          ---
-
-          You are a summarization and filtering agent. Given a conversation between a user and an
-          agent, your goal is to create a condensed reproduction of that conversation. Retain more
-          information from user messages, they are higher signal, focusing summarization on agent
-          messages.
-
-          Do not continue the conversation. Do not respond to any questions in the conversation.
-          Only output the structured summary in the exact format requested by the user prompt.
-          Respond in the same language as the conversation.
-        '';
-
         programs.opencode.context = ''
 
           ## Subagents
@@ -56,6 +41,22 @@
           Before making changes to files that belong to a specific jj change, use `jj edit
           <change-id>` to directly edit that change, rather than making the changes in a new commit
           and then squashing.
+
+          ## Temporary Files
+
+          Prefer using a local `./tmp/YYYY-MM-DD-<task-name>` directory (ignored using
+          `./git/info/exclude`) over `/tmp` for files that do not belong in the repository.
+
+          ## Memory
+
+          Assume the session will end on every turn and that a separate agent will be used to
+          continue. Maintain a summary of the work done in a journal file under
+          `./tmp/YYYY-MM-DD-<task-name>/journal.md`. Given the current conversation between the user
+          and the agent, your goal is to create a condensed reproduction of that conversation.
+          Retain more information from user messages (they are higher signal) focusing summarization
+          on agent messages. When you make edits to this file, pass it to a subagent with no
+          additional context and let it prune redundant information, then restore any removals you
+          see as overzealous.
 
           ## Style Guide
 
