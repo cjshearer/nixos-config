@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  self,
   ...
 }:
 {
@@ -10,9 +11,16 @@
         lib,
         config,
         osConfig,
+        pkgs,
         ...
       }:
       {
+        programs.opencode.package = self.packages.${pkgs.stdenv.hostPlatform.system}.opencode2;
+        programs.opencode.web.extraArgs = [
+          "--port"
+          "4096"
+        ];
+
         systemd.user.services.opencode-web.Unit.Wants = lib.mkIf (
           config.programs.opencode.web.enable && osConfig.services.tailscale.enable
         ) [ "tailscaled-serve-opencode.service" ];
