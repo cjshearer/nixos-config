@@ -1,7 +1,6 @@
 {
   lib,
   config,
-  pkgs,
   ...
 }:
 {
@@ -19,7 +18,6 @@
         ) [ "tailscaled-serve-opencode.service" ];
 
         programs.opencode.context = ''
-
           ## Subagents
 
           Protect your context window by delegating work to subagents. If knowing the process of
@@ -35,7 +33,7 @@
 
           New changes should be given a description prior to writing code, to avoid describing the
           implementation details and instead focus on the desired behavior or outcome.
-          
+
           Every commit should be self-contained and atomic. If a refinement targets a jj change that
           is not in main@origin, amend the jj change where the need for that refinement originated.
           Before making changes to files that belong to a specific jj change, use `jj edit
@@ -104,14 +102,6 @@
           brevity.
           ```
         '';
-
-        programs.opencode.package = pkgs.opencode.overrideAttrs ({
-          postPatch = (pkgs.opencode.postPatch or "") + ''
-            # fix for bun 1.4.x
-            substituteInPlace packages/opencode/script/build.ts \
-              --replace-fail 'splitting: true,' 'splitting: false,'
-          '';
-        });
 
         programs.opencode.settings = {
           provider = {
