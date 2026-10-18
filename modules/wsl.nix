@@ -30,7 +30,6 @@
     # Windows Terminal supports true color
     environment.sessionVariables.COLORTERM = "truecolor";
 
-    # The standard clipboard now works between Windows and WSL. Used by zellij and voxtype
     environment.systemPackages = [ pkgs.wl-clipboard ];
 
     wsl.defaultUser = "cjshearer";

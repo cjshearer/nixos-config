@@ -49,7 +49,7 @@
   home-manager.users.cjshearer.programs.ssh.enable = true;
   home-manager.users.cjshearer.programs.thunderbird.enable = true;
   home-manager.users.cjshearer.programs.vscode.enable = true;
-  home-manager.users.cjshearer.programs.zellij.enable = true;
+  home-manager.users.cjshearer.programs.tmux.enable = true;
   home-manager.users.cjshearer.services.voxtype.enable = true;
 
   users.cjshearer.programs.dusklight.enable = true;

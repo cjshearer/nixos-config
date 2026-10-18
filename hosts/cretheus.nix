@@ -46,7 +46,7 @@
   home-manager.users.cjshearer.programs.opencode.enable = true;
   home-manager.users.cjshearer.programs.ssh.enable = true;
   home-manager.users.cjshearer.programs.vscode.enable = true;
-  home-manager.users.cjshearer.programs.zellij.enable = true;
+  home-manager.users.cjshearer.programs.tmux.enable = true;
 
   home-manager.users.cjshearer.services.vscode-server.enable = true;
 

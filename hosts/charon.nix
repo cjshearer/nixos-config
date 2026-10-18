@@ -39,7 +39,7 @@
   home-manager.users.cjshearer.programs.helix.enable = true;
   home-manager.users.cjshearer.programs.lazygit.enable = true;
   home-manager.users.cjshearer.programs.ssh.enable = true;
-  home-manager.users.cjshearer.programs.zellij.enable = true;
+  home-manager.users.cjshearer.programs.tmux.enable = true;
 
   home-manager.users.cjshearer.services.vscode-server.enable = true;
 
