@@ -43,6 +43,8 @@
 
   home-manager.users.cjshearer.services.vscode-server.enable = true;
 
+  users.cjshearer.services.syncthing.enable = true;
+
   time.timeZone = "America/New_York";
 
   # This value determines the NixOS release from which the default

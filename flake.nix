@@ -17,7 +17,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     systems.url = "github:nix-systems/default-linux";
-    
+
     vscode-server.url = "github:nix-community/nixos-vscode-server";
   };
 
@@ -30,10 +30,11 @@
     }@inputs:
     let
       eachSystem = nixpkgs.lib.genAttrs (import systems);
+      nameOf = path: nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf path);
     in
     {
       nixosConfigurations = nixpkgs.lib.genAttrs' (nixpkgs.lib.fileset.toList ./hosts) (host: rec {
-        name = nixpkgs.lib.removeSuffix ".nix" (builtins.baseNameOf host);
+        name = nameOf host;
         value = nixpkgs.lib.nixosSystem {
           specialArgs = inputs;
           modules = [
@@ -55,5 +56,15 @@
       );
 
       legacyPackages = eachSystem (system: import nixpkgs { inherit system; });
+
+      checks = eachSystem (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        nixpkgs.lib.genAttrs' (nixpkgs.lib.fileset.toList ./tests) (
+          test: nixpkgs.lib.nameValuePair (nameOf test) (import test { inherit pkgs; })
+        )
+      );
     };
 }
