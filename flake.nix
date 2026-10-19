@@ -17,7 +17,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     systems.url = "github:nix-systems/default-linux";
-    
+
     vscode-server.url = "github:nix-community/nixos-vscode-server";
   };
 
@@ -55,5 +55,22 @@
       );
 
       legacyPackages = eachSystem (system: import nixpkgs { inherit system; });
+
+      checks = nixpkgs.lib.genAttrs [ "x86_64-linux" ] (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          syncthing-tailnet = import ./tests/syncthing-tailnet.nix {
+            inherit pkgs;
+            firewall = true;
+          };
+          syncthing-tailnet-no-firewall = import ./tests/syncthing-tailnet.nix {
+            inherit pkgs;
+            firewall = false;
+          };
+        }
+      );
     };
 }
