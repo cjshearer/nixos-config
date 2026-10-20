@@ -63,6 +63,7 @@
     operation = "mount";
   };
   users.cjshearer.services.syncthing.enable = true;
+  users.cjshearer.services.syncthing.notes.enable = true;
 
   programs.blender.enable = true;
   programs.direnv.enable = true;

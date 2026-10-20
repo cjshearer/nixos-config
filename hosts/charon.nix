@@ -44,6 +44,8 @@
   home-manager.users.cjshearer.services.vscode-server.enable = true;
 
   users.cjshearer.services.syncthing.enable = true;
+  users.cjshearer.services.syncthing.notes.enable = true;
+  users.cjshearer.services.syncthing.notes.replicate = true;
 
   time.timeZone = "America/New_York";
 
