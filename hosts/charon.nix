@@ -44,6 +44,8 @@
   home-manager.users.cjshearer.services.vscode-server.enable = true;
 
   users.cjshearer.services.syncthing.enable = true;
+  users.cjshearer.services.syncthing.notes.enable = true;
+  users.cjshearer.services.syncthing.notes.replicate = true;
 
   # Charon is always on, so it is the single host that holds the game folders
   # and mirrors them to OneDrive. The desktops sync the folders but never push.
