@@ -114,10 +114,25 @@ let
       dst = lib.escapeShellArg op.cfg.dst;
       workdir = lib.escapeShellArg (mkWorkDir op.name op.cfg.src op.cfg.dst);
       excludeArgs = mkExcludeArgs op;
+      maxDeleteArgs = lib.optionalString (
+        op.cfg.maxDelete != null
+      ) "--max-delete ${toString op.cfg.maxDelete}";
+
+      # A sync or bisync can destroy data if the local tree is still empty or
+      # catching up. Let an operation refuse to run until its source is ready.
+      precheck = lib.optionalString (op.cfg.precheck != null && op.cfg.operation != "mount") ''
+        if ! (
+          ${op.cfg.precheck}
+        ); then
+          echo "precheck failed, skipping ${op.name}"
+          exit 0
+        fi
+      '';
     in
-    pkgs.writeShellScript "rclone-bisync-${op.name}" (
+    pkgs.writeShellScript "rclone-${op.name}" (
       ''
         set -euo pipefail
+        ${precheck}
         ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${src}
         ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${dst}
       ''
@@ -126,6 +141,8 @@ let
           "exec ${lib.getExe pkgs.rclone} mount ${rcloneGlobalArgs} --vfs-cache-mode full --dir-cache-time 24h --poll-interval 30s --vfs-cache-max-age 2w --vfs-cache-max-size 50G --vfs-cache-min-free-space 20G ${excludeArgs} ${src} ${dst}"
         else if op.cfg.operation == "copy" then
           "exec ${lib.getExe pkgs.rclone} copy ${rcloneGlobalArgs} --update ${excludeArgs} ${src} ${dst}"
+        else if op.cfg.operation == "sync" then
+          "exec ${lib.getExe pkgs.rclone} sync ${rcloneGlobalArgs} ${maxDeleteArgs} ${excludeArgs} ${src} ${dst}"
         else
           ''
             ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${workdir}
@@ -224,6 +241,7 @@ in
               type = lib.types.enum [
                 "mount"
                 "copy"
+                "sync"
                 "bisync"
               ];
               default = "bisync";
@@ -237,10 +255,28 @@ in
               default = [ ];
               description = ''
                 Exclude paths matching these glob patterns (passed as `--exclude` flags).
-                Applies to "mount", "copy", and "bisync" operations.
+                Applies to "mount", "copy", "sync", and "bisync" operations.
                 To exclude a directory and all its contents, use a pattern like `dir/**`
                 or `/dir/**`. To exclude only the directory entry itself (not its children),
                 append a `/` separator, e.g. `dir/`.
+              '';
+            };
+            maxDelete = lib.mkOption {
+              type = lib.types.nullOr lib.types.int;
+              default = null;
+              description = ''
+                Abort a "sync" if it would delete more than this many files
+                (passed as `--max-delete`). This bounds the damage when the
+                source is unexpectedly empty or incomplete.
+              '';
+            };
+            precheck = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = ''
+                Shell command that must succeed before a non-mount operation
+                runs. A failure skips the run without failing the unit, which
+                makes it safe for a timer to poll until the source is ready.
               '';
             };
             unitName = lib.mkOption {
