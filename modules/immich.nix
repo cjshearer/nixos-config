@@ -44,6 +44,7 @@ lib.mkIf config.services.immich.enable {
     src = immichLocalPath;
     dst = "onedrive:/app/immich";
     enable = true;
-    operation = "bisync";
+    operation = "sync";
+    pullIfEmpty = true;
   };
 }

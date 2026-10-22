@@ -45,6 +45,12 @@
 
   users.cjshearer.services.syncthing.enable = true;
 
+  # Charon is always on, so it is the single host that holds the game folders
+  # and mirrors them to OneDrive. The desktops sync the folders but never push.
+  users.cjshearer.programs.dusklight.replicate = true;
+  users.cjshearer.programs.pcsx2.replicate = true;
+  users.cjshearer.services.rclone.enable = true;
+
   time.timeZone = "America/New_York";
 
   # This value determines the NixOS release from which the default

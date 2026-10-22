@@ -55,6 +55,7 @@
   users.cjshearer.programs.dusklight.enable = true;
   users.cjshearer.programs.pcsx2.enable = true;
 
+  users.cjshearer.services.rclone.enable = true;
   users.cjshearer.services.rclone.operations.onedrive = {
     src = "onedrive:";
     dst = "/mnt/onedrive";

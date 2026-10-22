@@ -26,6 +26,8 @@ let
   cfg = config.users.cjshearer.services.syncthing;
   hostName = config.networking.hostName;
 
+  syncthingConfig = "${config.services.syncthing.dataDir}/.config/syncthing/config.xml";
+
   # Every enabled host, including this one: the module only configures enabled
   # hosts, so this is the whole mesh.
   meshHosts = builtins.attrNames (
@@ -35,6 +37,19 @@ let
   );
 
   syncthingIdentity = pkgs.buildPackages.callPackage ../pkgs/syncthing-identity { };
+
+  syncthingTriggers = pkgs.callPackage ../pkgs/syncthing-triggers/package.nix { };
+
+  triggersFile = pkgs.writeText "syncthing-triggers.json" (
+    builtins.toJSON (
+      lib.mapAttrsToList (name: trigger: {
+        inherit name;
+        inherit (trigger) folder command;
+      }) cfg.triggers
+    )
+  );
+
+  triggerStateDir = "/home/cjshearer/.local/state/syncthing-triggers";
 
   mkKeys =
     host:
@@ -81,6 +96,42 @@ in
         };
       };
       description = "Devices that manage their own identity, such as Android.";
+    };
+
+    triggers = lib.mkOption {
+      type = lib.types.attrsOf (
+        lib.types.submodule {
+          options = {
+            folder = lib.mkOption {
+              type = lib.types.str;
+              description = "Syncthing folder ID to watch.";
+            };
+            command = lib.mkOption {
+              type = lib.types.str;
+              description = "Shell command to run when the folder is ready to replicate.";
+            };
+          };
+        }
+      );
+      default = { };
+      description = ''
+        Commands to run when a Syncthing folder is ready to replicate. A folder
+        consumer registers a command here instead of polling. The service
+        long-polls the event stream, waits for the folder to be quiet, and only
+        then runs the command if the local copy is complete: idle, nothing
+        needed, no pull errors, and 100% completion. Each command runs once per
+        folder sequence, so a reconnect does not re-run it.
+      '';
+    };
+
+    triggerSettle = lib.mkOption {
+      type = lib.types.int;
+      default = 15;
+      description = ''
+        Seconds a folder must be quiet before its triggers are considered. This
+        lets a just-connected peer finish exchanging indexes before a command
+        that deletes remote data runs.
+      '';
     };
   };
 
@@ -149,6 +200,31 @@ in
           "AF_UNIX"
           "AF_NETLINK"
         ];
+      };
+    };
+
+    # Syncthing answers events by long-poll, so one reader fans them out. A
+    # command runs only when its folder has been quiet and the local copy is
+    # complete, then at most once per folder sequence. See
+    # pkgs/syncthing-triggers for the readiness check.
+    systemd.services.syncthing-triggers = lib.mkIf (cfg.triggers != { }) {
+      description = "Run commands when a Syncthing folder is ready to replicate";
+      after = [ "syncthing.service" ];
+      wants = [ "syncthing.service" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        User = "cjshearer";
+        Group = "users";
+        Restart = "always";
+        RestartSec = "5s";
+        ExecStart = pkgs.writeShellScript "syncthing-triggers" ''
+          exec ${syncthingTriggers}/bin/syncthing-triggers \
+            --config ${lib.escapeShellArg syncthingConfig} \
+            --gui ${lib.escapeShellArg config.services.syncthing.guiAddress} \
+            --triggers ${lib.escapeShellArg triggersFile} \
+            --state-dir ${lib.escapeShellArg triggerStateDir} \
+            --settle ${toString cfg.triggerSettle}
+        '';
       };
     };
   };
