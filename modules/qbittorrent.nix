@@ -33,11 +33,14 @@ lib.mkIf config.services.qbittorrent.enable {
   systemd.services.qbittorrent.serviceConfig.PrivateUsers = lib.mkForce false;
   systemd.services.qbittorrent.serviceConfig.ProtectHome = lib.mkForce false;
 
+  # qBittorrent owns its profile, so the local tree is the source of truth and
+  # the remote is a backup. Restore from OneDrive only if the profile is gone.
   users.cjshearer.services.rclone.operations.qbittorrent = {
     src = "/home/cjshearer/.local/share/qBittorrent";
     dst = "onedrive:/app/qBittorrent";
     enable = true;
-    operation = "bisync";
+    operation = "sync";
+    pullIfEmpty = true;
   };
 
   users.cjshearer.services.rclone.operations.onedrive-uploads = {

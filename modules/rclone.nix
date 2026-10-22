@@ -53,6 +53,9 @@
 #   deprecated while v6 connects to the internet fail, so rclone's IPv6 sockets black-hole and
 #   stall every request until timeout. Binding to 0.0.0.0 sidesteps that, and shorter
 #   --timeout/--low-level-retries keep one stalled request from holding the VFS lock for minutes.
+# - #######: removed bisync. Game data now syncs over the Syncthing mesh, while immich and
+#   qBittorrent replicate one-way, so nothing needs a two-way operation. With it went the workdir,
+#   resync, recover, and lock-expiry machinery.
 {
   lib,
   pkgs,
@@ -63,12 +66,6 @@ let
   cfg = config.users.cjshearer.services.rclone.operations;
 
   isRemotePath = path: builtins.match "^[^/][^:]*:.*" path != null;
-  mkWorkDir =
-    name: src: dst:
-    let
-      hash = builtins.substring 0 8 (builtins.hashString "sha256" "${src}||${dst}");
-    in
-    "/home/cjshearer/.local/share/rclone-bisync/${name}-${hash}";
 
   flattenOperations = lib.mapAttrsToList (name: opCfg: {
     inherit name;
@@ -112,12 +109,26 @@ let
     let
       src = lib.escapeShellArg op.cfg.src;
       dst = lib.escapeShellArg op.cfg.dst;
-      workdir = lib.escapeShellArg (mkWorkDir op.name op.cfg.src op.cfg.dst);
       excludeArgs = mkExcludeArgs op;
+      maxDeleteArgs = lib.optionalString (
+        op.cfg.maxDelete != null
+      ) "--max-delete ${toString op.cfg.maxDelete}";
+
+      # A sync can destroy data if the local tree is still empty or catching
+      # up. Let an operation refuse to run until its source is ready.
+      precheck = lib.optionalString (op.cfg.precheck != null && op.cfg.operation != "mount") ''
+        if ! (
+          ${op.cfg.precheck}
+        ); then
+          echo "precheck failed, skipping ${op.name}"
+          exit 0
+        fi
+      '';
     in
-    pkgs.writeShellScript "rclone-bisync-${op.name}" (
+    pkgs.writeShellScript "rclone-${op.name}" (
       ''
         set -euo pipefail
+        ${precheck}
         ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${src}
         ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${dst}
       ''
@@ -128,31 +139,14 @@ let
           "exec ${lib.getExe pkgs.rclone} copy ${rcloneGlobalArgs} --update ${excludeArgs} ${src} ${dst}"
         else
           ''
-            ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${workdir}
-
-            resync_args=()
-            recover_args=("--recover")
-            check_sync_args=("--check-sync=false")
-
-            # To ensure we download from the remote if the local copy is empty, we check if a
-            # previous resync has been performed by looking for a .lst file in the workdir.
-            if ! ${lib.getExe pkgs.findutils} ${workdir} -maxdepth 1 -name '*.lst' -print -quit | grep -q .; then
-              resync_args+=(--resync --resync-mode newer)
-              recover_args=()
-              check_sync_args=()
-            fi
-
-            exec ${lib.getExe pkgs.rclone} bisync \
-              ${rcloneGlobalArgs} \
-              "''${recover_args[@]}" \
-              --resilient \
-              --max-lock 10m \
-              --workdir ${workdir} \
-              ${excludeArgs} \
-              "''${check_sync_args[@]}" \
-              "''${resync_args[@]}" \
-              ${src} \
-              ${dst}
+            ${lib.optionalString op.cfg.pullIfEmpty ''
+              # An empty source would erase the destination. Recover the remote
+              # copy first; copy cannot delete local files.
+              if [ -z "$(${pkgs.coreutils}/bin/ls -A ${src})" ]; then
+                ${lib.getExe pkgs.rclone} copy ${rcloneGlobalArgs} ${excludeArgs} ${dst} ${src}
+              fi
+            ''}
+            exec ${lib.getExe pkgs.rclone} sync ${rcloneGlobalArgs} ${maxDeleteArgs} ${excludeArgs} ${src} ${dst}
           ''
       )
     );
@@ -224,9 +218,9 @@ in
               type = lib.types.enum [
                 "mount"
                 "copy"
-                "bisync"
+                "sync"
               ];
-              default = "bisync";
+              description = "What to do with src and dst.";
             };
             interval = lib.mkOption {
               type = lib.types.str;
@@ -237,10 +231,37 @@ in
               default = [ ];
               description = ''
                 Exclude paths matching these glob patterns (passed as `--exclude` flags).
-                Applies to "mount", "copy", and "bisync" operations.
+                Applies to "mount", "copy", and "sync" operations.
                 To exclude a directory and all its contents, use a pattern like `dir/**`
                 or `/dir/**`. To exclude only the directory entry itself (not its children),
                 append a `/` separator, e.g. `dir/`.
+              '';
+            };
+            maxDelete = lib.mkOption {
+              type = lib.types.nullOr lib.types.int;
+              default = null;
+              description = ''
+                Abort a "sync" if it would delete more than this many files
+                (passed as `--max-delete`). This bounds the damage when the
+                source is unexpectedly empty or incomplete.
+              '';
+            };
+            precheck = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = ''
+                Shell command that must succeed before a non-mount operation
+                runs. A failure skips the run without failing the unit, which
+                makes it safe for a timer to poll until the source is ready.
+              '';
+            };
+            pullIfEmpty = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = ''
+                For a "sync" with a local source, copy from the destination
+                into the source first when the source is empty. Keeps a fresh
+                or wiped source from deleting the destination.
               '';
             };
             unitName = lib.mkOption {
