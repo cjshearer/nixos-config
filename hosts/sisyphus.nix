@@ -75,7 +75,6 @@
   programs.pixelflasher.enable = true;
   programs.steam.enable = true;
   programs.ytmdesktop.enable = true;
-  programs.zoom-us.enable = true;
 
   services.desktopManager.cosmic.enable = true;
   services.liquidctl.enable = true;
