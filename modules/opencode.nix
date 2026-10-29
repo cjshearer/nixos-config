@@ -15,7 +15,6 @@
         ...
       }:
       {
-        programs.opencode.package = self.packages.${pkgs.stdenv.hostPlatform.system}.opencode2;
         programs.opencode.web.extraArgs = [
           "--port"
           "4096"
