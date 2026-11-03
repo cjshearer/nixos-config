@@ -18,7 +18,7 @@
 
     systems.url = "github:nix-systems/default-linux";
     
-    vscode-server.url = "github:nix-community/nixos-vscode-server";
+    vscode-server.url = "github:cjshearer/nixos-vscode-server/fix-patchelf-order";
   };
 
   outputs =
