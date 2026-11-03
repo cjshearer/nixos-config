@@ -72,6 +72,9 @@
           - Avoid control flow statements like `try/catch` and `else` unless they are necessary.
           - Do not preemptively extract single-use helpers. Inline it unless the helper would hide
             real complexity, or the function has a clear independent name that improves the caller.
+          - Do not write tests that check if extraneous behavior has been removed, unless the
+            abscense of that behavior is itself an important requirement (it usually isn't). Tests
+            should only express active requirements of software.
 
           ## Host
 
