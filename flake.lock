@@ -177,16 +177,15 @@
         "flake-parts": "flake-parts"
       },
       "locked": {
-        "lastModified": 1793729665,
-        "narHash": "sha256-+fRwfqO3/jJ7ix/ZKwqvXl91k666TovrAZtvBOSAekU=",
-        "owner": "cjshearer",
+        "lastModified": 1794081290,
+        "narHash": "sha256-vJCjuYXp06XZ9rufttvv/W3mkzQzefYxEvmmsZfUmvw=",
+        "owner": "nix-community",
         "repo": "nixos-vscode-server",
-        "rev": "02237c0b78dbef35be1ce91e4f482aa38db9a9b4",
+        "rev": "e8aac40ed8d76486859741b1608badeca3475943",
         "type": "github"
       },
       "original": {
-        "owner": "cjshearer",
-        "ref": "fix-patchelf-order",
+        "owner": "nix-community",
         "repo": "nixos-vscode-server",
         "type": "github"
       }

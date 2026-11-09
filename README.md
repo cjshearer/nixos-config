@@ -60,3 +60,4 @@ sudo cp result/iso/*.iso /dev/sdX
 - [ideamaker: init at 4.3.3](https://github.com/NixOS/nixpkgs/pull/309130)
 - [pixelflasher: init at 7.9.2.4](https://github.com/NixOS/nixpkgs/pull/336191)
 - [ytmdesktop: init at 2.0.5](https://github.com/NixOS/nixpkgs/pull/317309)
+- [nixos-vscode-server: set rpath before changing the interpreter](https://github.com/nix-community/nixos-vscode-server/pull/105)
