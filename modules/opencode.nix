@@ -135,7 +135,24 @@
             general.model = "github-copilot/gpt-6-luna";
             explore.model = "github-copilot/gpt-6-luna";
           };
+        }
+        // lib.optionalAttrs osConfig.programs.google-chrome.enable {
+          mcp.servers.chrome-devtools = {
+            type = "local";
+            command = [
+              (lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.chrome-devtools-mcp)
+              "--autoConnect"
+              "--no-usage-statistics"
+              "--no-performance-crux"
+              "--allow-unrestricted-paths"
+            ];
+            environment.CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS = "1";
+          };
         };
+
+        programs.opencode.skills.chrome-devtools =
+          lib.mkIf osConfig.programs.google-chrome.enable
+            "${self.packages.${pkgs.stdenv.hostPlatform.system}.chrome-devtools-mcp}/lib/chrome-devtools-mcp/skills/chrome-devtools";
       }
     )
   ];
