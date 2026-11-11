@@ -32,6 +32,7 @@
   services.immich.enable = true;
   services.qbittorrent.enable = true;
   services.tailscale.enable = true;
+  users.cjshearer.services.syncthing.enable = true;
 
   home-manager.users.cjshearer.programs.atuin.enable = true;
   home-manager.users.cjshearer.programs.git.enable = true;

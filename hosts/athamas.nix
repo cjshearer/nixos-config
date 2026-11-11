@@ -51,6 +51,7 @@
     enable = true;
     operation = "mount";
   };
+  users.cjshearer.services.syncthing.enable = true;
 
   programs.direnv.enable = true;
   programs.discord.enable = true;
