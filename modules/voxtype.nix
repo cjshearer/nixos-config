@@ -33,15 +33,12 @@
                   settings = {
                     audio.feedback.enabled = true;
                     meeting.enabled = true;
-                    output.mode = lib.mkDefault "paste";
-                    output.paste_keys = "ctrl+shift+v";
-                    output.restore_clipboard = true;
                     output.shift_enter_newlines = true;
                     vad.enable = true;
                   };
                 };
               }
-
+ 
               (lib.mkIf osConfig.wsl.enable {
                 # WSL GPU access requires the D3D12/dxcore libraries from Windows to be on
                 # LD_LIBRARY_PATH.
