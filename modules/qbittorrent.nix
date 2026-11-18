@@ -1,10 +1,18 @@
 {
   lib,
   config,
+  pkgs,
   ...
 }:
 lib.mkIf config.services.qbittorrent.enable {
   services.qbittorrent = {
+    package = pkgs.qbittorrent-nox.overrideAttrs (old: {
+      version = "5.2.4";
+      src = old.src.override {
+        rev = "release-5.2.4";
+        hash = "sha256-HCfcwO8GEi4Ixfa+Ue2vgWyp407R3VDGRoLxUqJl1eM=";
+      };
+    });
     user = "cjshearer";
     group = "users";
     profileDir = "/home/cjshearer/.local/share/qBittorrent";
