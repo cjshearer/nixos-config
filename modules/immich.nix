@@ -5,7 +5,7 @@
 }:
 let
   immichLocalPath = "/var/lib/immich";
-  immichRcloneUnit = config.users.cjshearer.services.rclone.operations.immich.unitName;
+  immichSeedUnit = config.users.cjshearer.services.rclone.operations.immich.seedUnit;
 in
 # https://github.com/simonwjackson/mountainous/blob/main/modules/nixos/services/photos/default.nix
 # https://github.com/sarveshrulz/nixos_config/blob/main/system/raspberrypi/users/sarvesh/home.nix
@@ -22,12 +22,9 @@ lib.mkIf config.services.immich.enable {
 
   services.tailscale.enable = true;
 
-  systemd.services.immich-server.after = [ "${immichRcloneUnit}.service" ];
-  systemd.services.immich-server.requires = [ "${immichRcloneUnit}.service" ];
-  systemd.services.immich-server.wants = [
-    "${immichRcloneUnit}.timer"
-    "tailscaled-serve-immich.service"
-  ];
+  systemd.services.immich-server.after = [ immichSeedUnit ];
+  systemd.services.immich-server.requires = [ immichSeedUnit ];
+  systemd.services.immich-server.wants = [ "tailscaled-serve-immich.service" ];
 
   systemd.services.tailscaled-serve-immich = {
     partOf = [ "immich-server.service" ];
@@ -44,6 +41,6 @@ lib.mkIf config.services.immich.enable {
     src = immichLocalPath;
     dst = "onedrive:/app/immich";
     enable = true;
-    operation = "bisync";
+    operation = "sync";
   };
 }

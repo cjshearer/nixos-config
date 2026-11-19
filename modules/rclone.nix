@@ -49,10 +49,15 @@
 # - 6c90267: let the mount service recover from a wedged mount on its own. Restart unconditionally,
 #   bound the stop with a timeout and hand rclone SIGINT so it unmounts, instead of requiring a
 #   manual lazy unmount and restart.
-# - #######: force rclone onto IPv4 and bound request retries. This host's IPv6 addresses go
+# - 0819b1f: force rclone onto IPv4 and bound request retries. This host's IPv6 addresses go
 #   deprecated while v6 connects to the internet fail, so rclone's IPv6 sockets black-hole and
 #   stall every request until timeout. Binding to 0.0.0.0 sidesteps that, and shorter
 #   --timeout/--low-level-retries keep one stalled request from holding the VFS lock for minutes.
+# - #######: seed one-way syncs. A "sync" from a local source to a remote destination copies the
+#   remote into the source with `--ignore-existing` before the first run, so an empty local
+#   service directory cannot hide remote data. The seed is implicit and its unit is a read-only
+#   output that the periodic sync waits for. A marker makes the seed one-shot so later local
+#   changes are not re-seeded.
 {
   lib,
   pkgs,
@@ -69,6 +74,11 @@ let
       hash = builtins.substring 0 8 (builtins.hashString "sha256" "${src}||${dst}");
     in
     "/home/cjshearer/.local/share/rclone-bisync/${name}-${hash}";
+
+  mkUnitName = name: operation: "rclone-${name}-${operation}";
+  mkSeedUnitName = name: operation: "${mkUnitName name operation}-seed";
+
+  isSeedOp = op: op.cfg.operation == "sync" && !isRemotePath op.cfg.src && isRemotePath op.cfg.dst;
 
   flattenOperations = lib.mapAttrsToList (name: opCfg: {
     inherit name;
@@ -115,7 +125,22 @@ let
       workdir = lib.escapeShellArg (mkWorkDir op.name op.cfg.src op.cfg.dst);
       excludeArgs = mkExcludeArgs op;
     in
-    pkgs.writeShellScript "rclone-bisync-${op.name}" (
+    if op.isSeed or false then
+      let
+        marker = "/home/cjshearer/.local/state/rclone/${op.name}.seeded";
+      in
+      pkgs.writeShellScript "rclone-${op.name}-seed" ''
+        set -euo pipefail
+        marker=${lib.escapeShellArg marker}
+        if [ -e "$marker" ]; then
+          exit 0
+        fi
+        ${lib.getExe pkgs.rclone} copy --ignore-existing ${rcloneGlobalArgs} ${excludeArgs} ${dst} ${src}
+        ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg (builtins.dirOf marker)}
+        ${pkgs.coreutils}/bin/touch "$marker"
+      ''
+    else
+      pkgs.writeShellScript "rclone-bisync-${op.name}" (
       ''
         set -euo pipefail
         ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${src}
@@ -126,6 +151,10 @@ let
           "exec ${lib.getExe pkgs.rclone} mount ${rcloneGlobalArgs} --vfs-cache-mode full --dir-cache-time 24h --poll-interval 30s --vfs-cache-max-age 2w --vfs-cache-max-size 50G --vfs-cache-min-free-space 20G ${excludeArgs} ${src} ${dst}"
         else if op.cfg.operation == "copy" then
           "exec ${lib.getExe pkgs.rclone} copy ${rcloneGlobalArgs} --update ${excludeArgs} ${src} ${dst}"
+        else if op.cfg.operation == "sync" then
+          ''
+            exec ${lib.getExe pkgs.rclone} sync ${rcloneGlobalArgs} ${excludeArgs} ${src} ${dst}
+          ''
         else
           ''
             ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${workdir}
@@ -160,39 +189,45 @@ let
   mkService =
     op:
     let
-      name = op.cfg.unitName;
+      isSeed = op.isSeed or false;
       needsNetwork = isRemotePath op.cfg.src || isRemotePath op.cfg.dst;
+      needsSeed = !isSeed && isSeedOp op;
     in
-    lib.nameValuePair name {
-      after = lib.optional needsNetwork "network-online.target";
-      wants = lib.optional needsNetwork "network-online.target";
-      wantedBy = lib.optional (op.cfg.operation == "mount") "multi-user.target";
-      serviceConfig = {
-        User = "cjshearer";
-        Group = "users";
-      }
-      // lib.optionalAttrs (op.cfg.operation == "mount") {
-        Environment = [
-          "PATH=/run/wrappers/bin/:$PATH"
-        ];
-        Type = "notify";
-        Restart = "always";
-        RestartSec = "5s";
-        TimeoutStopSec = "15s";
-        KillSignal = "SIGINT";
-        ExecStart = mkExecStart op;
-        ExecStop = "/run/wrappers/bin/fusermount -uz ${lib.escapeShellArg op.cfg.dst}";
-      }
-      // lib.optionalAttrs (op.cfg.operation != "mount") {
-        Type = "oneshot";
-        TimeoutStartSec = "infinity";
-        ExecStart = mkExecStart op;
+    lib.nameValuePair
+      (if isSeed then mkSeedUnitName op.name op.cfg.operation else mkUnitName op.name op.cfg.operation)
+      {
+        after =
+          lib.optional needsNetwork "network-online.target"
+          ++ lib.optional needsSeed op.cfg.seedUnit;
+        requires = lib.optional needsSeed op.cfg.seedUnit;
+        wants = lib.optional needsNetwork "network-online.target";
+        wantedBy = lib.optional (isSeed || op.cfg.operation == "mount") "multi-user.target";
+        serviceConfig = {
+          User = "cjshearer";
+          Group = "users";
+        }
+        // lib.optionalAttrs (op.cfg.operation == "mount") {
+          Environment = [
+            "PATH=/run/wrappers/bin/:$PATH"
+          ];
+          Type = "notify";
+          Restart = "always";
+          RestartSec = "5s";
+          TimeoutStopSec = "15s";
+          KillSignal = "SIGINT";
+          ExecStart = mkExecStart op;
+          ExecStop = "/run/wrappers/bin/fusermount -uz ${lib.escapeShellArg op.cfg.dst}";
+        }
+        // lib.optionalAttrs (op.cfg.operation != "mount") {
+          Type = "oneshot";
+          TimeoutStartSec = "infinity";
+          ExecStart = mkExecStart op;
+        };
       };
-    };
 
   mkTimer =
     op:
-    lib.nameValuePair op.cfg.unitName {
+    lib.nameValuePair (mkUnitName op.name op.cfg.operation) {
       wantedBy = [ "timers.target" ];
       timerConfig = {
         OnBootSec = "1m";
@@ -225,6 +260,7 @@ in
                 "mount"
                 "copy"
                 "bisync"
+                "sync"
               ];
               default = "bisync";
             };
@@ -237,18 +273,19 @@ in
               default = [ ];
               description = ''
                 Exclude paths matching these glob patterns (passed as `--exclude` flags).
-                Applies to "mount", "copy", and "bisync" operations.
+                Applies to "mount", "copy", "bisync", and "sync" operations.
                 To exclude a directory and all its contents, use a pattern like `dir/**`
                 or `/dir/**`. To exclude only the directory entry itself (not its children),
                 append a `/` separator, e.g. `dir/`.
               '';
             };
-            unitName = lib.mkOption {
+            seedUnit = lib.mkOption {
               type = lib.types.str;
-              description = "Systemd unit base name for this operation.";
+              readOnly = true;
+              default = "${mkSeedUnitName name config.operation}.service";
+              description = "Systemd unit name for this operation's seed step.";
             };
           };
-          config.unitName = lib.mkDefault "rclone-${name}-${config.operation}";
         }
       )
     );
@@ -256,7 +293,11 @@ in
 
   config = lib.mkIf (enabledOperations != [ ]) {
 
-    systemd.services = lib.listToAttrs (map mkService enabledOperations);
+    systemd.services =
+      lib.listToAttrs (map mkService enabledOperations)
+      // lib.listToAttrs (
+        map (op: mkService (op // { isSeed = true; })) (lib.filter isSeedOp enabledOperations)
+      );
     systemd.timers = lib.listToAttrs (
       map mkTimer (lib.filter (op: op.cfg.operation != "mount") enabledOperations)
     );
