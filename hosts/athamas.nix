@@ -44,12 +44,7 @@
   home-manager.users.cjshearer.programs.thunderbird.enable = true;
   home-manager.users.cjshearer.programs.vscode.enable = true;
 
-  users.cjshearer.services.rclone.operations.onedrive = {
-    src = "onedrive:";
-    dst = "/mnt/onedrive";
-    exclude = [ "/Personal Vault/**" ];
-    operation = "mount";
-  };
+  users.cjshearer.services.rclone.webdav.client.enable = true;
 
   programs.direnv.enable = true;
   programs.discord.enable = true;

@@ -33,6 +33,7 @@
   services.qbittorrent.enable = true;
   services.tailscale.enable = true;
 
+  users.cjshearer.services.rclone.webdav.server.enable = true;
   home-manager.users.cjshearer.programs.atuin.enable = true;
   home-manager.users.cjshearer.programs.git.enable = true;
   home-manager.users.cjshearer.programs.jujutsu.enable = true;

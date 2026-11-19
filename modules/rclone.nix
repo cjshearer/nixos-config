@@ -58,9 +58,12 @@
 #   service directory cannot hide remote data. The seed is implicit and its unit is a read-only
 #   output that the periodic sync waits for. A marker makes the seed one-shot so later local
 #   changes are not re-seeded.
-# - #######: drop operation options every caller left at the same value. An operation is enabled
+# - 89ebd4b: drop operation options every caller left at the same value. An operation is enabled
 #   by its presence, all timed operations share one cadence, and unit names derive from the
 #   operation name and type.
+# - #######: mounting onedrive directly on each client resulted in poor performance, so we shift
+#   the hub that hosts access from onedrive to charon, which exposes onedrive over webdav. Now
+#   clients share a cache outside of onedrive, avoiding slow API calls and throttling.
 {
   lib,
   pkgs,
@@ -68,8 +71,9 @@
   ...
 }:
 let
-  home = "/home/cjshearer";
   rcloneBin = lib.getExe pkgs.rclone;
+  webdav = config.users.cjshearer.services.rclone.webdav;
+
   remoteName = "onedrive";
 
   mountPoint = "/mnt/onedrive";
@@ -92,8 +96,6 @@ let
   mkUnitName = name: operation: "rclone-${name}-${operation}";
   mkSeedUnitName = name: operation: "${mkUnitName name operation}-seed";
 
-  isMountOp = op: op.cfg.operation == "mount";
-
   isSeedOp = op: op.cfg.operation == "sync" && !isRemotePath op.cfg.src && isRemotePath op.cfg.dst;
 
   operations = lib.mapAttrsToList (name: opCfg: {
@@ -101,12 +103,12 @@ let
     cfg = opCfg;
   }) config.users.cjshearer.services.rclone.operations;
 
-  # IPv6 on this host is unreliable (global addresses go deprecated while v6 connects to the
-  # internet fail), so rclone's default IPv6 sockets black-hole and every request on them stalls
-  # until timeout. Bind to 0.0.0.0 to force IPv4. Also cap the request rate and fail stalled
-  # operations sooner: OneDrive throttles concurrent rclone processes, and a single stalled request
-  # holds the VFS lock and blocks all other lookups/reads while it retries.
-  rcloneGlobalArgs = lib.escapeShellArgs [
+  # OneDrive throttles concurrent rclone processes, and IPv6 on charon is
+  # unreliable (global addresses go deprecated while v6 connects to the internet
+  # fail), so rclone's default IPv6 sockets black-hole and every request on them
+  # stalls until timeout. Bind to 0.0.0.0 to force IPv4, and bound request
+  # retries so one stalled request cannot hold a process for minutes.
+  onedriveArgs = lib.escapeShellArgs [
     "--bind"
     "0.0.0.0"
     "--tpslimit"
@@ -128,12 +130,6 @@ let
     let
       src = lib.escapeShellArg op.cfg.src;
       dst = lib.escapeShellArg op.cfg.dst;
-      workdir = lib.escapeShellArg (
-        let
-          hash = builtins.substring 0 8 (builtins.hashString "sha256" "${op.cfg.src}||${op.cfg.dst}");
-        in
-        "${home}/.local/share/rclone-bisync/${op.name}-${hash}"
-      );
       excludeArgs = lib.escapeShellArgs (excludeFlags op.cfg.exclude);
     in
     if op.isSeed or false then
@@ -146,56 +142,25 @@ let
         if [ -e "$marker" ]; then
           exit 0
         fi
-        ${lib.getExe pkgs.rclone} copy --ignore-existing ${rcloneGlobalArgs} ${excludeArgs} ${dst} ${src}
+        ${rcloneBin} copy --ignore-existing ${onedriveArgs} ${excludeArgs} ${dst} ${src}
         ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg (builtins.dirOf marker)}
         ${pkgs.coreutils}/bin/touch "$marker"
       ''
     else
-      pkgs.writeShellScript "rclone-bisync-${op.name}" (
-      ''
-        set -euo pipefail
-        ${rcloneBin} mkdir ${rcloneGlobalArgs} ${src}
-        ${rcloneBin} mkdir ${rcloneGlobalArgs} ${dst}
-      ''
-      + (
-        if op.cfg.operation == "mount" then
-          "exec ${rcloneBin} mount ${rcloneGlobalArgs} --vfs-cache-mode full --dir-cache-time ${dirCacheTime} --poll-interval ${pollInterval} --vfs-cache-max-age 2w --vfs-cache-max-size 50G --vfs-cache-min-free-space 20G ${excludeArgs} ${src} ${dst}"
-        else if op.cfg.operation == "copy" then
-          "exec ${rcloneBin} copy ${rcloneGlobalArgs} --update ${excludeArgs} ${src} ${dst}"
-        else if op.cfg.operation == "sync" then
-          ''
-            exec ${rcloneBin} sync ${rcloneGlobalArgs} ${excludeArgs} ${src} ${dst}
-          ''
-        else
-          ''
-            ${rcloneBin} mkdir ${rcloneGlobalArgs} ${workdir}
-
-            resync_args=()
-            recover_args=("--recover")
-            check_sync_args=("--check-sync=false")
-
-            # To ensure we download from the remote if the local copy is empty, we check if a
-            # previous resync has been performed by looking for a .lst file in the workdir.
-            if ! ${lib.getExe pkgs.findutils} ${workdir} -maxdepth 1 -name '*.lst' -print -quit | grep -q .; then
-              resync_args+=(--resync --resync-mode newer)
-              recover_args=()
-              check_sync_args=()
-            fi
-
-            exec ${rcloneBin} bisync \
-              ${rcloneGlobalArgs} \
-              "''${recover_args[@]}" \
-              --resilient \
-              --max-lock 10m \
-              --workdir ${workdir} \
-              ${excludeArgs} \
-              "''${check_sync_args[@]}" \
-              "''${resync_args[@]}" \
-              ${src} \
-              ${dst}
-          ''
-      )
-    );
+      pkgs.writeShellScript "rclone-${op.name}" (
+        ''
+          set -euo pipefail
+          ${rcloneBin} mkdir ${onedriveArgs} ${src}
+          ${rcloneBin} mkdir ${onedriveArgs} ${dst}
+        ''
+        + (
+          {
+            copy = "exec ${rcloneBin} copy ${onedriveArgs} --update ${excludeArgs} ${src} ${dst}";
+            sync = "exec ${rcloneBin} sync ${onedriveArgs} ${excludeArgs} ${src} ${dst}";
+          }
+          .${op.cfg.operation}
+        )
+      );
 
   mkService =
     op:
@@ -210,25 +175,12 @@ let
         after = lib.optional needsNetwork "network-online.target" ++ lib.optional needsSeed op.cfg.seedUnit;
         requires = lib.optional needsSeed op.cfg.seedUnit;
         wants = lib.optional needsNetwork "network-online.target";
-        wantedBy = lib.optional (isSeed || isMountOp op) "multi-user.target";
+        wantedBy = lib.optional isSeed "multi-user.target";
         serviceConfig = {
           User = "cjshearer";
-          ExecStart = mkExecStart op;
-        }
-        // lib.optionalAttrs (isMountOp op) {
-          Environment = [
-            "PATH=${wrappers}:$PATH"
-          ];
-          Type = "notify";
-          Restart = "always";
-          RestartSec = "5s";
-          TimeoutStopSec = "15s";
-          KillSignal = "SIGINT";
-          ExecStop = unmount op.cfg.dst;
-        }
-        // lib.optionalAttrs (!isMountOp op) {
           Type = "oneshot";
           TimeoutStartSec = "infinity";
+          ExecStart = mkExecStart op;
         };
       };
 
@@ -243,100 +195,229 @@ let
       };
     };
 
+  # -- WebDAV hub ------------------------------------------------------------------------------
+  #
+  # The server is reachable directly on the tailnet and through the tailnet files service for
+  # Android. Access is controlled by Tailscale.
+
+  port = 8090;
+
+  cacheDirName = "rclone-webdav";
+
+  clientUrl = "http://charon:${toString port}/";
+
 in
 {
-  options.users.cjshearer.services.rclone.operations = lib.mkOption {
-    default = { };
+  options.users.cjshearer.services.rclone = {
+    operations = lib.mkOption {
+      default = { };
 
-    type = lib.types.attrsOf (
-      lib.types.submodule (
-        { name, config, ... }: {
-          options = {
-            src = lib.mkOption {
-              type = lib.types.str;
-              description = "Source path (local or remote).";
+      type = lib.types.attrsOf (
+        lib.types.submodule (
+          { name, config, ... }: {
+            options = {
+              src = lib.mkOption {
+                type = lib.types.str;
+                description = "Source path (local or remote).";
+              };
+              dst = lib.mkOption {
+                type = lib.types.str;
+                description = "Destination path (local or remote).";
+              };
+              operation = lib.mkOption {
+                type = lib.types.enum [
+                  "copy"
+                  "sync"
+                ];
+              };
+              exclude = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                default = [ ];
+                description = ''
+                  Exclude paths matching these glob patterns (passed as `--exclude` flags).
+                  Applies to "copy" and "sync" operations.
+                  To exclude a directory and all its contents, use a pattern like `dir/**`
+                  or `/dir/**`. To exclude only the directory entry itself (not its children),
+                  append a `/` separator, e.g. `dir/`.
+                '';
+              };
+              seedUnit = lib.mkOption {
+                type = lib.types.str;
+                readOnly = true;
+                default = "${mkSeedUnitName name config.operation}.service";
+                description = "Systemd unit name for this operation's seed step.";
+              };
             };
-            dst = lib.mkOption {
-              type = lib.types.str;
-              description = "Destination path (local or remote).";
-            };
-            operation = lib.mkOption {
-              type = lib.types.enum [
-                "mount"
-                "copy"
-                "bisync"
-                "sync"
-              ];
-            };
-            exclude = lib.mkOption {
-              type = lib.types.listOf lib.types.str;
-              default = [ ];
-              description = ''
-                Exclude paths matching these glob patterns (passed as `--exclude` flags).
-                Applies to "mount", "copy", "bisync", and "sync" operations.
-                To exclude a directory and all its contents, use a pattern like `dir/**`
-                or `/dir/**`. To exclude only the directory entry itself (not its children),
-                append a `/` separator, e.g. `dir/`.
-              '';
-            };
-            seedUnit = lib.mkOption {
-              type = lib.types.str;
-              readOnly = true;
-              default = "${mkSeedUnitName name config.operation}.service";
-              description = "Systemd unit name for this operation's seed step.";
-            };
-          };
-        }
-      )
-    );
+          }
+        )
+      );
+    };
+
+    webdav = {
+      server.enable = lib.mkEnableOption "the WebDAV hub for the OneDrive remote";
+      client.enable = lib.mkEnableOption "mounting the WebDAV hub";
+    };
   };
 
-  config = lib.mkIf (operations != [ ]) {
+  config = lib.mkMerge [
+    # The OneDrive remote config and its operations. The remote is also needed by the WebDAV
+    # server, so it is gated on either.
+    (lib.mkIf (operations != [ ] || webdav.server.enable) {
+      systemd.services =
+        lib.listToAttrs (map mkService operations)
+        // lib.listToAttrs (
+          map (op: mkService (op // { isSeed = true; })) (lib.filter isSeedOp operations)
+        );
+      systemd.timers = lib.listToAttrs (map mkTimer operations);
 
-    systemd.services =
-      lib.listToAttrs (map mkService operations)
-      // lib.listToAttrs (
-        map (op: mkService (op // { isSeed = true; })) (lib.filter isSeedOp operations)
-      );
-    systemd.timers = lib.listToAttrs (map mkTimer (lib.filter (op: !isMountOp op) operations));
+      # This assumes the operations are onedrive. If that changes, so should this configuration.
+      home-manager.users.cjshearer.programs.rclone = {
+        enable = true;
+        remotes.${remoteName} = {
+          config = {
+            delta = true;
+            drive_type = "personal";
+            type = "onedrive";
+          };
 
-    # This assumes all operations use onedrive. If that changes, so should this configuration.
-    home-manager.users.cjshearer.programs.rclone = {
-      enable = true;
-      remotes.${remoteName} = {
-        config = {
-          delta = true;
-          drive_type = "personal";
-          type = "onedrive";
-        };
+          # this is a hack to persist rclone secrets that are not managed by home-manager:
+          # https://github.com/nix-community/home-manager/pull/7688#issuecomment-3217292389
+          secrets = {
+            drive_id = ''
+              $(
+              tmp=$(mktemp)
+              ${rcloneBin} config dump --config "$configPath" \
+                | ${lib.getExe pkgs.jq} -r '.${remoteName}.drive_id // empty' > "$tmp"
+              echo "$tmp"
+              )'';
 
-        # this is a hack to persist rclone secrets that are not managed by home-manager:
-        # https://github.com/nix-community/home-manager/pull/7688#issuecomment-3217292389
-        secrets = {
-          drive_id = ''
-            $(
-            tmp=$(mktemp)
-            ${rcloneBin} config dump --config "$configPath" \
-              | ${lib.getExe pkgs.jq} -r '.${remoteName}.drive_id // empty' > "$tmp"
-            echo "$tmp"
-            )'';
-
-          token = ''
-            $(
-            tmp=$(mktemp)
-            ${rcloneBin} config dump --config "$configPath" \
-              | ${lib.getExe pkgs.jq} -r '.${remoteName}.token // empty' > "$tmp"
-            echo "$tmp"
-            )'';
+            token = ''
+              $(
+              tmp=$(mktemp)
+              ${rcloneBin} config dump --config "$configPath" \
+                | ${lib.getExe pkgs.jq} -r '.${remoteName}.token // empty' > "$tmp"
+              echo "$tmp"
+              )'';
+          };
         };
       };
-    };
+    })
 
-    home-manager.users.cjshearer.xdg.userDirs = lib.mkIf (lib.any isMountOp operations) {
-      documents = "${mountPoint}/Documents";
-      music = "${mountPoint}/Music";
-      pictures = "${mountPoint}/Pictures";
-      videos = "${mountPoint}/Videos";
-    };
-  };
+    # Serve the remote over WebDAV on charon.
+    (lib.mkIf webdav.server.enable {
+      assertions = [
+        {
+          assertion = config.services.tailscale.enable;
+          message = "The WebDAV hub is served over the tailnet but services.tailscale.enable is false.";
+        }
+      ];
+
+      networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ port ];
+
+      # OneDrive cannot list the Personal Vault through the API and emits repeated
+      # invalidResourceId errors (rclone#8736).
+      systemd.services.rclone-webdav = {
+        description = "rclone WebDAV server for OneDrive";
+        wantedBy = [ "multi-user.target" ];
+        after = [ "network-online.target" ];
+        wants = [ "network-online.target" ];
+        serviceConfig = {
+          User = "cjshearer";
+          CacheDirectory = cacheDirName;
+          Restart = "always";
+          RestartSec = "5s";
+          ExecStart = pkgs.writeShellScript "rclone-webdav-server" ''
+            exec ${rcloneBin} serve webdav ${remoteName}: ${onedriveArgs} \
+              --addr :${toString port} \
+              ${
+                lib.escapeShellArgs [
+                  "--cache-dir"
+                  "/var/cache/${cacheDirName}"
+                  "--vfs-cache-mode"
+                  "full"
+                  "--vfs-cache-max-size"
+                  "20G"
+                  "--vfs-cache-max-age"
+                  "2w"
+                  "--vfs-cache-min-free-space"
+                  "10G"
+                  "--dir-cache-time"
+                  dirCacheTime
+                  "--poll-interval"
+                  pollInterval
+                ]
+              } \
+              ${lib.escapeShellArgs (excludeFlags [ "/Personal Vault/**" ])}
+          '';
+        };
+      };
+
+      services.tailscale.serve.services.files.endpoints."tcp:443" = "http://127.0.0.1:${toString port}";
+    })
+
+    # Mount the WebDAV hub on client hosts.
+    (lib.mkIf webdav.client.enable {
+      assertions = [
+        {
+          assertion = config.services.tailscale.enable;
+          message = "The WebDAV client uses Tailscale but services.tailscale.enable is false.";
+        }
+      ];
+
+      # The WebDAV client talks to charon, not to OneDrive, so it only needs the IPv4 bind.
+      systemd.services.rclone-webdav-client = {
+        description = "Mount the charon WebDAV hub";
+        wantedBy = [ "multi-user.target" ];
+        after = [
+          "network-online.target"
+          "tailscaled.service"
+        ];
+        wants = [
+          "network-online.target"
+          "tailscaled.service"
+        ];
+        serviceConfig = {
+          User = "cjshearer";
+          Environment = [
+            "PATH=${wrappers}:$PATH"
+          ];
+          Type = "notify";
+          Restart = "on-failure";
+          RestartSec = "15s";
+          TimeoutStopSec = "15s";
+          KillSignal = "SIGINT";
+          ExecStartPre = [
+            "-${unmount mountPoint}"
+            (pkgs.writeShellScript "rclone-webdav-client-check" ''
+              exec ${lib.getExe pkgs.curl} \
+                --fail --silent --show-error \
+                --connect-timeout 3 --max-time 10 \
+                ${lib.escapeShellArg clientUrl}
+            '')
+          ];
+          ExecStart = pkgs.writeShellScript "rclone-webdav-client-start" ''
+            exec ${rcloneBin} mount :webdav: ${lib.escapeShellArg mountPoint} \
+              --bind 0.0.0.0 \
+              --webdav-url ${lib.escapeShellArg clientUrl} \
+              --webdav-vendor other \
+              ${lib.escapeShellArgs [
+                "--vfs-cache-mode"
+                "writes"
+                "--dir-cache-time"
+                dirCacheTime
+              ]}
+          '';
+          ExecStop = unmount mountPoint;
+          ExecStopPost = "-${unmount mountPoint}";
+        };
+      };
+
+      home-manager.users.cjshearer.xdg.userDirs = {
+        documents = "${mountPoint}/Documents";
+        music = "${mountPoint}/Music";
+        pictures = "${mountPoint}/Pictures";
+        videos = "${mountPoint}/Videos";
+      };
+    })
+  ];
 }
