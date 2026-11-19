@@ -53,6 +53,9 @@
 #   deprecated while v6 connects to the internet fail, so rclone's IPv6 sockets black-hole and
 #   stall every request until timeout. Binding to 0.0.0.0 sidesteps that, and shorter
 #   --timeout/--low-level-retries keep one stalled request from holding the VFS lock for minutes.
+# - #######: expose the shared global flags as an option so the WebDAV server (rclone-webdav.nix)
+#   uses the same IPv4, rate-limit, and timeout policy as mounts and copy jobs instead of
+#   duplicating them. Also split the remote config gate from the mount-only XDG user directories.
 {
   lib,
   pkgs,
@@ -60,7 +63,8 @@
   ...
 }:
 let
-  cfg = config.users.cjshearer.services.rclone.operations;
+  rclone = config.users.cjshearer.services.rclone;
+  cfg = rclone.operations;
 
   isRemotePath = path: builtins.match "^[^/][^:]*:.*" path != null;
   mkWorkDir =
@@ -81,27 +85,15 @@ let
     op: op.cfg.seed && op.cfg.operation == "sync" && !isRemotePath op.cfg.src && isRemotePath op.cfg.dst
   ) enabledOperations;
 
-  # IPv6 on this host is unreliable (global addresses go deprecated while v6 connects to the
-  # internet fail), so rclone's default IPv6 sockets black-hole and every request on them stalls
-  # until timeout. Bind to 0.0.0.0 to force IPv4. Also cap the request rate and fail stalled
-  # operations sooner: OneDrive throttles concurrent rclone processes, and a single stalled request
-  # holds the VFS lock and blocks all other lookups/reads while it retries.
-  rcloneGlobalArgs = lib.escapeShellArgs [
-    "--bind"
-    "0.0.0.0"
-    "--tpslimit"
-    "10"
-    "--tpslimit-burst"
-    "1"
-    "--timeout"
-    "15s"
-    "--contimeout"
-    "10s"
-    "--low-level-retries"
-    "2"
-    "--retries"
-    "3"
-  ];
+  rcloneGlobalArgs = lib.escapeShellArgs (
+    [
+      # IPv6 to OneDrive is unreliable on this host, so directly bound OneDrive operations use
+      # IPv4. WebDAV clients are not bound and may use IPv6.
+      "--bind"
+      "0.0.0.0"
+    ]
+    ++ rclone.globalArgs
+  );
 
   mkExcludeArgs =
     op:
@@ -127,9 +119,7 @@ let
         ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${dst}
       ''
       + (
-        if op.cfg.operation == "mount" then
-          "exec ${lib.getExe pkgs.rclone} mount ${rcloneGlobalArgs} --vfs-cache-mode full --dir-cache-time 24h --poll-interval 30s --vfs-cache-max-age 2w --vfs-cache-max-size 50G --vfs-cache-min-free-space 20G ${excludeArgs} ${src} ${dst}"
-        else if op.cfg.operation == "copy" then
+        if op.cfg.operation == "copy" then
           "exec ${lib.getExe pkgs.rclone} copy ${rcloneGlobalArgs} --update ${excludeArgs} ${src} ${dst}"
         else if op.cfg.operation == "sync" then
           ''
@@ -179,24 +169,9 @@ let
       after = lib.optional needsNetwork "network-online.target" ++ lib.optional needsSeed seedUnit;
       requires = lib.optional needsSeed seedUnit;
       wants = lib.optional needsNetwork "network-online.target";
-      wantedBy = lib.optional (op.cfg.operation == "mount") "multi-user.target";
       serviceConfig = {
         User = "cjshearer";
         Group = "users";
-      }
-      // lib.optionalAttrs (op.cfg.operation == "mount") {
-        Environment = [
-          "PATH=/run/wrappers/bin/:$PATH"
-        ];
-        Type = "notify";
-        Restart = "always";
-        RestartSec = "5s";
-        TimeoutStopSec = "15s";
-        KillSignal = "SIGINT";
-        ExecStart = mkExecStart op;
-        ExecStop = "/run/wrappers/bin/fusermount -uz ${lib.escapeShellArg op.cfg.dst}";
-      }
-      // lib.optionalAttrs (op.cfg.operation != "mount") {
         Type = "oneshot";
         TimeoutStartSec = "infinity";
         ExecStart = mkExecStart op;
@@ -251,77 +226,96 @@ let
 
 in
 {
-  options.users.cjshearer.services.rclone.operations = lib.mkOption {
-    default = { };
+  options.users.cjshearer.services.rclone = {
+    globalArgs = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [
+        # Cap the request rate and fail stalled operations sooner: OneDrive throttles concurrent
+        # rclone processes, and a single stalled request holds the VFS lock and blocks all other
+        # lookups/reads while it retries.
+        "--tpslimit"
+        "10"
+        "--timeout"
+        "15s"
+        "--contimeout"
+        "10s"
+        "--low-level-retries"
+        "2"
+      ];
+      description = ''
+        Global rclone flags shared by every invocation. OneDrive operations add the IPv4 bind.
+      '';
+    };
 
-    type = lib.types.attrsOf (
-      lib.types.submodule (
-        { name, config, ... }: {
-          options = {
-            src = lib.mkOption {
-              type = lib.types.str;
-              description = "Source path (local or remote).";
+    operations = lib.mkOption {
+      default = { };
+
+      type = lib.types.attrsOf (
+        lib.types.submodule (
+          { name, config, ... }: {
+            options = {
+              src = lib.mkOption {
+                type = lib.types.str;
+                description = "Source path (local or remote).";
+              };
+              dst = lib.mkOption {
+                type = lib.types.str;
+                description = "Destination path (local or remote).";
+              };
+              enable = lib.mkEnableOption "rclone operation";
+              operation = lib.mkOption {
+                type = lib.types.enum [
+                  "copy"
+                  "bisync"
+                  "sync"
+                ];
+                default = "bisync";
+              };
+              interval = lib.mkOption {
+                type = lib.types.str;
+                default = "15m";
+              };
+              seed = lib.mkOption {
+                type = lib.types.bool;
+                default = true;
+                description = ''
+                  For a "sync" from a local source to a remote destination, copy the remote into
+                  the source with `--ignore-existing` before the first sync. The copy is resumable
+                  and never deletes local files. A marker records a completed seed; the periodic
+                  sync waits for this step.
+                '';
+              };
+              exclude = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                default = [ ];
+                description = ''
+                  Exclude paths matching these glob patterns (passed as `--exclude` flags).
+                  Applies to "copy", "bisync", and "sync" operations.
+                  To exclude a directory and all its contents, use a pattern like `dir/**`
+                  or `/dir/**`. To exclude only the directory entry itself (not its children),
+                  append a `/` separator, e.g. `dir/`.
+                '';
+              };
+              unitName = lib.mkOption {
+                type = lib.types.str;
+                description = "Systemd unit base name for this operation.";
+              };
             };
-            dst = lib.mkOption {
-              type = lib.types.str;
-              description = "Destination path (local or remote).";
-            };
-            enable = lib.mkEnableOption "rclone operation";
-            operation = lib.mkOption {
-              type = lib.types.enum [
-                "mount"
-                "copy"
-                "bisync"
-                "sync"
-              ];
-              default = "bisync";
-            };
-            interval = lib.mkOption {
-              type = lib.types.str;
-              default = "15m";
-            };
-            seed = lib.mkOption {
-              type = lib.types.bool;
-              default = true;
-              description = ''
-                For a "sync" from a local source to a remote destination, copy the remote into
-                the source with `--ignore-existing` before the first sync. The copy is resumable
-                and never deletes local files. A marker records a completed seed; the periodic
-                sync waits for this step.
-              '';
-            };
-            exclude = lib.mkOption {
-              type = lib.types.listOf lib.types.str;
-              default = [ ];
-              description = ''
-                Exclude paths matching these glob patterns (passed as `--exclude` flags).
-                Applies to "mount", "copy", and "bisync" operations.
-                To exclude a directory and all its contents, use a pattern like `dir/**`
-                or `/dir/**`. To exclude only the directory entry itself (not its children),
-                append a `/` separator, e.g. `dir/`.
-              '';
-            };
-            unitName = lib.mkOption {
-              type = lib.types.str;
-              description = "Systemd unit base name for this operation.";
-            };
-          };
-          config.unitName = lib.mkDefault "rclone-${name}-${config.operation}";
-        }
-      )
-    );
+            config.unitName = lib.mkDefault "rclone-${name}-${config.operation}";
+          }
+        )
+      );
+    };
   };
 
-  config = lib.mkIf (enabledOperations != [ ]) {
+  config = lib.mkIf (enabledOperations != [ ] || rclone.webdav.enable) {
 
     systemd.services =
       lib.listToAttrs (map mkService enabledOperations)
       // lib.listToAttrs (map mkSeedService seedOperations);
-    systemd.timers = lib.listToAttrs (
-      map mkTimer (lib.filter (op: op.cfg.operation != "mount") enabledOperations)
-    );
+    systemd.timers = lib.listToAttrs (map mkTimer enabledOperations);
 
-    # This assumes all operations use onedrive. If that changes, so should this configuration.
+    # This assumes the operations are onedrive. If that changes, so should this configuration.
     home-manager.users.cjshearer.programs.rclone = {
       enable = true;
       remotes.onedrive = {
@@ -353,12 +347,5 @@ in
       };
     };
 
-    # This assumes the operation is a mount, but in practice that will always be the case.
-    home-manager.users.cjshearer.xdg.userDirs = {
-      documents = "/mnt/onedrive/Documents";
-      music = "/mnt/onedrive/Music";
-      pictures = "/mnt/onedrive/Pictures";
-      videos = "/mnt/onedrive/Videos";
-    };
   };
 }
