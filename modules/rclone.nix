@@ -293,8 +293,9 @@ in
       };
     };
 
-    # This assumes the operation is a mount, but in practice that will always be the case.
-    home-manager.users.cjshearer.xdg.userDirs = {
+    home-manager.users.cjshearer.xdg.userDirs = lib.mkIf (
+      lib.any (op: op.cfg.operation == "mount") enabledOperations
+    ) {
       documents = "/mnt/onedrive/Documents";
       music = "/mnt/onedrive/Music";
       pictures = "/mnt/onedrive/Pictures";
