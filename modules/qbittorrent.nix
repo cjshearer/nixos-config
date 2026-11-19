@@ -4,6 +4,10 @@
   pkgs,
   ...
 }:
+let
+  qbitConfigUnit = config.users.cjshearer.services.rclone.operations.qbittorrent.unitName;
+  qbitSeedUnit = "${qbitConfigUnit}-seed";
+in
 lib.mkIf config.services.qbittorrent.enable {
   services.qbittorrent = {
     package = pkgs.qbittorrent-nox.overrideAttrs (old: {
@@ -40,12 +44,15 @@ lib.mkIf config.services.qbittorrent.enable {
 
   systemd.services.qbittorrent.serviceConfig.PrivateUsers = lib.mkForce false;
   systemd.services.qbittorrent.serviceConfig.ProtectHome = lib.mkForce false;
+  systemd.services.qbittorrent.after = lib.mkAfter [ "${qbitSeedUnit}.service" ];
+  systemd.services.qbittorrent.requires = lib.mkAfter [ "${qbitSeedUnit}.service" ];
 
   users.cjshearer.services.rclone.operations.qbittorrent = {
     src = "/home/cjshearer/.local/share/qBittorrent";
     dst = "onedrive:/app/qBittorrent";
     enable = true;
-    operation = "bisync";
+    operation = "sync";
+    seed = true;
   };
 
   users.cjshearer.services.rclone.operations.onedrive-uploads = {

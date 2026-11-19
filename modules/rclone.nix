@@ -70,11 +70,16 @@ let
     in
     "/home/cjshearer/.local/share/rclone-bisync/${name}-${hash}";
 
+  seedMarker = name: "/home/cjshearer/.local/state/rclone/${name}.seeded";
+
   flattenOperations = lib.mapAttrsToList (name: opCfg: {
     inherit name;
     cfg = opCfg;
   }) cfg;
   enabledOperations = lib.filter (op: op.cfg.enable) flattenOperations;
+  seedOperations = lib.filter (
+    op: op.cfg.seed && op.cfg.operation == "sync" && !isRemotePath op.cfg.src && isRemotePath op.cfg.dst
+  ) enabledOperations;
 
   # IPv6 on this host is unreliable (global addresses go deprecated while v6 connects to the
   # internet fail), so rclone's default IPv6 sockets black-hole and every request on them stalls
@@ -126,6 +131,10 @@ let
           "exec ${lib.getExe pkgs.rclone} mount ${rcloneGlobalArgs} --vfs-cache-mode full --dir-cache-time 24h --poll-interval 30s --vfs-cache-max-age 2w --vfs-cache-max-size 50G --vfs-cache-min-free-space 20G ${excludeArgs} ${src} ${dst}"
         else if op.cfg.operation == "copy" then
           "exec ${lib.getExe pkgs.rclone} copy ${rcloneGlobalArgs} --update ${excludeArgs} ${src} ${dst}"
+        else if op.cfg.operation == "sync" then
+          ''
+            exec ${lib.getExe pkgs.rclone} sync ${rcloneGlobalArgs} ${excludeArgs} ${src} ${dst}
+          ''
         else
           ''
             ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${workdir}
@@ -162,9 +171,13 @@ let
     let
       name = op.cfg.unitName;
       needsNetwork = isRemotePath op.cfg.src || isRemotePath op.cfg.dst;
+      needsSeed =
+        op.cfg.seed && op.cfg.operation == "sync" && !isRemotePath op.cfg.src && isRemotePath op.cfg.dst;
+      seedUnit = "${name}-seed.service";
     in
     lib.nameValuePair name {
-      after = lib.optional needsNetwork "network-online.target";
+      after = lib.optional needsNetwork "network-online.target" ++ lib.optional needsSeed seedUnit;
+      requires = lib.optional needsSeed seedUnit;
       wants = lib.optional needsNetwork "network-online.target";
       wantedBy = lib.optional (op.cfg.operation == "mount") "multi-user.target";
       serviceConfig = {
@@ -187,6 +200,40 @@ let
         Type = "oneshot";
         TimeoutStartSec = "infinity";
         ExecStart = mkExecStart op;
+      };
+    };
+
+  mkSeedService =
+    op:
+    let
+      src = lib.escapeShellArg op.cfg.src;
+      dst = lib.escapeShellArg op.cfg.dst;
+      excludeArgs = mkExcludeArgs op;
+      marker = seedMarker op.name;
+      markerDir = builtins.dirOf marker;
+    in
+    lib.nameValuePair "${op.cfg.unitName}-seed" {
+      after = [
+        "home-manager-cjshearer.service"
+        "network-online.target"
+      ];
+      wants = [ "network-online.target" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        User = "cjshearer";
+        Group = "users";
+        Type = "oneshot";
+        TimeoutStartSec = "infinity";
+        ExecStart = pkgs.writeShellScript "rclone-${op.name}-seed" ''
+          set -euo pipefail
+          marker=${lib.escapeShellArg marker}
+          if [ -e "$marker" ]; then
+            exit 0
+          fi
+          ${lib.getExe pkgs.rclone} copy --ignore-existing ${rcloneGlobalArgs} ${excludeArgs} ${dst} ${src}
+          ${pkgs.coreutils}/bin/mkdir -p ${lib.escapeShellArg markerDir}
+          ${pkgs.coreutils}/bin/touch "$marker"
+        '';
       };
     };
 
@@ -225,12 +272,23 @@ in
                 "mount"
                 "copy"
                 "bisync"
+                "sync"
               ];
               default = "bisync";
             };
             interval = lib.mkOption {
               type = lib.types.str;
               default = "15m";
+            };
+            seed = lib.mkOption {
+              type = lib.types.bool;
+              default = true;
+              description = ''
+                For a "sync" from a local source to a remote destination, copy the remote into
+                the source with `--ignore-existing` before the first sync. The copy is resumable
+                and never deletes local files. A marker records a completed seed; the periodic
+                sync waits for this step.
+              '';
             };
             exclude = lib.mkOption {
               type = lib.types.listOf lib.types.str;
@@ -256,7 +314,9 @@ in
 
   config = lib.mkIf (enabledOperations != [ ]) {
 
-    systemd.services = lib.listToAttrs (map mkService enabledOperations);
+    systemd.services =
+      lib.listToAttrs (map mkService enabledOperations)
+      // lib.listToAttrs (map mkSeedService seedOperations);
     systemd.timers = lib.listToAttrs (
       map mkTimer (lib.filter (op: op.cfg.operation != "mount") enabledOperations)
     );
