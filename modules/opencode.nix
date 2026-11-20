@@ -140,7 +140,7 @@
           };
         }
         // lib.optionalAttrs (osConfig.networking.hostName == "hermes") {
-          model = "github-copilot/gpt-6.1-sol";
+          model = "github-copilot/gpt-6.2-sol";
           agent = {
             general.model = "github-copilot/gpt-6-luna";
             explore.model = "github-copilot/gpt-6-luna";
