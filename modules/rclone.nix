@@ -67,12 +67,6 @@ let
   cfg = rclone.operations;
 
   isRemotePath = path: builtins.match "^[^/][^:]*:.*" path != null;
-  mkWorkDir =
-    name: src: dst:
-    let
-      hash = builtins.substring 0 8 (builtins.hashString "sha256" "${src}||${dst}");
-    in
-    "/home/cjshearer/.local/share/rclone-bisync/${name}-${hash}";
 
   seedMarker = name: "/home/cjshearer/.local/state/rclone/${name}.seeded";
 
@@ -109,10 +103,9 @@ let
     let
       src = lib.escapeShellArg op.cfg.src;
       dst = lib.escapeShellArg op.cfg.dst;
-      workdir = lib.escapeShellArg (mkWorkDir op.name op.cfg.src op.cfg.dst);
       excludeArgs = mkExcludeArgs op;
     in
-    pkgs.writeShellScript "rclone-bisync-${op.name}" (
+    pkgs.writeShellScript "rclone-${op.name}" (
       ''
         set -euo pipefail
         ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${src}
@@ -121,37 +114,9 @@ let
       + (
         if op.cfg.operation == "copy" then
           "exec ${lib.getExe pkgs.rclone} copy ${rcloneGlobalArgs} --update ${excludeArgs} ${src} ${dst}"
-        else if op.cfg.operation == "sync" then
-          ''
-            exec ${lib.getExe pkgs.rclone} sync ${rcloneGlobalArgs} ${excludeArgs} ${src} ${dst}
-          ''
         else
           ''
-            ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${workdir}
-
-            resync_args=()
-            recover_args=("--recover")
-            check_sync_args=("--check-sync=false")
-
-            # To ensure we download from the remote if the local copy is empty, we check if a
-            # previous resync has been performed by looking for a .lst file in the workdir.
-            if ! ${lib.getExe pkgs.findutils} ${workdir} -maxdepth 1 -name '*.lst' -print -quit | grep -q .; then
-              resync_args+=(--resync --resync-mode newer)
-              recover_args=()
-              check_sync_args=()
-            fi
-
-            exec ${lib.getExe pkgs.rclone} bisync \
-              ${rcloneGlobalArgs} \
-              "''${recover_args[@]}" \
-              --resilient \
-              --max-lock 10m \
-              --workdir ${workdir} \
-              ${excludeArgs} \
-              "''${check_sync_args[@]}" \
-              "''${resync_args[@]}" \
-              ${src} \
-              ${dst}
+            exec ${lib.getExe pkgs.rclone} sync ${rcloneGlobalArgs} ${excludeArgs} ${src} ${dst}
           ''
       )
     );
@@ -266,10 +231,9 @@ in
               operation = lib.mkOption {
                 type = lib.types.enum [
                   "copy"
-                  "bisync"
                   "sync"
                 ];
-                default = "bisync";
+                default = "copy";
               };
               interval = lib.mkOption {
                 type = lib.types.str;
@@ -290,7 +254,7 @@ in
                 default = [ ];
                 description = ''
                   Exclude paths matching these glob patterns (passed as `--exclude` flags).
-                  Applies to "copy", "bisync", and "sync" operations.
+                  Applies to "copy" and "sync" operations.
                   To exclude a directory and all its contents, use a pattern like `dir/**`
                   or `/dir/**`. To exclude only the directory entry itself (not its children),
                   append a `/` separator, e.g. `dir/`.
