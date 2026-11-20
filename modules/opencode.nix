@@ -113,6 +113,16 @@
           ```
         '';
 
+        programs.opencode.skills.quick-edit = ''
+          ---
+          name: quick-edit
+          description: Small edits without exploration or verification
+          ---
+
+          Read only the files the request names. Edit them directly, matching local style. Do not
+          run formatters, linters, or tests. Reply with the changed paths.
+        '';
+
         programs.opencode.settings = {
           provider = {
             openrouter = {
