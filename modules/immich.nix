@@ -40,7 +40,6 @@ lib.mkIf config.services.immich.enable {
   users.cjshearer.services.rclone.operations.immich = {
     src = immichLocalPath;
     dst = "onedrive:/app/immich";
-    enable = true;
     operation = "sync";
   };
 }

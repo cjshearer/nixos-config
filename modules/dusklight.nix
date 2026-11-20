@@ -11,7 +11,6 @@
     home-manager.users.cjshearer.home.packages = [ pkgs.dusklight ];
 
     users.cjshearer.services.rclone.operations.dusklight = {
-      enable = true;
       exclude = [
         "/*cache.db"
         "/logs/"

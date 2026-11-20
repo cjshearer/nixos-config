@@ -49,14 +49,12 @@ lib.mkIf config.services.qbittorrent.enable {
   users.cjshearer.services.rclone.operations.qbittorrent = {
     src = "/home/cjshearer/.local/share/qBittorrent";
     dst = "onedrive:/app/qBittorrent";
-    enable = true;
     operation = "sync";
   };
 
   users.cjshearer.services.rclone.operations.onedrive-uploads = {
     src = "/home/cjshearer/onedrive-uploads";
     dst = "onedrive:/";
-    enable = true;
     operation = "copy";
   };
 }

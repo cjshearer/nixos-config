@@ -53,11 +53,14 @@
 #   deprecated while v6 connects to the internet fail, so rclone's IPv6 sockets black-hole and
 #   stall every request until timeout. Binding to 0.0.0.0 sidesteps that, and shorter
 #   --timeout/--low-level-retries keep one stalled request from holding the VFS lock for minutes.
-# - #######: seed one-way syncs. A "sync" from a local source to a remote destination copies the
+# - 20f70ad: seed one-way syncs. A "sync" from a local source to a remote destination copies the
 #   remote into the source with `--ignore-existing` before the first run, so an empty local
 #   service directory cannot hide remote data. The seed is implicit and its unit is a read-only
 #   output that the periodic sync waits for. A marker makes the seed one-shot so later local
 #   changes are not re-seeded.
+# - #######: drop operation options every caller left at the same value. An operation is enabled
+#   by its presence, all timed operations share one cadence, and unit names derive from the
+#   operation name and type.
 {
   lib,
   pkgs,
@@ -65,26 +68,38 @@
   ...
 }:
 let
-  cfg = config.users.cjshearer.services.rclone.operations;
+  home = "/home/cjshearer";
+  rcloneBin = lib.getExe pkgs.rclone;
+  remoteName = "onedrive";
+
+  mountPoint = "/mnt/onedrive";
+  wrappers = "/run/wrappers/bin";
+  unmount = path: "${wrappers}/fusermount3 -uz ${lib.escapeShellArg path}";
+
+  dirCacheTime = "24h";
+  pollInterval = "30s";
+
+  # `--exclude` flags for a list of glob patterns.
+  excludeFlags =
+    patterns:
+    lib.concatMap (pattern: [
+      "--exclude"
+      pattern
+    ]) patterns;
 
   isRemotePath = path: builtins.match "^[^/][^:]*:.*" path != null;
-  mkWorkDir =
-    name: src: dst:
-    let
-      hash = builtins.substring 0 8 (builtins.hashString "sha256" "${src}||${dst}");
-    in
-    "/home/cjshearer/.local/share/rclone-bisync/${name}-${hash}";
 
   mkUnitName = name: operation: "rclone-${name}-${operation}";
   mkSeedUnitName = name: operation: "${mkUnitName name operation}-seed";
 
+  isMountOp = op: op.cfg.operation == "mount";
+
   isSeedOp = op: op.cfg.operation == "sync" && !isRemotePath op.cfg.src && isRemotePath op.cfg.dst;
 
-  flattenOperations = lib.mapAttrsToList (name: opCfg: {
+  operations = lib.mapAttrsToList (name: opCfg: {
     inherit name;
     cfg = opCfg;
-  }) cfg;
-  enabledOperations = lib.filter (op: op.cfg.enable) flattenOperations;
+  }) config.users.cjshearer.services.rclone.operations;
 
   # IPv6 on this host is unreliable (global addresses go deprecated while v6 connects to the
   # internet fail), so rclone's default IPv6 sockets black-hole and every request on them stalls
@@ -108,22 +123,18 @@ let
     "3"
   ];
 
-  mkExcludeArgs =
-    op:
-    let
-      inherit (op.cfg) exclude;
-    in
-    lib.optionalString (exclude != [ ]) (
-      lib.concatMapStringsSep " " (pattern: "--exclude ${lib.escapeShellArg pattern}") exclude
-    );
-
   mkExecStart =
     op:
     let
       src = lib.escapeShellArg op.cfg.src;
       dst = lib.escapeShellArg op.cfg.dst;
-      workdir = lib.escapeShellArg (mkWorkDir op.name op.cfg.src op.cfg.dst);
-      excludeArgs = mkExcludeArgs op;
+      workdir = lib.escapeShellArg (
+        let
+          hash = builtins.substring 0 8 (builtins.hashString "sha256" "${op.cfg.src}||${op.cfg.dst}");
+        in
+        "${home}/.local/share/rclone-bisync/${op.name}-${hash}"
+      );
+      excludeArgs = lib.escapeShellArgs (excludeFlags op.cfg.exclude);
     in
     if op.isSeed or false then
       let
@@ -143,21 +154,21 @@ let
       pkgs.writeShellScript "rclone-bisync-${op.name}" (
       ''
         set -euo pipefail
-        ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${src}
-        ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${dst}
+        ${rcloneBin} mkdir ${rcloneGlobalArgs} ${src}
+        ${rcloneBin} mkdir ${rcloneGlobalArgs} ${dst}
       ''
       + (
         if op.cfg.operation == "mount" then
-          "exec ${lib.getExe pkgs.rclone} mount ${rcloneGlobalArgs} --vfs-cache-mode full --dir-cache-time 24h --poll-interval 30s --vfs-cache-max-age 2w --vfs-cache-max-size 50G --vfs-cache-min-free-space 20G ${excludeArgs} ${src} ${dst}"
+          "exec ${rcloneBin} mount ${rcloneGlobalArgs} --vfs-cache-mode full --dir-cache-time ${dirCacheTime} --poll-interval ${pollInterval} --vfs-cache-max-age 2w --vfs-cache-max-size 50G --vfs-cache-min-free-space 20G ${excludeArgs} ${src} ${dst}"
         else if op.cfg.operation == "copy" then
-          "exec ${lib.getExe pkgs.rclone} copy ${rcloneGlobalArgs} --update ${excludeArgs} ${src} ${dst}"
+          "exec ${rcloneBin} copy ${rcloneGlobalArgs} --update ${excludeArgs} ${src} ${dst}"
         else if op.cfg.operation == "sync" then
           ''
-            exec ${lib.getExe pkgs.rclone} sync ${rcloneGlobalArgs} ${excludeArgs} ${src} ${dst}
+            exec ${rcloneBin} sync ${rcloneGlobalArgs} ${excludeArgs} ${src} ${dst}
           ''
         else
           ''
-            ${lib.getExe pkgs.rclone} mkdir ${rcloneGlobalArgs} ${workdir}
+            ${rcloneBin} mkdir ${rcloneGlobalArgs} ${workdir}
 
             resync_args=()
             recover_args=("--recover")
@@ -171,7 +182,7 @@ let
               check_sync_args=()
             fi
 
-            exec ${lib.getExe pkgs.rclone} bisync \
+            exec ${rcloneBin} bisync \
               ${rcloneGlobalArgs} \
               "''${recover_args[@]}" \
               --resilient \
@@ -196,32 +207,28 @@ let
     lib.nameValuePair
       (if isSeed then mkSeedUnitName op.name op.cfg.operation else mkUnitName op.name op.cfg.operation)
       {
-        after =
-          lib.optional needsNetwork "network-online.target"
-          ++ lib.optional needsSeed op.cfg.seedUnit;
+        after = lib.optional needsNetwork "network-online.target" ++ lib.optional needsSeed op.cfg.seedUnit;
         requires = lib.optional needsSeed op.cfg.seedUnit;
         wants = lib.optional needsNetwork "network-online.target";
-        wantedBy = lib.optional (isSeed || op.cfg.operation == "mount") "multi-user.target";
+        wantedBy = lib.optional (isSeed || isMountOp op) "multi-user.target";
         serviceConfig = {
           User = "cjshearer";
-          Group = "users";
+          ExecStart = mkExecStart op;
         }
-        // lib.optionalAttrs (op.cfg.operation == "mount") {
+        // lib.optionalAttrs (isMountOp op) {
           Environment = [
-            "PATH=/run/wrappers/bin/:$PATH"
+            "PATH=${wrappers}:$PATH"
           ];
           Type = "notify";
           Restart = "always";
           RestartSec = "5s";
           TimeoutStopSec = "15s";
           KillSignal = "SIGINT";
-          ExecStart = mkExecStart op;
-          ExecStop = "/run/wrappers/bin/fusermount -uz ${lib.escapeShellArg op.cfg.dst}";
+          ExecStop = unmount op.cfg.dst;
         }
-        // lib.optionalAttrs (op.cfg.operation != "mount") {
+        // lib.optionalAttrs (!isMountOp op) {
           Type = "oneshot";
           TimeoutStartSec = "infinity";
-          ExecStart = mkExecStart op;
         };
       };
 
@@ -231,9 +238,8 @@ let
       wantedBy = [ "timers.target" ];
       timerConfig = {
         OnBootSec = "1m";
-        OnUnitInactiveSec = op.cfg.interval;
+        OnUnitInactiveSec = "15m";
         RandomizedDelaySec = "1m";
-        AccuracySec = "1m";
       };
     };
 
@@ -254,7 +260,6 @@ in
               type = lib.types.str;
               description = "Destination path (local or remote).";
             };
-            enable = lib.mkEnableOption "rclone operation";
             operation = lib.mkOption {
               type = lib.types.enum [
                 "mount"
@@ -262,11 +267,6 @@ in
                 "bisync"
                 "sync"
               ];
-              default = "bisync";
-            };
-            interval = lib.mkOption {
-              type = lib.types.str;
-              default = "15m";
             };
             exclude = lib.mkOption {
               type = lib.types.listOf lib.types.str;
@@ -291,21 +291,19 @@ in
     );
   };
 
-  config = lib.mkIf (enabledOperations != [ ]) {
+  config = lib.mkIf (operations != [ ]) {
 
     systemd.services =
-      lib.listToAttrs (map mkService enabledOperations)
+      lib.listToAttrs (map mkService operations)
       // lib.listToAttrs (
-        map (op: mkService (op // { isSeed = true; })) (lib.filter isSeedOp enabledOperations)
+        map (op: mkService (op // { isSeed = true; })) (lib.filter isSeedOp operations)
       );
-    systemd.timers = lib.listToAttrs (
-      map mkTimer (lib.filter (op: op.cfg.operation != "mount") enabledOperations)
-    );
+    systemd.timers = lib.listToAttrs (map mkTimer (lib.filter (op: !isMountOp op) operations));
 
     # This assumes all operations use onedrive. If that changes, so should this configuration.
     home-manager.users.cjshearer.programs.rclone = {
       enable = true;
-      remotes.onedrive = {
+      remotes.${remoteName} = {
         config = {
           delta = true;
           drive_type = "personal";
@@ -318,29 +316,27 @@ in
           drive_id = ''
             $(
             tmp=$(mktemp)
-            ${lib.getExe pkgs.rclone} config dump --config "$configPath" \
-              | ${lib.getExe pkgs.jq} -r '.onedrive.drive_id // empty' > "$tmp"
+            ${rcloneBin} config dump --config "$configPath" \
+              | ${lib.getExe pkgs.jq} -r '.${remoteName}.drive_id // empty' > "$tmp"
             echo "$tmp"
             )'';
 
           token = ''
             $(
             tmp=$(mktemp)
-            ${lib.getExe pkgs.rclone} config dump --config "$configPath" \
-              | ${lib.getExe pkgs.jq} -r '.onedrive.token // empty' > "$tmp"
+            ${rcloneBin} config dump --config "$configPath" \
+              | ${lib.getExe pkgs.jq} -r '.${remoteName}.token // empty' > "$tmp"
             echo "$tmp"
             )'';
         };
       };
     };
 
-    home-manager.users.cjshearer.xdg.userDirs = lib.mkIf (
-      lib.any (op: op.cfg.operation == "mount") enabledOperations
-    ) {
-      documents = "/mnt/onedrive/Documents";
-      music = "/mnt/onedrive/Music";
-      pictures = "/mnt/onedrive/Pictures";
-      videos = "/mnt/onedrive/Videos";
+    home-manager.users.cjshearer.xdg.userDirs = lib.mkIf (lib.any isMountOp operations) {
+      documents = "${mountPoint}/Documents";
+      music = "${mountPoint}/Music";
+      pictures = "${mountPoint}/Pictures";
+      videos = "${mountPoint}/Videos";
     };
   };
 }

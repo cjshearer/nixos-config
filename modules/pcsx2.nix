@@ -11,7 +11,6 @@
     home-manager.users.cjshearer.home.packages = [ pkgs.pcsx2 ];
 
     users.cjshearer.services.rclone.operations.pcsx2 = {
-      enable = true;
       exclude = [
         "/cache/"
         "/logs/"

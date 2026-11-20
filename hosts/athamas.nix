@@ -48,7 +48,6 @@
     src = "onedrive:";
     dst = "/mnt/onedrive";
     exclude = [ "/Personal Vault/**" ];
-    enable = true;
     operation = "mount";
   };
 
