@@ -30,16 +30,8 @@ lib.mkIf config.services.qbittorrent.enable {
     };
   };
 
-  systemd.services.tailscaled-serve-qbittorrent = {
-    partOf = [ "qbittorrent.service" ];
-    requires = [ "tailscaled.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${config.services.tailscale.package}/bin/tailscale serve --service=svc:torrent ${builtins.toString config.services.qbittorrent.webuiPort}";
-      ExecStop = "${config.services.tailscale.package}/bin/tailscale serve drain svc:torrent";
-      RemainAfterExit = true;
-    };
-  };
+  services.tailscale.serve.services.torrent.endpoints."tcp:443" =
+    "http://127.0.0.1:${builtins.toString config.services.qbittorrent.webuiPort}";
 
   systemd.services.qbittorrent.serviceConfig.PrivateUsers = lib.mkForce false;
   systemd.services.qbittorrent.serviceConfig.ProtectHome = lib.mkForce false;

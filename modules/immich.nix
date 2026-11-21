@@ -24,18 +24,8 @@ lib.mkIf config.services.immich.enable {
 
   systemd.services.immich-server.after = [ immichSeedUnit ];
   systemd.services.immich-server.requires = [ immichSeedUnit ];
-  systemd.services.immich-server.wants = [ "tailscaled-serve-immich.service" ];
-
-  systemd.services.tailscaled-serve-immich = {
-    partOf = [ "immich-server.service" ];
-    requires = [ "tailscaled.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${config.services.tailscale.package}/bin/tailscale serve --service=svc:photos ${builtins.toString config.services.immich.port}";
-      ExecStop = "${config.services.tailscale.package}/bin/tailscale serve drain svc:photos";
-      RemainAfterExit = true;
-    };
-  };
+  services.tailscale.serve.services.photos.endpoints."tcp:443" =
+    "http://127.0.0.1:${builtins.toString config.services.immich.port}";
 
   users.cjshearer.services.rclone.operations.immich = {
     src = immichLocalPath;
