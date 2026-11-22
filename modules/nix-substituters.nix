@@ -2,6 +2,7 @@
   config,
   lib,
   ncro,
+  pkgs,
   self,
   ...
 }:
@@ -9,7 +10,12 @@
   imports = [ ncro.nixosModules.default ];
 
   # We expose the local Nix store as an HTTP binary cache so other tailscale hosts can pull from us.
-  services.nix-serve.enable = config.services.tailscale.enable;
+  services.nix-serve = {
+    enable = config.services.tailscale.enable;
+    # The default nix-serve package restart-loops because it depends on
+    # Nix::Config, which was dropped along with nix-perl in Nix 2.35.
+    package = pkgs.nix-serve-ng;
+  };
 
   # Because Nix requests packages from substituters sequentially, it can take up to
   # `M * connection-timeout` seconds to begin downloading packages using the built-in substituters
